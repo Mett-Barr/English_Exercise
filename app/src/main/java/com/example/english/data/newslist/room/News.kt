@@ -1,4 +1,4 @@
-package com.example.english.data.newslist
+package com.example.english.data.newslist.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -17,6 +17,4 @@ data class News(
 
     @ColumnInfo(name = "tag")
     var tag: String,
-
-
 )

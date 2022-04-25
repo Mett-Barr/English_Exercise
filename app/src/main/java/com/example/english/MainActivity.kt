@@ -17,18 +17,17 @@ import androidx.lifecycle.lifecycleScope
 import com.example.english.article.*
 import com.example.english.stringconverter.StringConverter
 import com.example.english.ui.components.CustomTextField
-import com.example.english.ui.page.Article
-import com.example.english.ui.page.MainPage
-import com.example.english.ui.page.TestPage01
-import com.example.english.ui.page.TestPast
+import com.example.english.ui.page.*
 import com.example.english.ui.theme.EnglishTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,11 +41,8 @@ class MainActivity : ComponentActivity() {
 //                    TestPage01(list = viewModel.list.value)
 //                    CustomTextField()
 
-                    var  list = listOf("123")
-                    repeat(30) {
-                        list = list.plus("$it")
-                    }
-                    MainPage(list)
+//                    MainPage(viewModel)
+                    InsertPage()
                 }
             }
         }
@@ -56,6 +52,8 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             susInit()
         }
+
+//        viewModel.roomTest()
     }
 
     private fun init() {
@@ -81,10 +79,6 @@ class MainActivity : ComponentActivity() {
 //            File(this@MainActivity.filesDir.path + "/default.txt").forEachLine {
 //                Log.d("!!!", "susInit: $it")
 //            }
-
-            val list =
-                File(this@MainActivity.filesDir.path + "/" + TEST_FILE_NAME).reader().readLines()
-            viewModel.list.value = list
         }
     }
 }
