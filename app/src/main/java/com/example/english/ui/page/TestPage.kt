@@ -3,19 +3,20 @@ package com.example.english.ui.page
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.Card
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
@@ -96,4 +97,47 @@ fun TestPast() {
             keyboardActions = KeyboardActions()
         )
     }
+}
+
+@Composable
+fun TestPage2() {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp)) {
+            TextField(value = "123",
+                onValueChange = {},
+                shape = RoundedCornerShape(8.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.DarkGray,
+                    focusedIndicatorColor = Color.Transparent,
+                    focusedLabelColor = Color.Transparent,
+                    unfocusedLabelColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                modifier = Modifier.align(Alignment.Center))
+        }
+    }
+}
+
+@Composable
+fun TestTextField(
+    textFieldValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE
+) {
+    TextField(value = textFieldValue,
+        onValueChange = onValueChange,
+        shape = RoundedCornerShape(8.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.DarkGray,
+            focusedIndicatorColor = Color.Transparent,
+            focusedLabelColor = Color.Transparent,
+            unfocusedLabelColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        maxLines = maxLines,
+        modifier = modifier
+    )
 }

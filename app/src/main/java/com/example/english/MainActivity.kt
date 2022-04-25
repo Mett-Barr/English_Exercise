@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
 
 //                    MainPage(viewModel)
                     InsertPage()
+//                    TestPage2()
                 }
             }
         }

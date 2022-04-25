@@ -7,30 +7,29 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun InsertPage() {
     Column(modifier = Modifier.fillMaxSize()) {
 
         var title by remember {
-            mutableStateOf(
-                "123\n" +
-                        "  234\n" +
-                        "  34545"
-            )
+            mutableStateOf(TextFieldValue(text = "123\n" + "  234\n" + "  34545"))
         }
 
         var content by remember {
             mutableStateOf("")
         }
 
-        TextField(
-            value = title, onValueChange = { title = it }, maxLines = 5, modifier = Modifier
+        TestTextField(
+            textFieldValue = title, onValueChange = {title = it}, maxLines = 5, modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
         )
         TextField(
-            value = content, onValueChange = { content = it}, modifier = Modifier
+            value = content, onValueChange = { content = it }, modifier = Modifier
                 .weight(1F)
                 .fillMaxSize()
         )
