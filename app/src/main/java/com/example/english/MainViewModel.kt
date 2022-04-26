@@ -1,15 +1,14 @@
 package com.example.english
 
-import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.english.data.newslist.Repository
-import com.example.english.data.newslist.room.News
-import com.example.english.data.newslist.room.NewsObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,6 +16,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
+
+    var textFieldValue by mutableStateOf(TextFieldValue("123"))
 
     val list = repository.newsList()
 

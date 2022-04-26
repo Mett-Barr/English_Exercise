@@ -2,7 +2,6 @@ package com.example.english
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -16,13 +15,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import com.example.english.article.*
 import com.example.english.stringconverter.StringConverter
-import com.example.english.ui.components.CustomTextField
-import com.example.english.ui.page.*
+import com.example.english.ui.components.FlatTextField
+import com.example.english.ui.page.InsertPage
 import com.example.english.ui.theme.EnglishTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -42,8 +40,8 @@ class MainActivity : ComponentActivity() {
 //                    CustomTextField()
 
 //                    MainPage(viewModel)
-                    InsertPage()
-//                    TestPage2()
+                    InsertPage(viewModel)
+//                    FlatTextField(viewModel.textFieldValue) { viewModel.textFieldValue = it }
                 }
             }
         }
