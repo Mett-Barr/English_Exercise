@@ -17,6 +17,7 @@ class MainViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
+    // text input (testing)
     var textFieldValue by mutableStateOf(TextFieldValue("123"))
 
     val list = repository.newsList()

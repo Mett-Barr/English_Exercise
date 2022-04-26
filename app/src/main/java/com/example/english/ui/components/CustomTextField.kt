@@ -16,8 +16,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FlatTextField(
     modifier: Modifier = Modifier,
-    textFieldValue: TextFieldValue,
     maxLines: Int = Int.MAX_VALUE,
+    textLabel: String = "",
+    textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit
 ) {
     val context = LocalContext.current
@@ -26,22 +27,27 @@ fun FlatTextField(
     }
     Card(modifier = Modifier
         .fillMaxWidth()
-        .wrapContentHeight()
-        .padding(8.dp)
-        .clip(RoundedCornerShape(8.dp))
+//        .wrapContentHeight()
+//        .padding(8.dp)
         .background(MaterialTheme.colors.background)
-        .then(modifier),
+        .then(modifier)
+        .clip(RoundedCornerShape(8.dp)),
         elevation = 0.dp
     ) {
+//        val label = @Composable { Text(textLabel) }
         TextField(
             value = textFieldValue,
             onValueChange = onValueChange,
-            Modifier.fillMaxWidth().background(Color.Transparent),
+            Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent),
             colors = TextFieldDefaults.textFieldColors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
             ),
-            maxLines = maxLines
+            maxLines = maxLines,
+            shape = RoundedCornerShape(0.dp),
+            placeholder = @Composable { Text(text = textLabel) }
         )
     }
 }
