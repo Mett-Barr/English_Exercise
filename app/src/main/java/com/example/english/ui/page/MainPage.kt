@@ -44,7 +44,7 @@ fun MainScreen(viewModel: MainViewModel) {
             InsertPage(viewModel = viewModel, navController = navController)
         }
         composable(MainRoute.News.route){
-            NewsArticle(viewModel = viewModel)
+            NewsArticlePage(viewModel = viewModel)
         }
     }
 }

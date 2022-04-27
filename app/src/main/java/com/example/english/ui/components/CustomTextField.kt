@@ -51,3 +51,13 @@ fun FlatTextField(
         )
     }
 }
+
+@Composable
+fun SimpleTextField(
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
+    textLabel: String = "",
+    textFieldValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit) {
+    TextField(value = textFieldValue, onValueChange = onValueChange)
+}
