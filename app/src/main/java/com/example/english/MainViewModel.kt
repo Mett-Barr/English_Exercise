@@ -20,7 +20,13 @@ class MainViewModel @Inject constructor(
     // text input (testing)
     var textFieldValue by mutableStateOf(TextFieldValue("123"))
 
+    var draftTitle by mutableStateOf(TextFieldValue(""))
+    var draftContent by mutableStateOf(TextFieldValue(""))
+
     val list = repository.newsList()
+
+
+    var animTest by mutableStateOf(false)
 
     val roomSize: Flow<Int> = repository.getSize()
 

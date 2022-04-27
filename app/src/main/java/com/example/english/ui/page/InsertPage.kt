@@ -9,37 +9,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.OperationButton
 import com.example.english.ui.theme.Typography
 
 @Composable
-fun InsertPage(viewModel: MainViewModel) {
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
+fun InsertPage(viewModel: MainViewModel, navController: NavController) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(horizontal = 8.dp)) {
 
-        Text("News", style = Typography.h4, textAlign = TextAlign.Center, modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp, bottom = 4.dp))
+        Text(
+            "News",
+            style = Typography.h4,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 8.dp, bottom = 4.dp)
+        )
 
         // Title
         FlatTextField(
             modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
-            textFieldValue = viewModel.textFieldValue,
+            textFieldValue = viewModel.draftTitle,
             maxLines = 5,
             textLabel = "Title:"
-        ) { viewModel.textFieldValue = it }
+        ) { viewModel.draftTitle = it }
 
         // Content
         FlatTextField(
-            textFieldValue = viewModel.textFieldValue,
+            textFieldValue = viewModel.draftContent,
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1F)
                 .padding(top = 4.dp, bottom = 4.dp),
             textLabel = "Content:"
-        ) { viewModel.textFieldValue = it }
+        ) { viewModel.draftContent = it }
 
 
-        OperationButton()
+        OperationButton(
+            clickOK = {
+                navController.popBackStack()
+            },
+            clickCancel = {
+                navController.popBackStack()
+            }
+        )
     }
 }
 

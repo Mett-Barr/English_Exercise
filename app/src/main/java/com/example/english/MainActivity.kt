@@ -17,6 +17,7 @@ import com.example.english.article.*
 import com.example.english.stringconverter.StringConverter
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.page.InsertPage
+import com.example.english.ui.page.MainScreen
 import com.example.english.ui.theme.EnglishTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.coroutineScope
@@ -39,8 +40,8 @@ class MainActivity : ComponentActivity() {
 //                    TestPage01(list = viewModel.list.value)
 //                    CustomTextField()
 
-//                    MainPage(viewModel)
-                    InsertPage(viewModel)
+                    MainScreen(viewModel)
+//                    InsertPage(viewModel)
 //                    FlatTextField(viewModel.textFieldValue) { viewModel.textFieldValue = it }
                 }
             }
@@ -81,6 +82,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
 
 @Composable
 fun Greeting(name: String) {
