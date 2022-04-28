@@ -36,7 +36,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = MainRoute.Main.route) {
+    NavHost(navController = navController, startDestination = MainRoute.News.route) {
         composable(MainRoute.Main.route) {
             MainPage(list = list, navController)
         }

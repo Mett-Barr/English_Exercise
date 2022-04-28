@@ -1,12 +1,10 @@
 package com.example.english.ui.page
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -33,14 +31,14 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
         // Title
         FlatTextField(
             modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
-            textFieldValue = viewModel.draftTitle,
+            value = viewModel.draftTitle,
             maxLines = 5,
             textLabel = "Title:"
         ) { viewModel.draftTitle = it }
 
         // Content
         FlatTextField(
-            textFieldValue = viewModel.draftContent,
+            value = viewModel.draftContent,
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1F)

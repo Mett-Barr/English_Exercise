@@ -18,38 +18,25 @@ fun FlatTextField(
     modifier: Modifier = Modifier,
     maxLines: Int = Int.MAX_VALUE,
     textLabel: String = "",
-    textFieldValue: TextFieldValue,
+    value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit
 ) {
-    val context = LocalContext.current
-    var text by remember {
-        mutableStateOf("1\n2\n3\n4")
-    }
-    Card(modifier = Modifier
-        .fillMaxWidth()
-//        .wrapContentHeight()
-//        .padding(8.dp)
-        .background(MaterialTheme.colors.background)
-        .then(modifier)
-        .clip(RoundedCornerShape(8.dp)),
-        elevation = 0.dp
-    ) {
-//        val label = @Composable { Text(textLabel) }
-        TextField(
-            value = textFieldValue,
-            onValueChange = onValueChange,
-            Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            maxLines = maxLines,
-            shape = RoundedCornerShape(0.dp),
-            placeholder = @Composable { Text(text = textLabel) }
-        )
-    }
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)
+            .then(modifier)
+            .clip(RoundedCornerShape(8.dp)),
+        colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
+        maxLines = maxLines,
+        shape = RoundedCornerShape(0.dp),
+        placeholder = @Composable { Text(text = textLabel) }
+    )
 }
 
 @Composable
@@ -57,7 +44,19 @@ fun SimpleTextField(
     modifier: Modifier = Modifier,
     maxLines: Int = Int.MAX_VALUE,
     textLabel: String = "",
-    textFieldValue: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit) {
-    TextField(value = textFieldValue, onValueChange = onValueChange)
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier
+            .background(Color.Transparent)
+            .then(modifier),
+        colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            backgroundColor = Color.Transparent
+        ),
+        shape = RoundedCornerShape(0.dp),)
 }
