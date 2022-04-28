@@ -16,5 +16,5 @@ data class News(
     var caption: String = "No caption",
 
     @ColumnInfo(name = "tag")
-    var tag: String,
+    var tag: String = "",
 )

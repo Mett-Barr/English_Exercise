@@ -16,5 +16,5 @@ interface NewsDao {
     fun getSize(): Flow<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addNews(news: News)
+    suspend fun addNews(news: News): Long
 }

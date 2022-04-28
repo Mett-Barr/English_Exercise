@@ -18,7 +18,5 @@ class DefaultRepository(private val dao: NewsDao) : Repository {
         return false
     }
 
-    override suspend fun addNews(news: News) {
-        dao.addNews(news)
-    }
+    override suspend fun addNews(news: News): Long = dao.addNews(news)
 }

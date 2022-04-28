@@ -1,6 +1,8 @@
 package com.example.english.ui.page
 
+import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,46 +16,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.english.MainViewModel
+import com.example.english.ui.navigation.MainRoute
 import com.example.english.data.newslist.room.News
 import com.example.english.ui.theme.Typography
 
-sealed class MainRoute(val route: String) {
-    object Main : MainRoute("MainPage")
-    object Insert : MainRoute("InsertPage")
-    object News : MainRoute("NewsPage")
-}
-
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
+fun MainPage(viewModel: MainViewModel, navController: NavController) {
+
+    val context = LocalContext.current
 
     val list by viewModel.list.collectAsState(initial = emptyList())
 
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = MainRoute.News.route) {
-        composable(MainRoute.Main.route) {
-            MainPage(list = list, navController)
-        }
-        composable(MainRoute.Insert.route) {
-            InsertPage(viewModel = viewModel, navController = navController)
-        }
-        composable(MainRoute.News.route){
-            NewsArticlePage(viewModel = viewModel)
-        }
-    }
-}
-
-@Composable
-fun MainPage(list: List<News>, navController: NavController) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(MainRoute.News.route) }) {
+            FloatingActionButton(onClick = { navController.navigate(MainRoute.Insert.route) }) {
                 Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
             }
         },
@@ -70,18 +50,22 @@ fun MainPage(list: List<News>, navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(list) {
-                NewsItem(it)
+                NewsItem(it, viewModel, navController, context)
             }
         }
     }
 }
 
 @Composable
-fun NewsItem(news: News) {
+fun NewsItem(news: News, viewModel: MainViewModel, navController: NavController, context: Context) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
+            .clickable {
+                navController.navigate(MainRoute.News.route)
+                viewModel.currentNews(news, context)
+            }
     ) {
         Row {
             Column(
@@ -90,7 +74,7 @@ fun NewsItem(news: News) {
                     .padding(8.dp)
             ) {
                 Text(
-                    text = news.title + (10..99).random().toString(),
+                    text = news.title,
                     maxLines = 2,
                     style = Typography.h5
                 )
