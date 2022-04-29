@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
 import com.example.english.data.newslist.room.NewsObject
+import com.example.english.stringconverter.StringConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -41,8 +42,10 @@ class MainViewModel @Inject constructor(
     var currentTitle by mutableStateOf("Title")
 
     //    var currentContent by mutableStateOf(listOf(""))
-    var currentContent = mutableStateListOf<String>()
-    var currentContentCn = mutableStateListOf<String>()
+    var currentContent = mutableStateListOf<TextFieldValue>()
+    var currentContentCn = mutableStateListOf<TextFieldValue>()
+//    var currentContent = mutableStateListOf<String>()
+//    var currentContentCn = mutableStateListOf<String>()
 
     fun currentNews(news: News, context: Context) {
         currentFileName = FILE_NAME + news.id.toString()
@@ -52,22 +55,8 @@ class MainViewModel @Inject constructor(
     }
 
 
-    var animTest by mutableStateOf(false)
-
-    val roomSize: Flow<Int> = repository.getSize()
-
-    var newsListIsEmpty = repository.isEmpty()
-
-    fun roomTest() {
-        viewModelScope.launch {
-        }
-    }
-
 
     /** Repository operation */
-
-//    var currentNews = NewsObject.blankNews
-
     // Insert
     fun addNews(context: Context) {
         viewModelScope.launch { suspendAddNews(context) }
@@ -86,24 +75,15 @@ class MainViewModel @Inject constructor(
     }
 
 
-    /** txt operation */
-
+    /** File operation */
     private fun addFile(fileName: String, fileNameCn: String, context: Context) {
         val fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)
-//        fos.write(draftTitle.text.toByteArray())
-        fos.write(draftContent.text.toByteArray())
+        val list = StringConverter().stringToList(draftContent.text)
+        list.forEach { fos.write(it.toByteArray()) }
         fos.close()
 
-
         val fosCn = context.openFileOutput(fileNameCn, Context.MODE_PRIVATE)
-        val listSize = draftContent.text.lines().size
-        repeat(listSize) {
-            fosCn.write("\n".toByteArray())
-        }
-//        fosCn.write(listSize.toString().toByteArray())
-
-//        fosCn.write(draftTitle.text.toByteArray())
-//        fosCn.write(draftContent.text.toByteArray())
+        repeat(list.size) { fosCn.write("\n".toByteArray())}
         fosCn.close()
     }
 
@@ -111,35 +91,31 @@ class MainViewModel @Inject constructor(
         val fos = context.openFileInput(fileName)
         val reader = BufferedReader(InputStreamReader(fos))
         val tmpList = reader.readLines()
-//        currentContent = reader.readLines().toMutableStateList()
+        currentContent = emptyList<TextFieldValue>().toMutableStateList()
         tmpList.forEach {
-//            if (it != "") {
-//            }
-            currentContent.add(it)
+            currentContent.add(TextFieldValue(it))
         }
+//        currentContent = tmpList.toMutableStateList()
 
         val fosCn = context.openFileInput(fileNameCn)
         val readerCn = BufferedReader(InputStreamReader(fosCn))
         val tmpListCn = readerCn.readLines()
-//        currentContent = reader.readLines().toMutableStateList()
-//        currentContentCn.add("CN")
+        currentContentCn = emptyList<TextFieldValue>().toMutableStateList()
         tmpListCn.forEach {
-//            if (it != "") {
-//            }
-                currentContentCn.add(it)
+            currentContentCn.add(TextFieldValue(it))
         }
-
+//        currentContentCn = tmpListCn.toMutableStateList()
     }
 
-//    private fun fileParagraphs()
+    private fun saveFile(fileName: String, fileNameCn: String, context: Context) {
+        val fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)
+        val list = StringConverter().stringToList(draftContent.text)
+        list.forEach { fos.write(it.toByteArray()) }
+        fos.close()
+    }
 
 
-//
-//    fun roomTest() {
-//        viewModelScope.launch {
-//            repeat(3) { repository.addNews(NewsObject.news) }
-//            newsListIsEmpty.value  = repository.isEmpty()
-//            Log.d("!!!", "roomTest: ${newsListIsEmpty.value}")
-//        }
-//    }
+
+    /** Navigation */
+//    fun
 }

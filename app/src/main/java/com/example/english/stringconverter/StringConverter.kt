@@ -10,17 +10,28 @@ class StringConverter {
     fun stringToListNull(string: String) {
         val list = mutableListOf<String>()
         list.addAll(string.split("\n"))
-        list.removeAll(listOf("\n"))
-        list.removeAll(listOf(" "))
-        Log.d("!!!", "stringToList: $list")
+//        list.removeAll(listOf("\n"))
+//        list.removeAll(listOf(" "))
+//        Log.d("!!!", "stringToList: $list")
     }
 
     fun stringToList(string: String): List<String> {
         val list = mutableListOf<String>()
-        list.addAll(string.split("\n"))
-        list.removeAll(listOf("\n"))
+        string.split("\n").forEach {
+//            if (it != "\n" && it != "") list.add(it.plus("\n"))
+            if (it.isNotBlank()) list.add(it.plus("\n"))
+        }
+//        list.removeAll(listOf("\n"))
         Log.d("!!!", "stringToList: $list")
         return list.toList()
+    }
+
+    fun removeBlank(string: String): String {
+        var noBlankString = ""
+        string.split("\n").forEach {
+            if (it.isNotBlank()) noBlankString += it
+        }
+        return noBlankString
     }
 
     fun getArticle(string: String): String {

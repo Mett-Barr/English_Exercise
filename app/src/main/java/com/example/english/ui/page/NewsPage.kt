@@ -23,24 +23,16 @@ import com.example.english.ui.components.IconTemplate
 @Composable
 fun NewsArticlePage(viewModel: MainViewModel, title: String) {
 
-    var painter by remember { mutableStateOf(R.drawable.arrow_more) }
-
     fun getRid(boolean: Boolean): Int = if (boolean) R.drawable.arrow_less else R.drawable.arrow_more
-
-    var paragraphs = viewModel.currentContent
 
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(8.dp)
     ) {
         item {
-            Text(text = title)
+            Text(text = viewModel.currentContent.size.toString())
         }
         itemsIndexed(viewModel.currentContent) { index, paragraphs ->
-
-//            var paragraph by remember {
-//                mutableStateOf(paragraphs)
-//            }
 
             var openState by remember {
                 mutableStateOf(false)
@@ -56,15 +48,15 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String) {
                 Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)) {
 
                     FlatTextField(
-                        value = TextFieldValue(paragraphs),
-                        onValueChange = { viewModel.currentContent[index] = it.text },
+                        value = paragraphs,
+                        onValueChange = { viewModel.currentContent[index] = it },
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedVisibility(visible = openState) {
                         FlatTextField(
-                            value = TextFieldValue(viewModel.currentContentCn[index]),
-                            onValueChange = { viewModel.currentContentCn[index] = it.text },
+                            value = viewModel.currentContentCn[index],
+                            onValueChange = { viewModel.currentContentCn[index] = it },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 8.dp)
@@ -74,18 +66,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Spacer(modifier = Modifier.weight(1F))
 
-
                         IconTemplate(painter = painterResource(id = R.drawable.words),
                             onClick = { })
                         IconTemplate(painter = painterResource(id = R.drawable.edit), onClick = { })
-
                         AnimatedContent(targetState = openState) {
                             IconTemplate(painter = painterResource(id = getRid(it)), onClick = {
-//                                viewModel.animTest = !viewModel.animTest
                                 openState = !openState
-//                                painter =
-//                                    if (openState) R.drawable.arrow_less
-//                                    else R.drawable.arrow_more
                             })
                         }
                     }
