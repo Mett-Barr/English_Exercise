@@ -1,11 +1,7 @@
 package com.example.english
 
 import android.content.Context
-import android.content.Intent
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,6 +16,7 @@ import java.io.InputStreamReader
 import javax.inject.Inject
 
 const val FILE_NAME = "News_"
+const val FILE_NAME_CN = "News_CN_"
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -37,22 +34,22 @@ class MainViewModel @Inject constructor(
     val list = repository.newsList()
 
 
-
     /** current news */
-    var currentFileName by mutableStateOf(FILE_NAME + "0")
+    private var currentFileName by mutableStateOf(FILE_NAME + "0")
+    var currentFileNameCn by mutableStateOf(FILE_NAME_CN + "0")
+
     var currentTitle by mutableStateOf("Title")
 
     //    var currentContent by mutableStateOf(listOf(""))
-    var currentContent = mutableListOf<String>()
-        private set
+    var currentContent = mutableStateListOf<String>()
+    var currentContentCn = mutableStateListOf<String>()
 
     fun currentNews(news: News, context: Context) {
         currentFileName = FILE_NAME + news.id.toString()
+        currentFileNameCn = FILE_NAME_CN + news.id.toString()
         currentTitle = news.title
-        getFile(currentFileName, context)
+        getFile(currentFileName, currentFileNameCn, context)
     }
-
-
 
 
     var animTest by mutableStateOf(false)
@@ -82,26 +79,59 @@ class MainViewModel @Inject constructor(
         val caption = draftContent.text.split("\n")[0]
         val id = repository.addNews(News(0, draftTitle.text, caption))
         val fileName = FILE_NAME + id.toString()
+        val fileNameCn = FILE_NAME_CN + id.toString()
 
         // add file
-        addFile(fileName, context)
+        addFile(fileName, fileNameCn, context)
     }
 
 
     /** txt operation */
 
-    private fun addFile(fileName: String, context: Context) {
+    private fun addFile(fileName: String, fileNameCn: String, context: Context) {
         val fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)
-        fos.write(draftTitle.text.toByteArray())
+//        fos.write(draftTitle.text.toByteArray())
         fos.write(draftContent.text.toByteArray())
         fos.close()
+
+
+        val fosCn = context.openFileOutput(fileNameCn, Context.MODE_PRIVATE)
+        val listSize = draftContent.text.lines().size
+        repeat(listSize) {
+            fosCn.write("\n".toByteArray())
+        }
+//        fosCn.write(listSize.toString().toByteArray())
+
+//        fosCn.write(draftTitle.text.toByteArray())
+//        fosCn.write(draftContent.text.toByteArray())
+        fosCn.close()
     }
 
-    private fun getFile(fileName: String, context: Context) {
+    private fun getFile(fileName: String, fileNameCn: String, context: Context) {
         val fos = context.openFileInput(fileName)
         val reader = BufferedReader(InputStreamReader(fos))
-        currentContent = reader.readLines().toMutableList()
+        val tmpList = reader.readLines()
+//        currentContent = reader.readLines().toMutableStateList()
+        tmpList.forEach {
+//            if (it != "") {
+//            }
+            currentContent.add(it)
+        }
+
+        val fosCn = context.openFileInput(fileNameCn)
+        val readerCn = BufferedReader(InputStreamReader(fosCn))
+        val tmpListCn = readerCn.readLines()
+//        currentContent = reader.readLines().toMutableStateList()
+//        currentContentCn.add("CN")
+        tmpListCn.forEach {
+//            if (it != "") {
+//            }
+                currentContentCn.add(it)
+        }
+
     }
+
+//    private fun fileParagraphs()
 
 
 //

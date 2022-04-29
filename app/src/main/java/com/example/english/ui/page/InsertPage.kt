@@ -10,6 +10,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
+import com.example.english.stringconverter.StringConverter
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.OperationButton
 import com.example.english.ui.theme.Typography
@@ -54,6 +55,7 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
         OperationButton(
             clickOK = {
                 viewModel.addNews(context)
+                StringConverter().stringToListNull(viewModel.draftContent.text)
                 navController.popBackStack()
             },
             clickCancel = {

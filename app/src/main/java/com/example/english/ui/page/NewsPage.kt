@@ -63,8 +63,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String) {
 
                     AnimatedVisibility(visible = openState) {
                         FlatTextField(
-                            value = viewModel.draftContent,
-                            onValueChange = { viewModel.draftContent = it },
+                            value = TextFieldValue(viewModel.currentContentCn[index]),
+                            onValueChange = { viewModel.currentContentCn[index] = it.text },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 8.dp)

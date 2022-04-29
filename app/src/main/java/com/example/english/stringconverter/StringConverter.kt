@@ -7,6 +7,22 @@ import java.io.InputStreamReader
 
 class StringConverter {
 
+    fun stringToListNull(string: String) {
+        val list = mutableListOf<String>()
+        list.addAll(string.split("\n"))
+        list.removeAll(listOf("\n"))
+        list.removeAll(listOf(" "))
+        Log.d("!!!", "stringToList: $list")
+    }
+
+    fun stringToList(string: String): List<String> {
+        val list = mutableListOf<String>()
+        list.addAll(string.split("\n"))
+        list.removeAll(listOf("\n"))
+        Log.d("!!!", "stringToList: $list")
+        return list.toList()
+    }
+
     fun getArticle(string: String): String {
 
 
