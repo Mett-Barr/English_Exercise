@@ -22,7 +22,7 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(horizontal = 8.dp)) {
+        .systemBarsPadding()) {
 
         Text(
             "News",

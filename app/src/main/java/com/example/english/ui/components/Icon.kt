@@ -14,11 +14,11 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun IconTemplate(
+fun ClickableIcon(
+    modifier: Modifier,
     imageVector: ImageVector,
     contentDescription: String? = null,
-    onClick: () -> Unit,
-    modifier: Modifier,
+    onClick: () -> Unit = {},
 ) {
     Icon(
         imageVector = imageVector,
@@ -34,11 +34,11 @@ fun IconTemplate(
 }
 
 @Composable
-fun IconTemplate(
+fun ClickableIcon(
+    modifier: Modifier = Modifier,
     painter: Painter,
     contentDescription: String? = null,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     Icon(
         painter = painter,
@@ -52,4 +52,24 @@ fun IconTemplate(
             .then(modifier)
     )
 }
+
+//@Composable
+//fun MiddleIcon(
+//    modifier: Modifier = Modifier,
+//    painter: Painter,
+//    contentDescription: String? = null,
+//    onClick: () -> Unit,
+//) {
+//    Icon(
+//        painter = painter,
+//        contentDescription = contentDescription,
+//        modifier = Modifier
+//            .padding(4.dp)
+//            .clip(RoundedCornerShape(50))
+//            .clickable { onClick.invoke() }
+//            .padding(8.dp)
+//            .size(24.dp)
+//            .then(modifier)
+//    )
+//}
 

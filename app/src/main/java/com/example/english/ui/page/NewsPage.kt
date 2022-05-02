@@ -1,37 +1,72 @@
 package com.example.english.ui.page
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.ui.components.FlatTextField
-import com.example.english.ui.components.IconTemplate
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.example.english.ui.components.ClickableIcon
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 
+//    val activity = LocalContext.current as Activity
     val context = LocalContext.current
+
+//    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val hideKeyboardModifier = Modifier.clickable(
+        interactionSource = MutableInteractionSource(),
+        indication = null
+    ) {
+        focusManager.clearFocus()
+        keyboardController?.hide()
+    }
+
+
+//    fun hideKeyboard() {
+//        focusManager.clearFocus()
+//        keyboardController?.hide()
+//    }
+//
+//    @RequiresApi(Build.VERSION_CODES.R)
+//    fun hideKeyboardView() {
+//        focusManager.clearFocus()
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            activity.window.insetsController?.hide(android.view.WindowInsets.Type.ime())
+//        }
+//    }
+
 
     fun getRid(boolean: Boolean): Int =
         if (boolean) R.drawable.arrow_less else R.drawable.arrow_more
-
 
     val dispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
 
@@ -40,28 +75,35 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         navController.popBackStack()
     }
 
-    BackHandler() {
+    BackHandler {
         popBack()
+        Log.d("!!!", "NewsArticlePage: BackHandler")
     }
 
     Scaffold(
         bottomBar = {
-//            BottomAppBar {
-//                Text(text = "BottomAppBar")
-//            }
-        }
+            BottomAppBar {
+                Row(modifier = Modifier
+                    .wrapContentHeight()
+                    .height(56.dp)) {
+                    ClickableIcon(painter = painterResource(getRid(false))) {
+                        dispatcher.onBackPressed()
+                    }
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1F))
+                    ClickableIcon(painter = painterResource(R.drawable.edit))
+                    ClickableIcon(painter = painterResource(R.drawable.edit))
+                }
+            }
+        },
+        modifier = hideKeyboardModifier
 
     ) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-//            contentPadding = PaddingValues(8.dp),
-//            contentPadding = rememberInsetsPaddingValues(
-//                insets = LocalWindowInsets.current.systemBars,
-//                applyTop = true,
-//                applyBottom = true
-//            ),
-//            contentPadding = it,
-//            modifier = Modifier.padding(it)
+            contentPadding = WindowInsets.systemBars.asPaddingValues(),
+            modifier = Modifier.focusable()
         ) {
             item {
                 Text(text = viewModel.currentContent.size.toString())
@@ -72,16 +114,13 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     mutableStateOf(false)
                 }
 
-                fun removeParagraph() {
-                    viewModel.currentContent.remove(paragraph)
-                }
-
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colors.background)
+//                        .then(hideKeyboardModifier)
                 ) {
                     Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)) {
 
@@ -102,16 +141,19 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         }
 
                         Row(modifier = Modifier.fillMaxWidth()) {
-                            IconTemplate(painter = painterResource(id = R.drawable.delete),
-                                onClick = { removeParagraph() })
+//                            IconTemplate(painter = painterResource(id = R.drawable.delete),
+//                                onClick = { removeParagraph() })
 
-                            Spacer(modifier = Modifier.weight(1F))
+                            Spacer(modifier = Modifier
+                                .weight(1F)
+                                .focusable()
+                                .clickable { })
 
-                            IconTemplate(painter = painterResource(id = R.drawable.translation),
-                                onClick = { })
-                            IconTemplate(painter = painterResource(id = R.drawable.word), onClick = { })
+//                            IconTemplate(painter = painterResource(id = R.drawable.translation),
+//                                onClick = { })
+//                            IconTemplate(painter = painterResource(id = R.drawable.word), onClick = { })
                             AnimatedContent(targetState = openState) {
-                                IconTemplate(painter = painterResource(id = getRid(it)), onClick = {
+                                ClickableIcon(painter = painterResource(id = getRid(it)), onClick = {
                                     openState = !openState
                                 })
                             }

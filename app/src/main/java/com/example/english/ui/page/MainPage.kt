@@ -40,14 +40,9 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
         modifier = Modifier.fillMaxSize()
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                bottom = 56.dp + 32.dp,
-                start = 16.dp,
-                top = 16.dp,
-                end = 16.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+            contentPadding = WindowInsets.systemBars.asPaddingValues(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(list) {
                 NewsItem(it, viewModel, navController, context)
