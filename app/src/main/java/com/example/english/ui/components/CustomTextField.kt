@@ -33,6 +33,7 @@ fun FlatTextField(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         ),
+        textStyle = Typography().h6,
         maxLines = maxLines,
         shape = RoundedCornerShape(0.dp),
         placeholder = @Composable { Text(text = textLabel) }

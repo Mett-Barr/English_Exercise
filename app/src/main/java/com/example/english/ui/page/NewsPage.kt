@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
-import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.ClickableIcon
+import com.example.english.ui.components.FlatTextField
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -85,25 +86,31 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
             BottomAppBar {
                 Row(modifier = Modifier
                     .wrapContentHeight()
-                    .height(56.dp)) {
-                    ClickableIcon(painter = painterResource(getRid(false))) {
+                    .height(64.dp)
+                    .align(Alignment.CenterVertically)) {
+                    ClickableIcon(painter = painterResource(R.drawable.back)) {
                         dispatcher.onBackPressed()
                     }
                     Spacer(modifier = Modifier
                         .fillMaxWidth()
                         .weight(1F))
-                    ClickableIcon(painter = painterResource(R.drawable.edit))
+                    ClickableIcon(painter = painterResource(R.drawable.delete))
+                    ClickableIcon(painter = painterResource(R.drawable.lable))
                     ClickableIcon(painter = painterResource(R.drawable.edit))
                 }
             }
         },
+
         modifier = hideKeyboardModifier
 
     ) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
+//            contentPadding = PaddingValues.,
             contentPadding = WindowInsets.systemBars.asPaddingValues(),
-            modifier = Modifier.focusable()
+            modifier = Modifier
+                .padding(it)
+                .padding(horizontal = 8.dp)
         ) {
             item {
                 Text(text = viewModel.currentContent.size.toString())
@@ -141,21 +148,23 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         }
 
                         Row(modifier = Modifier.fillMaxWidth()) {
-//                            IconTemplate(painter = painterResource(id = R.drawable.delete),
-//                                onClick = { removeParagraph() })
+                            ClickableIcon(painter = painterResource(id = R.drawable.delete),
+                                onClick = { viewModel.currentContent.remove(paragraph) })
 
                             Spacer(modifier = Modifier
                                 .weight(1F)
                                 .focusable()
                                 .clickable { })
 
-//                            IconTemplate(painter = painterResource(id = R.drawable.translation),
-//                                onClick = { })
-//                            IconTemplate(painter = painterResource(id = R.drawable.word), onClick = { })
+                            ClickableIcon(painter = painterResource(id = R.drawable.translation),
+                                onClick = { })
+                            ClickableIcon(painter = painterResource(id = R.drawable.word),
+                                onClick = { })
                             AnimatedContent(targetState = openState) {
-                                ClickableIcon(painter = painterResource(id = getRid(it)), onClick = {
-                                    openState = !openState
-                                })
+                                ClickableIcon(painter = painterResource(id = getRid(it)),
+                                    onClick = {
+                                        openState = !openState
+                                    })
                             }
                         }
                     }
