@@ -2,16 +2,22 @@ package com.example.english
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.core.view.WindowCompat
 import com.example.english.data.newsarticle.NewsFileOperatorService
 import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.theme.EnglishTheme
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,48 +27,38 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
-            EnglishTheme {
-                Surface(modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background) {
-                    MainNavigation(viewModel)
+//            val systemUiController = rememberSystemUiController()
+//            val useDarkIcons = MaterialTheme.colors.isLight
+//            SideEffect {
+//                // Update all of the system bar colors to be transparent, and use
+//                // dark icons if we're in light theme
+//                systemUiController.setSystemBarsColor(
+//                    color = Color.Transparent,
+//                    darkIcons = useDarkIcons
+//                )
+//
+//                // setStatusBarsColor() and setNavigationBarsColor() also exist
+//            }
+
+            ProvideWindowInsets() {
+                EnglishTheme {
+                    Surface(modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colors.background) {
+                        MainNavigation(viewModel)
+                    }
                 }
             }
         }
     }
 
-    fun fileService() {
-        val intent = Intent(this, NewsFileOperatorService::class.java)
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+        Log.d("!!!", "onBackPressed: ")
     }
-
-//    private fun init() {
-//        val fos = this.openFileOutput("text.txt", Context.MODE_PRIVATE)
-//        val string = "qwe asd zxc"
-////        val charset = Charsets.
-//
-//        // 寫檔，把string寫進去
-////        fos.writer(Charsets.UTF_8)
-//        fos.write(string.toByteArray())
-//        fos.close()
-//
-//        StringConverter().getParagraphsSize(this, "text.txt")
-//    }
-//
-//    private suspend fun susInit() {
-//        coroutineScope {
-////            saveFileTest(this@MainActivity)
-//            saveFileTest2(this@MainActivity)
-//            readFileTest(this@MainActivity)
-////            Log.d("!!!", "fileExistTest " + (fileExistTest(this@MainActivity)).toString())
-//
-////            File(this@MainActivity.filesDir.path + "/default.txt").forEachLine {
-////                Log.d("!!!", "susInit: $it")
-////            }
-//        }
-//    }
-
-
 }
 
 //@Composable

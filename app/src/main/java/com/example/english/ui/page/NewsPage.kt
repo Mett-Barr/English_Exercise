@@ -1,78 +1,120 @@
 package com.example.english.ui.page
 
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.IconTemplate
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun NewsArticlePage(viewModel: MainViewModel, title: String) {
+fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 
-    fun getRid(boolean: Boolean): Int = if (boolean) R.drawable.arrow_less else R.drawable.arrow_more
+    val context = LocalContext.current
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(8.dp)
-    ) {
-        item {
-            Text(text = viewModel.currentContent.size.toString())
+    fun getRid(boolean: Boolean): Int =
+        if (boolean) R.drawable.arrow_less else R.drawable.arrow_more
+
+
+    val dispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
+
+    fun popBack() {
+        viewModel.saveCurrentFile(context)
+        navController.popBackStack()
+    }
+
+    BackHandler() {
+        popBack()
+    }
+
+    Scaffold(
+        bottomBar = {
+//            BottomAppBar {
+//                Text(text = "BottomAppBar")
+//            }
         }
-        itemsIndexed(viewModel.currentContent) { index, paragraphs ->
 
-            var openState by remember {
-                mutableStateOf(false)
+    ) {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+//            contentPadding = PaddingValues(8.dp),
+//            contentPadding = rememberInsetsPaddingValues(
+//                insets = LocalWindowInsets.current.systemBars,
+//                applyTop = true,
+//                applyBottom = true
+//            ),
+//            contentPadding = it,
+//            modifier = Modifier.padding(it)
+        ) {
+            item {
+                Text(text = viewModel.currentContent.size.toString())
             }
+            itemsIndexed(viewModel.currentContent) { index, paragraph ->
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colors.background)
-            ) {
-                Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)) {
+                var openState by remember {
+                    mutableStateOf(false)
+                }
 
-                    FlatTextField(
-                        value = paragraphs,
-                        onValueChange = { viewModel.currentContent[index] = it },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                fun removeParagraph() {
+                    viewModel.currentContent.remove(paragraph)
+                }
 
-                    AnimatedVisibility(visible = openState) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colors.background)
+                ) {
+                    Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)) {
+
                         FlatTextField(
-                            value = viewModel.currentContentCn[index],
-                            onValueChange = { viewModel.currentContentCn[index] = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
+                            value = paragraph,
+                            onValueChange = { viewModel.currentContent[index] = it },
+                            modifier = Modifier.fillMaxWidth()
                         )
-                    }
 
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Spacer(modifier = Modifier.weight(1F))
+                        AnimatedVisibility(visible = openState) {
+                            FlatTextField(
+                                value = viewModel.currentContentCn[index],
+                                onValueChange = { viewModel.currentContentCn[index] = it },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                            )
+                        }
 
-                        IconTemplate(painter = painterResource(id = R.drawable.words),
-                            onClick = { })
-                        IconTemplate(painter = painterResource(id = R.drawable.edit), onClick = { })
-                        AnimatedContent(targetState = openState) {
-                            IconTemplate(painter = painterResource(id = getRid(it)), onClick = {
-                                openState = !openState
-                            })
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            IconTemplate(painter = painterResource(id = R.drawable.delete),
+                                onClick = { removeParagraph() })
+
+                            Spacer(modifier = Modifier.weight(1F))
+
+                            IconTemplate(painter = painterResource(id = R.drawable.translation),
+                                onClick = { })
+                            IconTemplate(painter = painterResource(id = R.drawable.word), onClick = { })
+                            AnimatedContent(targetState = openState) {
+                                IconTemplate(painter = painterResource(id = getRid(it)), onClick = {
+                                    openState = !openState
+                                })
+                            }
                         }
                     }
                 }

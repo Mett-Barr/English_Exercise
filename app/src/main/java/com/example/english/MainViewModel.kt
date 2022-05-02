@@ -41,11 +41,8 @@ class MainViewModel @Inject constructor(
 
     var currentTitle by mutableStateOf("Title")
 
-    //    var currentContent by mutableStateOf(listOf(""))
     var currentContent = mutableStateListOf<TextFieldValue>()
     var currentContentCn = mutableStateListOf<TextFieldValue>()
-//    var currentContent = mutableStateListOf<String>()
-//    var currentContentCn = mutableStateListOf<String>()
 
     fun currentNews(news: News, context: Context) {
         currentFileName = FILE_NAME + news.id.toString()
@@ -53,6 +50,7 @@ class MainViewModel @Inject constructor(
         currentTitle = news.title
         getFile(currentFileName, currentFileNameCn, context)
     }
+
 
 
 
@@ -95,7 +93,6 @@ class MainViewModel @Inject constructor(
         tmpList.forEach {
             currentContent.add(TextFieldValue(it))
         }
-//        currentContent = tmpList.toMutableStateList()
 
         val fosCn = context.openFileInput(fileNameCn)
         val readerCn = BufferedReader(InputStreamReader(fosCn))
@@ -107,15 +104,44 @@ class MainViewModel @Inject constructor(
 //        currentContentCn = tmpListCn.toMutableStateList()
     }
 
-    private fun saveFile(fileName: String, fileNameCn: String, context: Context) {
+    fun saveFile(fileName: String, fileNameCn: String, context: Context) {
         val fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)
-        val list = StringConverter().stringToList(draftContent.text)
-        list.forEach { fos.write(it.toByteArray()) }
+        currentContent.forEach {
+            fos.write(it.text.toByteArray())
+        }
+//        val list = StringConverter().stringToList(draftContent.text)
+//        list.forEach { fos.write(it.toByteArray()) }
         fos.close()
+
+        val fosCn = context.openFileOutput(fileNameCn, Context.MODE_PRIVATE)
+        currentContentCn.forEach {
+            fosCn.write(it.text.toByteArray())
+        }
+//        repeat(list.size) { fosCn.write("\n".toByteArray())}
+        fosCn.close()
+    }
+
+    fun saveCurrentFile(context: Context) {
+        val fos = context.openFileOutput(currentFileName, Context.MODE_PRIVATE)
+        currentContent.forEach {
+            fos.write(it.text.plus("\n").toByteArray())
+        }
+//        val list = StringConverter().stringToList(draftContent.text)
+//        list.forEach { fos.write(it.toByteArray()) }
+        fos.close()
+
+        val fosCn = context.openFileOutput(currentFileNameCn, Context.MODE_PRIVATE)
+        currentContentCn.forEach {
+            fosCn.write(it.text.plus("\n").toByteArray())
+        }
+//        repeat(list.size) { fosCn.write("\n".toByteArray())}
+        fosCn.close()
     }
 
 
 
     /** Navigation */
-//    fun
+    fun newsPagePopBack() {
+
+    }
 }
