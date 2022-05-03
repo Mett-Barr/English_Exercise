@@ -37,6 +37,7 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
     fun addNews() {
         viewModel.addNews(context)
         StringConverter().stringToListNull(viewModel.draftContent.text)
+        openDialog = false
         navController.popBackStack()
     }
 
@@ -44,6 +45,7 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
+            .padding(horizontal = 16.dp)
     ) {
 
         Text(
@@ -73,6 +75,19 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
             textLabel = "Content:"
         ) { viewModel.draftContent = it }
 
+        TextField(
+            value = viewModel.draftContent,
+            onValueChange = {
+            when (it.text) {
+                "123" -> { /**TODO*/ }
+                "234" -> { /**TODO*/ }
+                "345" -> { /**TODO*/ }
+            }
+
+            if (it.text.contains("ABCD")) {
+                viewModel.draftContent = it.copy(it.text.plus("\n"))
+            }
+        })
 
         OperationButton(
             clickCancel = {
@@ -100,7 +115,7 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
                     modifier = Modifier
                         .selectableGroup()
                         .padding(horizontal = 4.dp)
-                        .padding(top = 16.dp, bottom = 4.dp)
+                        .padding(top = 4.dp, bottom = 4.dp)
                 ) {
                     Text(
                         text = "Tag", style = Typography.h4, modifier = Modifier

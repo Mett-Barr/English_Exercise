@@ -61,6 +61,7 @@ fun NewsItem(news: News, viewModel: MainViewModel, navController: NavController,
                 navController.navigate(MainRoute.News.route)
                 viewModel.currentNews(news, context)
             }
+            .background(MaterialTheme.colors.background)
     ) {
         Row {
             Column(
