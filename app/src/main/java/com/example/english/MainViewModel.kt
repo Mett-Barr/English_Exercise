@@ -43,6 +43,8 @@ class MainViewModel @Inject constructor(
 
     var currentContent = mutableStateListOf<TextFieldValue>()
     var currentContentCn = mutableStateListOf<TextFieldValue>()
+    var currentContentTr = mutableStateListOf<TextFieldValue>()
+    var currentContentWords = mutableStateListOf<TextFieldValue>()
 
     fun currentNews(news: News, context: Context) {
         currentFileName = FILE_NAME + news.id.toString()

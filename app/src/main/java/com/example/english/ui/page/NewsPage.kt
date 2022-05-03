@@ -6,6 +6,8 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -31,7 +33,9 @@ import com.example.english.R
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class,
+    ExperimentalFoundationApi::class, ExperimentalFoundationApi::class
+)
 @Composable
 fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 
@@ -84,16 +88,20 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     Scaffold(
         bottomBar = {
             BottomAppBar {
-                Row(modifier = Modifier
-                    .wrapContentHeight()
-                    .height(64.dp)
-                    .align(Alignment.CenterVertically)) {
+                Row(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .height(64.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
                     ClickableIcon(painter = painterResource(R.drawable.back)) {
                         dispatcher.onBackPressed()
                     }
-                    Spacer(modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1F))
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1F)
+                    )
                     ClickableIcon(painter = painterResource(R.drawable.delete))
                     ClickableIcon(painter = painterResource(R.drawable.lable))
                     ClickableIcon(painter = painterResource(R.drawable.edit))
@@ -103,13 +111,13 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
         modifier = hideKeyboardModifier
 
-    ) {
+    ) { paddingValues ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
 //            contentPadding = PaddingValues.,
             contentPadding = WindowInsets.systemBars.asPaddingValues(),
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .padding(horizontal = 8.dp)
         ) {
             item {
@@ -121,12 +129,17 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     mutableStateOf(false)
                 }
 
+                var annotationState by remember {
+                    mutableStateOf(AnnotationState.CLOSE)
+                }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colors.background)
+//                        .animateItemPlacement(TweenSpec())
 //                        .then(hideKeyboardModifier)
                 ) {
                     Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)) {
@@ -147,9 +160,19 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             )
                         }
 
+                        AnimatedContent(targetState = annotationState) {
+                            when (it) {
+                                AnnotationState.TRANSLATION -> Text(text = "translation state")
+                                AnnotationState.WORDS -> Text(text = ("word\nstate"))
+                                AnnotationState.CLOSE -> {}
+                            }
+                        }
+
                         Row(modifier = Modifier.fillMaxWidth()) {
                             ClickableIcon(painter = painterResource(id = R.drawable.delete),
-                                onClick = { viewModel.currentContent.remove(paragraph) })
+                                onClick = {
+                                    viewModel.currentContent.remove(paragraph)
+                                })
 
                             Spacer(modifier = Modifier
                                 .weight(1F)
@@ -157,9 +180,17 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 .clickable { })
 
                             ClickableIcon(painter = painterResource(id = R.drawable.translation),
-                                onClick = { })
+                                onClick = {
+                                    annotationState =
+                                        if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
+                                        else AnnotationState.TRANSLATION
+                                })
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
-                                onClick = { })
+                                onClick = {
+                                    annotationState =
+                                        if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
+                                        else AnnotationState.WORDS
+                                })
                             AnimatedContent(targetState = openState) {
                                 ClickableIcon(painter = painterResource(id = getRid(it)),
                                     onClick = {
@@ -172,4 +203,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
             }
         }
     }
+}
+
+enum class AnnotationState {
+    TRANSLATION, WORDS, CLOSE
 }
