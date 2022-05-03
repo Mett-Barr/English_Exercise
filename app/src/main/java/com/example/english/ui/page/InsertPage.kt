@@ -1,5 +1,6 @@
 package com.example.english.ui.page
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -80,33 +81,41 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
         val radioOptions = listOf("A", "S", "D")
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
 
-        var test = Test.A
+        var test by remember {
+            mutableStateOf(Test.A)
+        }
 
         Dialog(onDismissRequest = { openDialog = false }) {
-            Column(modifier = Modifier.selectableGroup()) {
+            Card {
+                Column(modifier = Modifier.selectableGroup()) {
 //                radioOptions.forEach()
-                for (tag in enumValues<Test>()) {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .selectable(
-                                selected = (text == selectedOption),
-                                onClick = { onOptionSelected(text) },
-                                role = Role.RadioButton
+                    for (tag in enumValues<Test>()) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .selectable(
+                                    selected = (tag == test),
+                                    onClick = {
+                                        Log.d("!!!", tag.name)
+                                        test = tag
+                                        Log.d("!!!", tag.name + "\n\n ")
+                                    },
+                                    role = Role.RadioButton
+                                )
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (tag.name == selectedOption),
+                                onClick = null // null recommended for accessibility with screenreaders
                             )
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (text == selectedOption),
-                            onClick = null // null recommended for accessibility with screenreaders
-                        )
-                        Text(
-                            text = text,
-                            style = MaterialTheme.typography.body1.merge(),
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
+                            Text(
+                                text = tag.name,
+                                style = MaterialTheme.typography.body1.merge(),
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
                     }
                 }
             }
