@@ -75,20 +75,6 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
             textLabel = "Content:"
         ) { viewModel.draftContent = it }
 
-        TextField(
-            value = viewModel.draftContent,
-            onValueChange = {
-            when (it.text) {
-                "123" -> { /**TODO*/ }
-                "234" -> { /**TODO*/ }
-                "345" -> { /**TODO*/ }
-            }
-
-            if (it.text.contains("ABCD")) {
-                viewModel.draftContent = it.copy(it.text.plus("\n"))
-            }
-        })
-
         OperationButton(
             clickCancel = {
                 navController.popBackStack()
