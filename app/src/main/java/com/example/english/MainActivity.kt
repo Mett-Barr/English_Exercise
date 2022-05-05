@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
 
         englishGermanTranslator.translate("\"Especially at a time when the COVID situation is still serious, IPs being swiftly revealed can effectively reduce the appearance of disgusting content from rumor-makers and rumor-spreaders,\" wrote user UltraScarry.\n")
             .addOnSuccessListener { translatedText ->
-                // Translation successful.
+                // com.example.english.translation.format.Translation successful.
                 Log.d("!!!", "init: $translatedText")
             }
             .addOnFailureListener { exception ->
@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
                 Log.d("!!!", "error")
             }
 
-//        val translator = Translation.getClient(options)
+//        val translator = com.example.english.translation.format.Translation.getClient(options)
         lifecycle.addObserver(englishGermanTranslator)
     }
 }

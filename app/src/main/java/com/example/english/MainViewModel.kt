@@ -1,6 +1,7 @@
 package com.example.english
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -9,7 +10,10 @@ import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
 import com.example.english.data.newslist.room.NewsObject
 import com.example.english.stringconverter.StringConverter
+import com.example.english.translation.format.PostFormat
+import com.example.english.translation.test.TranslationApi.retrofitService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
@@ -23,6 +27,22 @@ const val FILE_NAME_CN = "News_CN_"
 class MainViewModel @Inject constructor(
     private val repository: Repository,
 ) : ViewModel() {
+
+    // Test Translation
+    fun translation(text: String) {
+        val postText = PostFormat(text)
+        viewModelScope.launch {
+            try {
+//                val translatedText = retrofitService.getTranslatedText(postText)
+//                Log.d("!!!", "translation:\n $translatedText")
+            } catch (e: Exception) {
+                Log.d("!!!", "translation: $e")
+            }
+        }
+    }
+
+
+
 
     // text input (testing)
     var textFieldValue by mutableStateOf(TextFieldValue("123"))

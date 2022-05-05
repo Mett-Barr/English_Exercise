@@ -94,7 +94,7 @@ dependencies {
     // Window Insets
     implementation "androidx.compose.foundation:foundation-layout:1.2.0-alpha08"
 
-    // ML Kit Translation
+    // ML Kit com.example.english.translation.format.Translation
     implementation 'com.google.mlkit:translate:17.0.0'
 
 

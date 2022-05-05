@@ -184,6 +184,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     annotationState =
                                         if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
                                         else AnnotationState.TRANSLATION
+
+                                    viewModel.translation(paragraph.text)
                                 })
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
                                 onClick = {
