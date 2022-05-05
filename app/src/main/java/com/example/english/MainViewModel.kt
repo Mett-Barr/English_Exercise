@@ -10,12 +10,16 @@ import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
 import com.example.english.data.newslist.room.NewsObject
 import com.example.english.stringconverter.StringConverter
-import com.example.english.translation.format.PostFormat
-import com.example.english.translation.test.TranslationApi.retrofitService
+import com.example.english.translation.format.PostObject
+import com.example.english.translation.test.BASE_URL
+import com.example.english.translation.test.TranslationTest
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.inject.Inject
@@ -29,17 +33,54 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Test Translation
+    /**
+     * Build the Moshi object with Kotlin adapter factory that Retrofit will be using.
+     */
+    private val moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
+
+    /**
+     * The Retrofit object with the Moshi converter.
+     */
+    private val retrofit = Retrofit.Builder()
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .baseUrl(BASE_URL)
+        .build()
+
+    private val retrofit2 = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(BASE_URL)
+        .build()
+
+    private val retrofitService: TranslationTest by lazy { retrofit2.create(TranslationTest::class.java) }
+
     fun translation(text: String) {
-        val postText = PostFormat(text)
+        val postText = PostObject(q = text)
         viewModelScope.launch {
             try {
-//                val translatedText = retrofitService.getTranslatedText(postText)
-//                Log.d("!!!", "translation:\n $translatedText")
+                val translatedText = retrofitService.getTranslatedText(postText)
+                Log.d("!!!", "translation:\n $translatedText")
             } catch (e: Exception) {
                 Log.d("!!!", "translation: $e")
             }
         }
     }
+
+    fun translation2(text: String) {
+        val postText = PostObject(q = text)
+        viewModelScope.launch {
+            try {
+                val translatedText = retrofitService.getTranslatedText3()
+                Log.d("!!!", "translation:\n $translatedText")
+            } catch (e: Exception) {
+                Log.d("!!!", "translation: $e")
+            }
+        }
+    }
+
+
+
 
 
 
