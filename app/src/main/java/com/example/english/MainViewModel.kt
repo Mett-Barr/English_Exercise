@@ -33,6 +33,9 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Test Translation
+
+    val sha1 = "17:58:72:D8:5C:35:6A:DB:26:DA:80:E9:1F:C5:28:29:CB:C6:CE:43"
+
     /**
      * Build the Moshi object with Kotlin adapter factory that Retrofit will be using.
      */
@@ -56,6 +59,9 @@ class MainViewModel @Inject constructor(
     private val retrofitService: TranslationTest by lazy { retrofit2.create(TranslationTest::class.java) }
 
     fun translation(text: String) {
+
+
+
         val postText = PostObject(q = text)
         viewModelScope.launch {
             try {
