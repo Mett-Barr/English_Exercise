@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import com.example.english.translation.translate
 import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.theme.EnglishTheme
 import com.google.mlkit.common.model.DownloadConditions
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        translate(this)
 //        init()
     }
 

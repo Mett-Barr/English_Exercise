@@ -18,11 +18,9 @@ class StringConverter {
     fun stringToList(string: String): List<String> {
         val list = mutableListOf<String>()
         string.split("\n").forEach {
-//            if (it != "\n" && it != "") list.add(it.plus("\n"))
             if (it.isNotBlank()) list.add(it.plus("\n"))
         }
 //        list.removeAll(listOf("\n"))
-        Log.d("!!!", "stringToList: $list")
         return list.toList()
     }
 

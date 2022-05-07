@@ -11,7 +11,7 @@ import retrofit2.http.POST
 
 
 const val BASE_URL =
-    "https://translation.googleapis.com/language/translate/v2/detect/"
+    "https://translation.googleapis.com/language/translate/v2/"
 
 const val testUrl =
     "?key=AIzaSyBjmgx_l-kWKBO1L2Bci7bCxvKM83BQLgY&source=en&target=de&q=Hello%20world&q=My%20name%20is%20Jeff"

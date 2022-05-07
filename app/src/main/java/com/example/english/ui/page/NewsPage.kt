@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
+import com.example.english.translation.translate
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 
@@ -147,7 +148,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         FlatTextField(
                             value = paragraph,
                             onValueChange = { viewModel.currentContent[index] = it },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            readOnly = true
                         )
 
                         AnimatedVisibility(visible = openState) {
@@ -160,9 +162,19 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             )
                         }
 
-                        AnimatedContent(targetState = annotationState) {
+                        AnimatedContent(targetState = annotationState) { it ->
                             when (it) {
-                                AnnotationState.TRANSLATION -> Text(text = "translation state")
+                                AnnotationState.TRANSLATION -> {
+                                    FlatTextField(value = viewModel.currentContentTr[index],
+                                        onValueChange = {
+                                            viewModel.currentContentTr[index] = it
+                                        },
+                                        readOnly = true,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp)
+                                    )
+                                }
                                 AnnotationState.WORDS -> Text(text = ("word\nstate"))
                                 AnnotationState.CLOSE -> {}
                             }
@@ -171,7 +183,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         Row(modifier = Modifier.fillMaxWidth()) {
                             ClickableIcon(painter = painterResource(id = R.drawable.delete),
                                 onClick = {
-                                    viewModel.currentContent.remove(paragraph)
+                                    viewModel.removeCurrentParagraph(index)
                                 })
 
                             Spacer(modifier = Modifier
@@ -185,7 +197,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
                                         else AnnotationState.TRANSLATION
 
-                                    viewModel.translation(paragraph.text)
+//                                    viewModel.translation(paragraph.text)
+//                                    viewModel.translateTest(context, paragraph.text)
+//                                    translate(context)
                                 })
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
                                 onClick = {
@@ -193,7 +207,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
                                         else AnnotationState.WORDS
 
-                                    viewModel.translation2(paragraph.text)
+//                                    viewModel.translation2(paragraph.text)
                                 })
                             AnimatedContent(targetState = openState) {
                                 ClickableIcon(painter = painterResource(id = getRid(it)),

@@ -19,6 +19,7 @@ fun FlatTextField(
     maxLines: Int = Int.MAX_VALUE,
     textLabel: String = "",
     value: TextFieldValue,
+    readOnly: Boolean = false,
     onValueChange: (TextFieldValue) -> Unit
 ) {
     TextField(
@@ -36,6 +37,7 @@ fun FlatTextField(
         textStyle = Typography().h6,
         maxLines = maxLines,
         shape = RoundedCornerShape(0.dp),
+        readOnly = readOnly,
         placeholder = @Composable { Text(text = textLabel) }
     )
 }
