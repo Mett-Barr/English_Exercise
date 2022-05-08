@@ -5,52 +5,42 @@ import android.util.Log
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.example.english.data.newsarticle.FileOperator
+import com.example.english.data.article.FileOperator
+import com.example.english.translation.json.Translations
 import com.google.gson.JsonObject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
-const val BASE_URL =
-    "https://translation.googleapis.com/language/translate/v2/"
-
+const val BASE_URL = "https://translation.googleapis.com/language/translate/v2/"
 const val BASIC_SETTING = "?key=AIzaSyBjmgx_l-kWKBO1L2Bci7bCxvKM83BQLgY&source=en&target=zh-TW"
-
 const val TRANSLATE_REQUEST = "&q="
 
-fun translate(context: Context) {
-    val queue = Volley.newRequestQueue(context)
-
-    val text =
-        "?key=AIzaSyBjmgx_l-kWKBO1L2Bci7bCxvKM83BQLgY&source=en&target=de&q=Hello%20world&q=My%20name%20is%20Jeff"
-
-    Log.d("!!!", "translateParagraph: translate")
-
-
-    val stringRequest = StringRequest(
-        Request.Method.POST, BASE_URL + text,
-        { response ->
-            Log.d("!!!", response)
-            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-            val adapter: JsonAdapter<Translations> = moshi.adapter(Translations::class.java)
-            val translations = adapter.fromJson(response)
-//            Log.d("!!!", translations.toString())
-        },
-        {
+//fun translate(context: Context) {
+//    val queue = Volley.newRequestQueue(context)
+//
+//    val text =
+//        "?key=AIzaSyBjmgx_l-kWKBO1L2Bci7bCxvKM83BQLgY&source=en&target=de&q=Hello%20world&q=My%20name%20is%20Jeff"
+//
+//    Log.d("!!!", "translateParagraph: translate")
+//
+//
+//    val stringRequest = StringRequest(
+//        Request.Method.POST, BASE_URL + text,
+//        { response ->
+//            Log.d("!!!", response)
+//            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+//            val adapter: JsonAdapter<Translations> = moshi.adapter(Translations::class.java)
+//            val translations = adapter.fromJson(response)
+//        },
+//        {
 //            Log.d("!!!", it.toString())
-        }
-    )
-
-    // Add the request to the RequestQueue.
-    queue.add(stringRequest)
-}
-
-
-
-
-
-
-
+//        }
+//    )
+//
+//    // Add the request to the RequestQueue.
+//    queue.add(stringRequest)
+//}
 
 
 fun translateArticle(fileNum: String, content: List<String>, context: Context) {
@@ -77,26 +67,12 @@ fun translateArticle(fileNum: String, content: List<String>, context: Context) {
 //            Log.d("!!!", translations.toString())
         },
         {
-//            Log.d("!!!", it.toString())
+            Log.d("!!!", it.toString())
         }
     )
 
-    // Add the request to the RequestQueue.
     queue.add(stringRequest)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 fun translateParagraph(context: Context, paragraph: String) {
@@ -124,22 +100,6 @@ fun translateParagraph(context: Context, paragraph: String) {
     // Add the request to the RequestQueue.
     queue.add(stringRequest)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 fun translate(context: Context, file: String) {

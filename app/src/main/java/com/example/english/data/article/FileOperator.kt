@@ -1,4 +1,4 @@
-package com.example.english.data.newsarticle
+package com.example.english.data.article
 
 import android.content.Context
 import android.util.Log
@@ -6,7 +6,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.english.stringconverter.StringConverter
-import com.example.english.translation.Translation
+import com.example.english.translation.json.Translation
 import com.example.english.translation.translateArticle
 import java.io.BufferedReader
 import java.io.InputStreamReader

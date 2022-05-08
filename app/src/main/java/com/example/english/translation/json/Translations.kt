@@ -1,4 +1,4 @@
-package com.example.english.translation
+package com.example.english.translation.json
 
 import com.squareup.moshi.JsonClass
 

@@ -6,6 +6,11 @@ import com.example.english.data.newslist.DefaultRepository
 import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.NewsDao
 import com.example.english.data.newslist.room.NewsDatabase
+import com.example.english.data.words.DefaultWordRepository
+import com.example.english.data.words.WordRepository
+import com.example.english.data.words.room.Word
+import com.example.english.data.words.room.WordDao
+import com.example.english.data.words.room.WordDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,4 +41,28 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun getRepository(newsDao: NewsDao) = DefaultRepository(newsDao) as Repository
+
+
+
+
+
+    @Provides
+    @Singleton
+    fun provideWordDatabase(@ApplicationContext appContext: Context): WordDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            WordDatabase::class.java,
+            "word_database"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWordDao(wordDB: WordDatabase): WordDao {
+        return wordDB.wordDao()
+    }
+
+    @Provides
+    @Singleton
+    fun getWordRepository(wordDao: WordDao) = DefaultWordRepository(wordDao) as WordRepository
 }

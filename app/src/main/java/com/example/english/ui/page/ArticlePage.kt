@@ -3,6 +3,7 @@ package com.example.english.ui.page
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -22,10 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
@@ -33,6 +37,8 @@ import com.example.english.R
 import com.example.english.translation.translate
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class,
     ExperimentalFoundationApi::class, ExperimentalFoundationApi::class
@@ -45,6 +51,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
 //    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+
+//    val coroutineScope = rememberCoroutineScope()
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -122,7 +130,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 .padding(horizontal = 8.dp)
         ) {
             item {
-                Text(text = viewModel.currentContent.size.toString())
+                Text(text = viewModel.currentTitle, style = Typography().h5, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
             }
             itemsIndexed(viewModel.currentContent) { index, paragraph ->
 
@@ -162,6 +170,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             )
                         }
 
+                        val color = remember {
+                            Animatable(Color.White)
+                        }
+
                         AnimatedContent(targetState = annotationState) { it ->
                             when (it) {
                                 AnnotationState.TRANSLATION -> {
@@ -174,9 +186,23 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                             .fillMaxWidth()
                                             .padding(top = 8.dp)
                                     )
+
+                                    LaunchedEffect(key1 = 1) {
+                                        color.animateTo(Color.Yellow)
+                                    }
                                 }
-                                AnnotationState.WORDS -> Text(text = ("word\nstate"))
-                                AnnotationState.CLOSE -> {}
+                                AnnotationState.WORDS -> {
+                                    Text(text = ("word\nstate"))
+
+                                    LaunchedEffect(key1 = 1) {
+                                        color.animateTo(Color.White)
+                                    }
+                                }
+                                AnnotationState.CLOSE -> {
+                                    LaunchedEffect(key1 = 1) {
+                                        color.animateTo(Color.White)
+                                    }
+                                }
                             }
                         }
 
@@ -192,6 +218,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 .clickable { })
 
                             ClickableIcon(painter = painterResource(id = R.drawable.translation),
+                                tint = color.value,
                                 onClick = {
                                     annotationState =
                                         if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
@@ -203,9 +230,25 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 })
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
                                 onClick = {
-                                    annotationState =
-                                        if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
-                                        else AnnotationState.WORDS
+
+                                    // 1.檢測是否選取單字
+                                    val contextText = viewModel.currentContent[index].getSelectedText()
+                                    if (contextText.isNotBlank()) {
+                                        // 2.translate並且開啟annotation欄位
+
+                                        AnnotationState.WORDS
+                                    } else {
+                                        // 3.檢測開啟狀態，決定開關annotation欄位
+                                        annotationState =
+                                            if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
+                                            else AnnotationState.WORDS
+                                    }
+
+
+//                                    annotationState =
+//                                        if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
+//                                        else AnnotationState.WORDS
+
 
 //                                    viewModel.translation2(paragraph.text)
                                 })
