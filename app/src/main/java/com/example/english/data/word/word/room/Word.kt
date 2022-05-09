@@ -10,7 +10,7 @@ data class Word(
     val id: Int,
 
     @ColumnInfo(name = "english")
-    var word: String = "",
+    var english: String = "",
 
     @ColumnInfo(name = "chinese")
     var chinese: String = "",

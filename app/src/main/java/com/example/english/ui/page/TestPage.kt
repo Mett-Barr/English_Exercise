@@ -126,7 +126,7 @@ fun TestTextField(
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     TextField(value = textFieldValue,
         onValueChange = onValueChange,
@@ -147,7 +147,8 @@ fun TestTextField(
 @Composable
 fun Test04(viewModel: MainViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
-        Button(onClick = { viewModel.wordTest("test") }) {
+        Button(modifier = Modifier.align(Alignment.Center),
+            onClick = { viewModel.wordTest("test") }) {
             Text(text = "Test")
         }
     }

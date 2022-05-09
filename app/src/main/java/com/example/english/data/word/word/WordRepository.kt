@@ -9,6 +9,8 @@ interface WordRepository {
 
     fun getWordByName(english: String): Flow<Word?>
 
+    fun getWordId(english: String): Flow<Int>
+
     suspend fun addNewWord(word: Word): Long
 
     suspend fun deleteWord(word: Word)

@@ -56,7 +56,11 @@ object DatabaseModule {
             appContext,
             WordDatabase::class.java,
             "word_database"
-        ).build()
+        )
+
+                // test
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -80,7 +84,11 @@ object DatabaseModule {
             appContext,
             WordListDatabase::class.java,
             "word_database"
-        ).build()
+        )
+
+            // test
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

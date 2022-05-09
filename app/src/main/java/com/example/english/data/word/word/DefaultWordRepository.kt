@@ -15,6 +15,10 @@ class DefaultWordRepository(private val dao: WordDao) : WordRepository {
         return dao.getWordByEnglish(english)
     }
 
+    override fun getWordId(english: String): Flow<Int> {
+        return dao.getWordId(english)
+    }
+
     override suspend fun addNewWord(word: Word): Long {
         return dao.addNewWord(word)
     }

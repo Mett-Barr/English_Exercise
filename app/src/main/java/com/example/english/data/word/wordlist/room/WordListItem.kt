@@ -9,7 +9,7 @@ data class WordListItem(
 
 @JsonClass(generateAdapter = true)
 data class WordIndex(
-    var newsIndex: Int,
+    var paragraphIndex: Int,
     var wordIndex: Int
 )
 

@@ -15,6 +15,7 @@ import com.example.english.data.article.FILE_NAME_Tr
 import com.example.english.data.article.FileOperator
 import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
+import com.example.english.data.word.addWordInList
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
 import com.example.english.data.word.wordlist.WordListConverter
@@ -32,7 +33,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: Repository,
     private val wordRepository: WordRepository,
-    private val wordListRepository: WordListRepository
+    private val wordListRepository: WordListRepository,
 ) : ViewModel() {
 
 
@@ -94,11 +95,18 @@ class MainViewModel @Inject constructor(
 
     private fun addFile(fileNum: Long, context: Context) {
         viewModelScope.launch {
-            FileOperator.addFile(fileNum = fileNum.toString(), draftContent = draftContent.text, context = context)
+            FileOperator.addFile(fileNum = fileNum.toString(),
+                draftContent = draftContent.text,
+                context = context)
         }
     }
 
-    private fun getFile(fileName: String, fileNameCn: String, fileNameTr: String, context: Context) {
+    private fun getFile(
+        fileName: String,
+        fileNameCn: String,
+        fileNameTr: String,
+        context: Context,
+    ) {
         viewModelScope.launch {
             currentContent = FileOperator.getFile(fileName, context)
             currentContentCn = FileOperator.getFileCn(fileNameCn, context)
@@ -139,18 +147,29 @@ class MainViewModel @Inject constructor(
 //            wordRepository.addNewWord(word)
 //            Log.d("!!!", "wordTest: ")
 
-            val listWordIndex: List<WordIndex> = listOf(WordIndex(0, 0), WordIndex(1, 3))
-            val wordListItem: WordListItem = WordListItem(listWordIndex)
-            val list = WordList(0, WordListConverter().itemToString(wordListItem))
-            wordListRepository.addWordList(list)
+//            val listWordIndex: List<WordIndex> = listOf(WordIndex(0, 0), WordIndex(1, 3))
+//            val wordListItem: WordListItem = WordListItem(listWordIndex)
+//            val list = WordList(0, WordListConverter().itemToString(wordListItem))
+//            wordListRepository.addWordList(list)
+//
+//            Log.d("!!!1", list.toString())
+//            Log.d("!!!2", WordListConverter().itemToString(wordListItem))
+//            Log.d("!!!3", WordListConverter().itemToString(WordListConverter().stringToItem(list.wordList)))
 
-            Log.d("!!!1", list.toString())
-            Log.d("!!!2", WordListConverter().itemToString(wordListItem))
-            Log.d("!!!3", WordListConverter().itemToString(WordListConverter().stringToItem(list.wordList)))
+
+            addWordInList(
+                word = Word(0, "dog", "狗"),
+                newsIndex = 1,
+                paragraphIndex = 0,
+                wordListItem = WordListItem(listOf(WordIndex(0, 1),
+                    WordIndex(0, 2),
+                    WordIndex(2, 1))),
+                wordRepository = wordRepository,
+                wordListRepository = wordListRepository
+            )
 
         }
     }
-
 
 
     /** Navigation */
