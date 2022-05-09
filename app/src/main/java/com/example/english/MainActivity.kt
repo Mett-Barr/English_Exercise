@@ -14,6 +14,7 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.example.english.ui.navigation.MainNavigation
+import com.example.english.ui.page.Test04
 import com.example.english.ui.theme.EnglishTheme
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
@@ -43,24 +44,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainNavigation(viewModel)
+//                    MainNavigation(viewModel)
+                    Test04(viewModel)
                 }
             }
         }
-
-//        val intent = Intent()
-//        intent.action = Intent.ACTION_PROCESS_TEXT
-//        intent.type = "text/plain"
-//        intent.setPackage("com.google.android.apps.translate")
-//        intent.putExtra(Intent.EXTRA_PROCESS_TEXT, "hello")
-//        startActivity(intent)
-//
-//        getContent.launch("text/plain")
-
-
-//        wordTranslate(this)
-
-//        init()
     }
 
     override fun onBackPressed() {

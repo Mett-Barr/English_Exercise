@@ -9,6 +9,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 
+fun translateApp(context: Context, text: String) {
+    val intent = Intent()
+        intent.action = Intent.ACTION_PROCESS_TEXT
+        intent.type = "text/plain"
+        intent.setPackage("com.google.android.apps.translate")
+        intent.putExtra(Intent.EXTRA_PROCESS_TEXT, text)
+        context.startActivity(intent)
+}
 
 fun wordTranslate(context: Context) {
     try {

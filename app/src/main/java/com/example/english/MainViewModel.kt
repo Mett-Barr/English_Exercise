@@ -1,6 +1,7 @@
 package com.example.english
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -14,7 +15,14 @@ import com.example.english.data.article.FILE_NAME_Tr
 import com.example.english.data.article.FileOperator
 import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
-import com.example.english.data.words.WordRepository
+import com.example.english.data.word.word.WordRepository
+import com.example.english.data.word.word.room.Word
+import com.example.english.data.word.wordlist.WordListConverter
+import com.example.english.data.word.wordlist.WordListRepository
+import com.example.english.data.word.wordlist.room.EmptyWordListItem
+import com.example.english.data.word.wordlist.room.WordIndex
+import com.example.english.data.word.wordlist.room.WordList
+import com.example.english.data.word.wordlist.room.WordListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: Repository,
-    private val wordRepository: WordRepository
+    private val wordRepository: WordRepository,
+    private val wordListRepository: WordListRepository
 ) : ViewModel() {
 
 
@@ -122,6 +131,25 @@ class MainViewModel @Inject constructor(
 
 
     /** Word Operation  */
+    // Test
+    fun wordTest(text: String) {
+        val word = Word(0, text)
+
+        viewModelScope.launch {
+//            wordRepository.addNewWord(word)
+//            Log.d("!!!", "wordTest: ")
+
+            val listWordIndex: List<WordIndex> = listOf(WordIndex(0, 0), WordIndex(1, 3))
+            val wordListItem: WordListItem = WordListItem(listWordIndex)
+            val list = WordList(0, WordListConverter().itemToString(wordListItem))
+            wordListRepository.addWordList(list)
+
+            Log.d("!!!1", list.toString())
+            Log.d("!!!2", WordListConverter().itemToString(wordListItem))
+            Log.d("!!!3", WordListConverter().itemToString(WordListConverter().stringToItem(list.wordList)))
+
+        }
+    }
 
 
 

@@ -1,4 +1,4 @@
-package com.example.english.data.words.room
+package com.example.english.data.word.word.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,7 +9,7 @@ data class Word(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
 
-    @ColumnInfo(name = "word")
+    @ColumnInfo(name = "english")
     var word: String = "",
 
     @ColumnInfo(name = "chinese")

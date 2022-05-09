@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.example.english.MainViewModel
 import kotlin.random.Random
 
 @Composable
@@ -140,4 +141,14 @@ fun TestTextField(
         maxLines = maxLines,
         modifier = modifier
     )
+}
+
+
+@Composable
+fun Test04(viewModel: MainViewModel) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Button(onClick = { viewModel.wordTest("test") }) {
+            Text(text = "Test")
+        }
+    }
 }
