@@ -1,7 +1,6 @@
 package com.example.english
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -18,13 +17,13 @@ import com.example.english.data.newslist.room.News
 import com.example.english.data.word.addWordInList
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
-import com.example.english.data.word.wordlist.WordListConverter
 import com.example.english.data.word.wordlist.WordListRepository
-import com.example.english.data.word.wordlist.room.EmptyWordListItem
+import com.example.english.data.word.wordlist.room.EmptyWordList
 import com.example.english.data.word.wordlist.room.WordIndex
 import com.example.english.data.word.wordlist.room.WordList
 import com.example.english.data.word.wordlist.room.WordListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,8 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: Repository,
-    private val wordRepository: WordRepository,
-    private val wordListRepository: WordListRepository,
+    val wordRepository: WordRepository,
+    val wordListRepository: WordListRepository,
 ) : ViewModel() {
 
 
@@ -46,6 +45,8 @@ class MainViewModel @Inject constructor(
 
 
     /** current news */
+    var currentNewsIndex by mutableStateOf(0)
+    private var currentNewsSize by mutableStateOf(0)
     private var currentFileName by mutableStateOf(FILE_NAME + "0")
     private var currentFileNameCn by mutableStateOf(FILE_NAME_CN + "0")
     private var currentFileNameTr by mutableStateOf(FILE_NAME_Tr + "0")
@@ -55,14 +56,19 @@ class MainViewModel @Inject constructor(
     var currentContent = mutableStateListOf<TextFieldValue>()
     var currentContentCn = mutableStateListOf<TextFieldValue>()
     var currentContentTr = mutableStateListOf<TextFieldValue>()
-    var currentContentWords = mutableStateListOf<TextFieldValue>()
+
+    var currentWordList = mutableStateOf(EmptyWordList.wordList)
+//    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
+    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
 
     fun currentNews(news: News, context: Context) {
+        currentNewsIndex = news.id
         currentFileName = FILE_NAME + news.id.toString()
         currentFileNameCn = FILE_NAME_CN + news.id.toString()
         currentFileNameTr = FILE_NAME_Tr + news.id.toString()
         currentTitle = news.title
         getFile(currentFileName, currentFileNameCn, currentFileNameTr, context)
+        getWordListByNewsIndex(news.id)
     }
 
     fun removeCurrentParagraph(index: Int) {
@@ -82,22 +88,29 @@ class MainViewModel @Inject constructor(
 
         // Room
         val caption = draftContent.text.split("\n")[0]
-        val id = repository.addNews(News(0, draftTitle.text, caption))
-        val fileName = FILE_NAME + id.toString()
-        val fileNameCn = FILE_NAME_CN + id.toString()
+        val newsIndex = repository.addNews(News(0, draftTitle.text, caption))
+        val fileName = FILE_NAME + newsIndex.toString()
+        val fileNameCn = FILE_NAME_CN + newsIndex.toString()
 
         // add file
-        addFile(id, context)
+        addNewFile(newsIndex, context)
+
+        // add word list
+        addNewWordList(
+            WordList(newsIndex = newsIndex.toInt(), wordListItemString = "")
+        )
     }
 
 
     /** File operation */
 
-    private fun addFile(fileNum: Long, context: Context) {
+    private fun addNewFile(fileNum: Long, context: Context) {
         viewModelScope.launch {
-            FileOperator.addFile(fileNum = fileNum.toString(),
+            FileOperator.addFile(
+                fileNum = fileNum.toString(),
                 draftContent = draftContent.text,
-                context = context)
+                context = context
+            )
         }
     }
 
@@ -139,6 +152,33 @@ class MainViewModel @Inject constructor(
 
 
     /** Word Operation  */
+    // Query
+    fun getWordById(id: Int): Flow<Word> {
+        return wordRepository.getWord(id)
+    }
+
+    // Insert
+    fun addNewWord(word: Word) {
+        viewModelScope.launch {
+            wordRepository.addNewWord(word)
+        }
+    }
+
+    // update
+    fun updateWord(word: Word) {
+        viewModelScope.launch {
+            wordRepository.updateWord(word)
+        }
+    }
+
+    // Delete()
+    fun deleteWord(word: Word) {
+        viewModelScope.launch {
+            wordRepository.deleteWord(word)
+        }
+    }
+
+
     // Test
     fun wordTest(text: String) {
         val word = Word(0, text)
@@ -161,13 +201,59 @@ class MainViewModel @Inject constructor(
                 word = Word(0, "dog", "狗"),
                 newsIndex = 1,
                 paragraphIndex = 0,
-                wordListItem = WordListItem(listOf(WordIndex(0, 1),
-                    WordIndex(0, 2),
-                    WordIndex(2, 1))),
+                wordListItem = WordListItem(
+                    listOf(
+                        WordIndex(0, 1),
+                        WordIndex(0, 2),
+                        WordIndex(2, 1)
+                    )
+                ),
                 wordRepository = wordRepository,
                 wordListRepository = wordListRepository
             )
 
+        }
+    }
+
+
+    /** WordList Operation */
+    // Query
+    private fun getWordListByNewsIndex(newsIndex: Int) {
+        viewModelScope.launch {
+            wordListRepository.getWordListByNewsIndex(newsIndex)
+        }
+    }
+
+//    fun getWordListToPage() {
+//        viewModelScope.launch {
+//            currentContentWordList
+//        }
+//    }
+
+    fun getCurrentWordList(): Flow<WordList> = wordListRepository.getWordListByNewsIndex(currentNewsIndex)
+
+    suspend fun getCurrentWordListToPage() {
+        getCurrentWordList().collect {
+
+        }
+    }
+
+    // Insert
+    private suspend fun addNewWordList(wordList: WordList) {
+        wordListRepository.addWordList(wordList)
+    }
+
+    // Update
+    fun updateWordList(wordList: WordList) {
+        viewModelScope.launch {
+            wordListRepository.updateWordList(wordList)
+        }
+    }
+
+    // Delete
+    fun deleteWordList(wordList: WordList) {
+        viewModelScope.launch {
+            wordListRepository.deleteWordList(wordList)
         }
     }
 

@@ -5,10 +5,10 @@ import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
 import com.example.english.data.word.wordlist.WordListConverter
 import com.example.english.data.word.wordlist.WordListRepository
+import com.example.english.data.word.wordlist.itemToString
 import com.example.english.data.word.wordlist.room.WordIndex
 import com.example.english.data.word.wordlist.room.WordList
 import com.example.english.data.word.wordlist.room.WordListItem
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 
 fun wordIsExist(word: Word, repository: WordRepository) {
@@ -32,7 +32,7 @@ suspend fun addWordInList(
     wordListRepository: WordListRepository,
 ) {
 
-    wordListRepository.addWordList(WordList(0, ""))
+    wordListRepository.addWordList(WordList(0, newsIndex,""))
 
     var wordId: Int = 0
 
@@ -42,19 +42,29 @@ suspend fun addWordInList(
         wordId = wordRepository.addNewWord(word).toInt()
         Log.d("!!!", "未存在，新增後獲得單字的index")
 
-
         val newWord = Word(wordId, word.english, word.chinese)
 
-        val newWordListItem: WordListItem = WordListItem(wordListItem.list + WordIndex(paragraphIndex, wordId))
+//        val newWord = Word(wordId, word.english, word.chinese)
+//
+//        val newWordListItem: WordListItem = WordListItem(wordListItem.list + WordIndex(paragraphIndex, wordId))
+//
+//        // 將已確定的Word資訊，更新到WordList上
+//        wordListRepository.updateWordList(
+//            WordList(
+//                newsIndex,
+//                WordListConverter().itemToString(newWordListItem)
+//            )
+//        )
+//        Log.d("!!!", "將已確定的Word資訊，更新到WordList上")
 
-        // 將已確定的Word資訊，更新到WordList上
-        wordListRepository.updateWordList(
-            WordList(
-                newsIndex,
-                WordListConverter().itemToString(newWordListItem)
-            )
+        updateWordList(
+            wordId,
+            newWord,
+            wordListItem,
+            paragraphIndex,
+            wordListRepository,
+            newsIndex
         )
-        Log.d("!!!", "將已確定的Word資訊，更新到WordList上")
 
     } else {
         // 已存在，從Word查詢單字的Index
@@ -63,28 +73,14 @@ suspend fun addWordInList(
             Log.d("!!!", "已存在，從Word查詢單字的Index")
 
 
-            val newWord = Word(wordId, word.english, word.chinese)
-
-            Log.d("!!!1", wordListItem.toString())
-            val newWordListItem: WordListItem = WordListItem(wordListItem.list + WordIndex(paragraphIndex, wordId))
-            Log.d("!!!2", newWordListItem.toString())
-
-            // 將已確定的Word資訊，更新到WordList上
-            wordListRepository.updateWordList(
-                WordList(
-                    newsIndex,
-                    WordListConverter().itemToString(newWordListItem)
-                )
+            updateWordList(
+                wordId,
+                word,
+                wordListItem,
+                paragraphIndex,
+                wordListRepository,
+                newsIndex
             )
-            Log.d("!!!", "將已確定的Word資訊，更新到WordList上")
-
-            wordListRepository.getWordList(1).collect {
-                if (it != null) {
-
-                    Log.d("!!!3", it.toString())
-                }
-            }
-
         }
     }
 
@@ -102,4 +98,30 @@ suspend fun addWordInList(
 //        )
 //    )
 //    Log.d("!!!", "將已確定的Word資訊，更新到WordList上")
+}
+
+private suspend fun updateWordList(
+    wordId: Int,
+    word: Word,
+    wordListItem: WordListItem,
+    paragraphIndex: Int,
+    wordListRepository: WordListRepository,
+    newsIndex: Int
+) {
+    val newWord = Word(wordId, word.english, word.chinese)
+
+    Log.d("!!!1", wordListItem.toString())
+    val newWordListItem =
+        WordListItem(wordListItem.list + WordIndex(paragraphIndex, wordId))
+    Log.d("!!!2", newWordListItem.toString())
+
+    // 將已確定的Word資訊，更新到WordList上
+    wordListRepository.updateWordList(
+        WordList(
+            0,
+            newsIndex,
+            itemToString(newWordListItem)
+        )
+    )
+    Log.d("!!!", "將已確定的Word資訊，更新到WordList上")
 }

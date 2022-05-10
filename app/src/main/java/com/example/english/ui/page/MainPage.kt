@@ -40,25 +40,27 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
         modifier = Modifier.fillMaxSize()
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
             contentPadding = WindowInsets.systemBars.asPaddingValues(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(list) {
-                NewsItem(it, viewModel, navController, context)
+                NewsItem(it, viewModel, { navController.navigate(MainRoute.News.route) }, context)
             }
         }
     }
 }
 
 @Composable
-fun NewsItem(news: News, viewModel: MainViewModel, navController: NavController, context: Context) {
+fun NewsItem(news: News, viewModel: MainViewModel, navigation: () -> Unit, context: Context) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .clickable {
-                navController.navigate(MainRoute.News.route)
+                navigation.invoke()
                 viewModel.currentNews(news, context)
             }
             .background(MaterialTheme.colors.background)

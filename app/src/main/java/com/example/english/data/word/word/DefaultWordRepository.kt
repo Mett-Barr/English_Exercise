@@ -23,6 +23,10 @@ class DefaultWordRepository(private val dao: WordDao) : WordRepository {
         return dao.addNewWord(word)
     }
 
+    override suspend fun updateWord(word: Word) {
+        dao.updateWord(word)
+    }
+
     override suspend fun deleteWord(word: Word) {
         dao.deleteWord(word)
     }

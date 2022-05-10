@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.Flow
 interface WordListDao {
 
     @Query("SELECT * from wordlist WHERE id=:id")
-    fun getWordList(id: Int): Flow<WordList>
+    fun getWordListById(id: Int): Flow<WordList>
+
+    @Query("SELECT * from wordlist WHERE newsIndex=:newsIndex")
+    fun getWordListByNewsIndex(newsIndex: Int): Flow<WordList>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addWordList(wordList: WordList)

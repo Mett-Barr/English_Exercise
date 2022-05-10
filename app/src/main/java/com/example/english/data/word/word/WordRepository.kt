@@ -13,6 +13,8 @@ interface WordRepository {
 
     suspend fun addNewWord(word: Word): Long
 
+    suspend fun updateWord(word: Word)
+
     suspend fun deleteWord(word: Word)
 
     suspend fun isWordExist(english: String): Boolean

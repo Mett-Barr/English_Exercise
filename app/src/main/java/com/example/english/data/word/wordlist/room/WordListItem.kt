@@ -13,7 +13,8 @@ data class WordIndex(
     var wordIndex: Int
 )
 
-object EmptyWordListItem {
-    val emptyList = WordListItem(emptyList())
+object EmptyWordList {
+    val wordList = WordList(0, 0, "")
+    val wordListItem = WordListItem(emptyList())
 }
 

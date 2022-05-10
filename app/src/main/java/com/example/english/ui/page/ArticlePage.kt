@@ -7,7 +7,6 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +14,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -34,25 +34,30 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
-import com.example.english.translation.translate
+import com.example.english.data.word.addWordInList
+import com.example.english.data.word.word.room.EmptyWord
+import com.example.english.data.word.word.room.Word
+import com.example.english.data.word.wordlist.room.EmptyWordList
+import com.example.english.data.word.wordlist.stringToItem
+import com.example.english.data.word.wordlist.wordListToNewsPage
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class,
+
+@OptIn(
+    ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class,
     ExperimentalFoundationApi::class, ExperimentalFoundationApi::class
 )
 @Composable
 fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
-
 //    val activity = LocalContext.current as Activity
     val context = LocalContext.current
 
 //    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-//    val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -94,6 +99,22 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         Log.d("!!!", "NewsArticlePage: BackHandler")
     }
 
+
+    val wordList = viewModel.getCurrentWordList().collectAsState(initial = EmptyWordList.wordList)
+    val wordListItemString by remember(wordList) {
+        derivedStateOf {
+            wordList.value.wordListItemString
+        }
+    }
+
+    val wordListForPage by remember(wordListItemString) {
+        derivedStateOf {
+            val wordListItem = stringToItem(wordListItemString)
+            wordListToNewsPage(wordListItem, viewModel.currentContent.size)
+        }
+    }
+
+
     Scaffold(
         bottomBar = {
             BottomAppBar {
@@ -130,7 +151,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 .padding(horizontal = 8.dp)
         ) {
             item {
-                Text(text = viewModel.currentTitle, style = Typography().h5, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
+                Text(
+                    text = viewModel.currentTitle,
+                    style = Typography().h5,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
+                )
             }
             itemsIndexed(viewModel.currentContent) { index, paragraph ->
 
@@ -177,7 +203,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         AnimatedContent(targetState = annotationState) { it ->
                             when (it) {
                                 AnnotationState.TRANSLATION -> {
-                                    FlatTextField(value = viewModel.currentContentTr[index],
+                                    FlatTextField(
+                                        value = viewModel.currentContentTr[index],
                                         onValueChange = {
                                             viewModel.currentContentTr[index] = it
                                         },
@@ -193,6 +220,24 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 }
                                 AnnotationState.WORDS -> {
                                     Text(text = ("word\nstate"))
+
+                                    LazyColumn() {
+                                        items(wordListForPage[index].toList()) {
+                                            Row {
+                                                val word = viewModel.getWordById(it).collectAsState(
+                                                    initial = EmptyWord.word
+                                                )
+                                                Text(
+                                                    text = word.value.english,
+                                                    modifier = Modifier.weight(1F)
+                                                )
+                                                Text(
+                                                    text = word.value.chinese,
+                                                    modifier = Modifier.weight(1F)
+                                                )
+                                            }
+                                        }
+                                    }
 
                                     LaunchedEffect(key1 = 1) {
                                         color.animateTo(Color.White)
@@ -232,10 +277,23 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 onClick = {
 
                                     // 1.檢測是否選取單字
-                                    val contextText = viewModel.currentContent[index].getSelectedText()
-                                    if (contextText.isNotBlank()) {
+                                    val contentText =
+                                        viewModel.currentContent[index].getSelectedText().text
+                                    if (contentText.isNotBlank()) {
                                         // 2.translate並且開啟annotation欄位
 
+                                        val newWord = Word(english = contentText)
+
+                                        coroutineScope.launch {
+                                            addWordInList(
+                                                word = newWord,
+                                                newsIndex = viewModel.currentNewsIndex,
+                                                paragraphIndex = index,
+                                                wordListItem = stringToItem(wordListItemString),
+                                                wordRepository = viewModel.wordRepository,
+                                                wordListRepository = viewModel.wordListRepository
+                                            )
+                                        }
                                         AnnotationState.WORDS
                                     } else {
                                         // 3.檢測開啟狀態，決定開關annotation欄位

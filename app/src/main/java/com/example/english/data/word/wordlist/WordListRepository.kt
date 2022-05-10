@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface WordListRepository {
 
-    suspend fun getWordList(id: Int): Flow<WordList>
+    fun getWordListById(id: Int): Flow<WordList>
+
+    fun getWordListByNewsIndex(newsIndex: Int): Flow<WordList>
 
     suspend fun addWordList(wordList: WordList)
 
