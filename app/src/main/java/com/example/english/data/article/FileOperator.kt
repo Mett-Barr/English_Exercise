@@ -5,6 +5,9 @@ import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
+import com.example.english.data.word.wordlist.stringToItem
+import com.example.english.data.word.wordlist.wordListToPage
+import com.example.english.data.word.wordlist.wordListToStringFile
 import com.example.english.stringconverter.StringConverter
 import com.example.english.translation.json.Translation
 import com.example.english.translation.translateArticle
@@ -14,6 +17,7 @@ import java.io.InputStreamReader
 const val FILE_NAME = "News_"
 const val FILE_NAME_CN = "News_CN_"
 const val FILE_NAME_Tr = "News_TR_"
+const val FILE_NAME_WORDLIST = "News_WordList_"
 
 object FileOperator {
 
@@ -28,6 +32,12 @@ object FileOperator {
         fosCn.close()
 
         addTranslatedFile(fileNum, draftContent, context)
+
+
+        // add blank wordList file
+        val fosWordList = context.openFileOutput(FILE_NAME_WORDLIST + fileNum, Context.MODE_PRIVATE)
+        fosWordList.write("".toByteArray())
+        fosWordList.close()
 
         Log.d("!!!", "addFile: ")
     }
@@ -53,6 +63,28 @@ object FileOperator {
         }
         return currentContent
     }
+
+    fun getWordListFile(
+        fileName: String,
+        newsSize: Int,
+        context: Context
+    ): SnapshotStateList<MutableList<Int>> {
+        val fos = context.openFileInput(fileName)
+        val reader = BufferedReader(InputStreamReader(fos))
+//        val tmpList = reader.readLines()
+//        val currentContent = emptyList<List<Int>>().toMutableStateList()
+//        tmpList.forEach {
+//            currentContent.add(TextFieldValue(it))
+//        }
+//        return currentContent
+
+
+        val wordListItemString = reader.readText()
+        val wordListItem = stringToItem(wordListItemString)
+        return wordListToPage(wordListItem, newsSize)
+    }
+
+
 
     fun getFileCn(fileNameCn: String, context: Context): SnapshotStateList<TextFieldValue> {
         val fosCn = context.openFileInput(fileNameCn)
@@ -97,10 +129,12 @@ fun saveFileCn(
         currentFileName: String,
         currentFileNameCn: String,
         currentFileNameTr: String,
+        currentFileNameWordList: String,
 
         currentContent: SnapshotStateList<TextFieldValue>,
         currentContentCn: SnapshotStateList<TextFieldValue>,
         currentContentTr: SnapshotStateList<TextFieldValue>,
+        currentContentWordList: SnapshotStateList<MutableList<Int>>,
 
         context: Context,
     ) {
@@ -126,6 +160,15 @@ fun saveFileCn(
         }
 //        repeat(list.size) { fosCn.write("\n".toByteArray())}
         fosTr.close()
+
+
+
+        // save wordList file
+        val fosWordList = context.openFileOutput(currentFileNameWordList, Context.MODE_PRIVATE)
+        val wordListForStringFile = wordListToStringFile(currentContentWordList)
+        fosWordList.write(wordListForStringFile.toByteArray())
+
+        fosWordList.close()
     }
 
 }

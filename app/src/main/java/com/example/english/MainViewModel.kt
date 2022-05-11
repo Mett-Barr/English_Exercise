@@ -5,10 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.english.data.article.FILE_NAME
-import com.example.english.data.article.FILE_NAME_CN
-import com.example.english.data.article.FILE_NAME_Tr
-import com.example.english.data.article.FileOperator
+import com.example.english.data.article.*
 import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
 import com.example.english.data.word.addWordInList
@@ -48,24 +45,33 @@ class MainViewModel @Inject constructor(
     private var currentFileNameCn by mutableStateOf(FILE_NAME_CN + "0")
     private var currentFileNameTr by mutableStateOf(FILE_NAME_Tr + "0")
 
+    private var currentFileNameWordList by mutableStateOf(FILE_NAME_WORDLIST + "0")
+
     var currentTitle by mutableStateOf("Title")
 
     var currentContent = mutableStateListOf<TextFieldValue>()
     var currentContentCn = mutableStateListOf<TextFieldValue>()
     var currentContentTr = mutableStateListOf<TextFieldValue>()
 
-    var currentWordList = mutableStateOf(EmptyWordList.wordList)
+//    var currentWordList = mutableStateOf(EmptyWordList.wordList)
+    var oldCurrentWordList = mutableStateOf(EmptyWordList.wordList)
+
+//    var currentWordList = mutableStateListOf<List<Int>>()
 
     //    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
-    var currentContentWordList = mutableStateListOf<List<Int>>()
+    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
 
     fun currentNews(news: News, context: Context) {
         currentNewsIndex = news.id
         currentFileName = FILE_NAME + news.id.toString()
         currentFileNameCn = FILE_NAME_CN + news.id.toString()
         currentFileNameTr = FILE_NAME_Tr + news.id.toString()
+        currentFileNameWordList = FILE_NAME_WORDLIST + news.id.toString()
         currentTitle = news.title
-        getFile(currentFileName, currentFileNameCn, currentFileNameTr, context)
+
+        // get content for page
+        getFile(currentFileName, currentFileNameCn, currentFileNameTr, currentFileNameWordList, context)
+
         getWordListByNewsIndex(news.id)
     }
 
@@ -86,17 +92,17 @@ class MainViewModel @Inject constructor(
 
         // Room
         val caption = draftContent.text.split("\n")[0]
-        val newsIndex = repository.addNews(News(0, draftTitle.text, caption))
-        val fileName = FILE_NAME + newsIndex.toString()
-        val fileNameCn = FILE_NAME_CN + newsIndex.toString()
+        val newsId = repository.addNews(News(0, draftTitle.text, caption))
+//        val fileName = FILE_NAME + newsId.toString()
+//        val fileNameCn = FILE_NAME_CN + newsId.toString()
 
         // add file
-        addNewFile(newsIndex, context)
+        addNewFile(newsId, context)
 
         // add word list
-        addNewWordList(
-            WordList(newsId = newsIndex.toInt(), wordListItemString = "")
-        )
+//        addNewWordList(
+//            WordList(newsId = newsId.toInt(), wordListItemString = "")
+//        )
     }
 
 
@@ -116,12 +122,17 @@ class MainViewModel @Inject constructor(
         fileName: String,
         fileNameCn: String,
         fileNameTr: String,
+        fileNameWordList: String,
         context: Context,
     ) {
         viewModelScope.launch {
             currentContent = FileOperator.getFile(fileName, context)
+
+            currentNewsSize = currentContent.size
+
             currentContentCn = FileOperator.getFileCn(fileNameCn, context)
             currentContentTr = FileOperator.getFile(fileNameTr, context)
+            currentContentWordList = FileOperator.getWordListFile(fileNameWordList, currentNewsSize, context)
         }
     }
 
@@ -139,9 +150,13 @@ class MainViewModel @Inject constructor(
                 currentFileNameCn = currentFileNameCn,
                 currentFileNameTr = currentFileNameTr,
 
+                currentFileNameWordList = currentFileNameWordList,
+
                 currentContent = currentContent,
                 currentContentCn = currentContentCn,
                 currentContentTr = currentContentTr,
+
+                currentContentWordList = currentContentWordList,
 
                 context = context
             )
@@ -198,7 +213,7 @@ class MainViewModel @Inject constructor(
             addWordInList(
                 word = Word(0, "dog", "狗"),
                 paragraphIndex = 0,
-                wordList = currentWordList.value,
+                wordList = oldCurrentWordList.value,
                 wordListItem = WordListItem(
                     listOf(
                         WordIndex(0, 1),

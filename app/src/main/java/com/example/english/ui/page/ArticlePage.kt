@@ -39,7 +39,7 @@ import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.data.word.wordlist.room.EmptyWordList
 import com.example.english.data.word.wordlist.stringToItem
-import com.example.english.data.word.wordlist.wordListToNewsPage
+import com.example.english.data.word.wordlist.wordListToPage
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import kotlinx.coroutines.launch
@@ -107,12 +107,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         }
     }
 
-    val wordListForPage by remember(wordListItemString) {
-        derivedStateOf {
-            val wordListItem = stringToItem(wordListItemString)
-            wordListToNewsPage(wordListItem, viewModel.currentContent.size)
-        }
-    }
+//    val wordListForPage by remember(wordListItemString) {
+//        derivedStateOf {
+//            val wordListItem = stringToItem(wordListItemString)
+//            wordListToPage(wordListItem, viewModel.currentContent.size)
+//        }
+//    }
 
 
     Scaffold(
@@ -222,7 +222,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     Text(text = ("word\nstate"))
 
                                     LazyColumn() {
-                                        items(wordListForPage[index].toList()) {
+                                        items(viewModel.currentContentWordList[index].toList()) {
                                             Row {
                                                 val word = viewModel.getWordById(it).collectAsState(
                                                     initial = EmptyWord.word

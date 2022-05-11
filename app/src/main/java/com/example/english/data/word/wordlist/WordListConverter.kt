@@ -3,7 +3,9 @@ package com.example.english.data.word.wordlist
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.room.TypeConverter
+import com.example.english.data.word.wordlist.room.EmptyWordList
 import com.example.english.data.word.wordlist.room.EmptyWordList.wordListItem
+import com.example.english.data.word.wordlist.room.WordIndex
 import com.example.english.data.word.wordlist.room.WordListItem
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -51,7 +53,7 @@ fun stringToItem(string: String): WordListItem {
 }
 
 
-fun wordListToNewsPage(wordListItem: WordListItem, size: Int): SnapshotStateList<MutableList<Int>> {
+fun wordListToPage(wordListItem: WordListItem, size: Int): SnapshotStateList<MutableList<Int>> {
 
     val list = mutableStateListOf<MutableList<Int>>()
     val emptyList = mutableListOf<Int>()
@@ -65,4 +67,23 @@ fun wordListToNewsPage(wordListItem: WordListItem, size: Int): SnapshotStateList
     }
 
     return list
+}
+
+fun wordListToStringFile(wordListForPage: List<List<Int>>): String {
+
+    var wordListItem: WordListItem = EmptyWordList.wordListItem
+    var paragraphIndex = 0
+    wordListForPage.forEach { paragraphList ->
+        paragraphList.forEach { wordIndex ->
+
+            wordListItem.list += WordIndex(
+                wordIndex = wordIndex,
+//                paragraphIndex = paragraphList.indexOf(paragraphList)
+                paragraphIndex = paragraphIndex
+            )
+        }
+        paragraphIndex += 1
+    }
+
+    return itemToString(wordListItem)
 }
