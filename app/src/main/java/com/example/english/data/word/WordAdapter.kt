@@ -3,7 +3,6 @@ package com.example.english.data.word
 import android.util.Log
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
-import com.example.english.data.word.wordlist.WordListConverter
 import com.example.english.data.word.wordlist.WordListRepository
 import com.example.english.data.word.wordlist.itemToString
 import com.example.english.data.word.wordlist.room.WordIndex
@@ -25,24 +24,24 @@ fun addNewWord(word: Word, repository: WordRepository) {
 
 suspend fun addWordInList(
     word: Word,
-    newsIndex: Int,
     paragraphIndex: Int,
+    wordList: WordList,
     wordListItem: WordListItem,
     wordRepository: WordRepository,
     wordListRepository: WordListRepository,
 ) {
 
-    wordListRepository.addWordList(WordList(0, newsIndex,""))
+//    wordListRepository.addWordList(WordList(0, newsIndex,""))
 
     var wordId: Int = 0
 
     // 檢查單字是否已存在
     if (!wordIsExistByEnglish(word.english, wordRepository)) {
-        // 未存在，新增後獲得單字的index
+        // 未存在，新增後獲得單字的ID
         wordId = wordRepository.addNewWord(word).toInt()
         Log.d("!!!", "未存在，新增後獲得單字的index")
 
-        val newWord = Word(wordId, word.english, word.chinese)
+//        val newWord = Word(wordId, word.english, word.chinese)
 
 //        val newWord = Word(wordId, word.english, word.chinese)
 //
@@ -59,15 +58,15 @@ suspend fun addWordInList(
 
         updateWordList(
             wordId,
-            newWord,
-            wordListItem,
+//            newWord,
             paragraphIndex,
+            wordListItem,
+            wordList,
             wordListRepository,
-            newsIndex
         )
 
     } else {
-        // 已存在，從Word查詢單字的Index
+        // 已存在，從Word查詢單字的ID
         wordRepository.getWordId(word.english).collect {
             wordId = it
             Log.d("!!!", "已存在，從Word查詢單字的Index")
@@ -75,11 +74,11 @@ suspend fun addWordInList(
 
             updateWordList(
                 wordId,
-                word,
-                wordListItem,
+//                word,
                 paragraphIndex,
+                wordListItem,
+                wordList,
                 wordListRepository,
-                newsIndex
             )
         }
     }
@@ -102,13 +101,13 @@ suspend fun addWordInList(
 
 private suspend fun updateWordList(
     wordId: Int,
-    word: Word,
-    wordListItem: WordListItem,
+//    word: Word,
     paragraphIndex: Int,
-    wordListRepository: WordListRepository,
-    newsIndex: Int
+    wordListItem: WordListItem,
+    wordList: WordList,
+    wordListRepository: WordListRepository
 ) {
-    val newWord = Word(wordId, word.english, word.chinese)
+//    val newWord = Word(wordId, word.english, word.chinese)
 
     Log.d("!!!1", wordListItem.toString())
     val newWordListItem =
@@ -118,8 +117,8 @@ private suspend fun updateWordList(
     // 將已確定的Word資訊，更新到WordList上
     wordListRepository.updateWordList(
         WordList(
-            0,
-            newsIndex,
+            wordList.id,
+            wordList.newsId,
             itemToString(newWordListItem)
         )
     )

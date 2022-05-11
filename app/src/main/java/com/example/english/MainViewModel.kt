@@ -1,10 +1,7 @@
 package com.example.english
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -58,8 +55,9 @@ class MainViewModel @Inject constructor(
     var currentContentTr = mutableStateListOf<TextFieldValue>()
 
     var currentWordList = mutableStateOf(EmptyWordList.wordList)
-//    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
-    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
+
+    //    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
+    var currentContentWordList = mutableStateListOf<List<Int>>()
 
     fun currentNews(news: News, context: Context) {
         currentNewsIndex = news.id
@@ -97,7 +95,7 @@ class MainViewModel @Inject constructor(
 
         // add word list
         addNewWordList(
-            WordList(newsIndex = newsIndex.toInt(), wordListItemString = "")
+            WordList(newsId = newsIndex.toInt(), wordListItemString = "")
         )
     }
 
@@ -199,8 +197,8 @@ class MainViewModel @Inject constructor(
 
             addWordInList(
                 word = Word(0, "dog", "狗"),
-                newsIndex = 1,
                 paragraphIndex = 0,
+                wordList = currentWordList.value,
                 wordListItem = WordListItem(
                     listOf(
                         WordIndex(0, 1),
@@ -220,7 +218,7 @@ class MainViewModel @Inject constructor(
     // Query
     private fun getWordListByNewsIndex(newsIndex: Int) {
         viewModelScope.launch {
-            wordListRepository.getWordListByNewsIndex(newsIndex)
+//            currentWordList = wordListRepository.getWordListByNewsIndex(newsIndex)
         }
     }
 
@@ -230,13 +228,14 @@ class MainViewModel @Inject constructor(
 //        }
 //    }
 
-    fun getCurrentWordList(): Flow<WordList> = wordListRepository.getWordListByNewsIndex(currentNewsIndex)
+    fun getCurrentWordList(): Flow<WordList> =
+        wordListRepository.getWordListByNewsIndex(currentNewsIndex)
 
-    suspend fun getCurrentWordListToPage() {
-        getCurrentWordList().collect {
-
-        }
-    }
+//    suspend fun getCurrentWordListToPage() {
+//        getCurrentWordList().collect {
+//
+//        }
+//    }
 
     // Insert
     private suspend fun addNewWordList(wordList: WordList) {

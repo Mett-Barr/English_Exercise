@@ -9,7 +9,7 @@ data class WordList(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    val newsIndex: Int,
+    val newsId: Int,
 
     val wordListItemString: String = ""
 )

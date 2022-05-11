@@ -9,7 +9,7 @@ interface WordListDao {
     @Query("SELECT * from wordlist WHERE id=:id")
     fun getWordListById(id: Int): Flow<WordList>
 
-    @Query("SELECT * from wordlist WHERE newsIndex=:newsIndex")
+    @Query("SELECT * from wordlist WHERE newsId=:newsIndex")
     fun getWordListByNewsIndex(newsIndex: Int): Flow<WordList>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -44,8 +44,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-//                    MainNavigation(viewModel)
-                    Test04(viewModel)
+                    MainNavigation(viewModel)
+//                    Test04(viewModel)
                 }
             }
         }

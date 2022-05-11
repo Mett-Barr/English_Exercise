@@ -287,8 +287,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         coroutineScope.launch {
                                             addWordInList(
                                                 word = newWord,
-                                                newsIndex = viewModel.currentNewsIndex,
                                                 paragraphIndex = index,
+                                                wordList = wordList.value,
                                                 wordListItem = stringToItem(wordListItemString),
                                                 wordRepository = viewModel.wordRepository,
                                                 wordListRepository = viewModel.wordListRepository
