@@ -33,24 +33,34 @@ fun TestPage01(list: List<String>) {
         items(list) {
             if (it != "\n" && it != "\n\n" && it != "\n\n\n" && it != "") {
 
-                Row(modifier = Modifier
-                    .height(IntrinsicSize.Max)
-                    .background(Color.Gray)) {
-                    Card(modifier = Modifier
-                        .weight(1F)
+                Row(
+                    modifier = Modifier
+                        .height(IntrinsicSize.Max)
+                        .background(Color.Gray)
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .weight(1F)
 //                        .height(IntrinsicSize.Max)
-                        .padding(8.dp)) {
-                        Text(text = it, modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(4.dp))
+                            .padding(8.dp)
+                    ) {
+                        Text(
+                            text = it, modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(4.dp)
+                        )
                     }
-                    Card(modifier = Modifier
-                        .weight(1F)
+                    Card(
+                        modifier = Modifier
+                            .weight(1F)
 //                        .height(IntrinsicSize.Max)
-                        .padding(8.dp)) {
-                        Text(text = randomLine(), modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(4.dp))
+                            .padding(8.dp)
+                    ) {
+                        Text(
+                            text = randomLine(), modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(4.dp)
+                        )
                     }
                 }
             }
@@ -91,7 +101,8 @@ fun TestPast() {
         mutableStateOf("123\n234")
     }
     Box(modifier = Modifier.fillMaxSize()) {
-        TextField(value = text,
+        TextField(
+            value = text,
             onValueChange = { text = it },
             modifier = Modifier
                 .align(Alignment.Center),
@@ -103,10 +114,13 @@ fun TestPast() {
 @Composable
 fun TestPage2() {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(30.dp)) {
-            TextField(value = "123",
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(30.dp)
+        ) {
+            TextField(
+                value = "123",
                 onValueChange = {},
                 shape = RoundedCornerShape(8.dp),
                 colors = TextFieldDefaults.textFieldColors(
@@ -116,7 +130,8 @@ fun TestPage2() {
                     unfocusedLabelColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                modifier = Modifier.align(Alignment.Center))
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 }
@@ -128,7 +143,8 @@ fun TestTextField(
     modifier: Modifier = Modifier,
     maxLines: Int = Int.MAX_VALUE,
 ) {
-    TextField(value = textFieldValue,
+    TextField(
+        value = textFieldValue,
         onValueChange = onValueChange,
         shape = RoundedCornerShape(8.dp),
         colors = TextFieldDefaults.textFieldColors(
@@ -148,7 +164,9 @@ fun TestTextField(
 fun Test04(viewModel: MainViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         Button(modifier = Modifier.align(Alignment.Center),
-            onClick = { viewModel.wordTest("test") }) {
+            onClick = {
+//                viewModel.wordTest("test")
+            }) {
             Text(text = "Test")
         }
     }

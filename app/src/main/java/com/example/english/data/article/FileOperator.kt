@@ -20,7 +20,6 @@ const val FILE_NAME_Tr = "News_TR_"
 const val FILE_NAME_WORDLIST = "News_WordList_"
 
 object FileOperator {
-
     fun addFile(fileNum: String, draftContent: String, context: Context) {
         val fos = context.openFileOutput(FILE_NAME + fileNum, Context.MODE_PRIVATE)
         val list = StringConverter().stringToList(draftContent)
@@ -170,5 +169,4 @@ fun saveFileCn(
 
         fosWordList.close()
     }
-
 }

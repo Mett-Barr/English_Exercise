@@ -34,12 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
-import com.example.english.data.word.addWordInList
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
-import com.example.english.data.word.wordlist.room.EmptyWordList
-import com.example.english.data.word.wordlist.stringToItem
-import com.example.english.data.word.wordlist.wordListToPage
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import kotlinx.coroutines.launch
@@ -100,12 +96,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     }
 
 
-    val wordList = viewModel.getCurrentWordList().collectAsState(initial = EmptyWordList.wordList)
-    val wordListItemString by remember(wordList) {
-        derivedStateOf {
-            wordList.value.wordListItemString
-        }
-    }
+//    val wordList = viewModel.getCurrentWordList().collectAsState(initial = EmptyWordList.wordList)
+//    val wordListItemString by remember(wordList) {
+//        derivedStateOf {
+//            wordList.value.wordListItemString
+//        }
+//    }
 
 //    val wordListForPage by remember(wordListItemString) {
 //        derivedStateOf {
@@ -285,14 +281,14 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         val newWord = Word(english = contentText)
 
                                         coroutineScope.launch {
-                                            addWordInList(
-                                                word = newWord,
-                                                paragraphIndex = index,
-                                                wordList = wordList.value,
-                                                wordListItem = stringToItem(wordListItemString),
-                                                wordRepository = viewModel.wordRepository,
-                                                wordListRepository = viewModel.wordListRepository
-                                            )
+//                                            addWordInList(
+//                                                word = newWord,
+//                                                paragraphIndex = index,
+//                                                wordList = wordList.value,
+//                                                wordListItem = stringToItem(wordListItemString),
+//                                                wordRepository = viewModel.wordRepository,
+//                                                wordListRepository = viewModel.wordListRepository
+//                                            )
                                         }
                                         AnnotationState.WORDS
                                     } else {
