@@ -15,6 +15,6 @@ data class WordIndex(
 
 object EmptyWordList {
     val wordList = WordList(0, 0, "")
-    val wordListItem = WordListItem(emptyList())
+    val emptyWordListItem = WordListItem(emptyList())
 }
 

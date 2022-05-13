@@ -154,7 +154,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
                 )
             }
-            itemsIndexed(viewModel.currentContent) { index, paragraph ->
+            itemsIndexed(viewModel.currentContent) { paragraphIndex, paragraphContent ->
 
                 var openState by remember {
                     mutableStateOf(false)
@@ -176,16 +176,16 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)) {
 
                         FlatTextField(
-                            value = paragraph,
-                            onValueChange = { viewModel.currentContent[index] = it },
+                            value = paragraphContent,
+                            onValueChange = { viewModel.currentContent[paragraphIndex] = it },
                             modifier = Modifier.fillMaxWidth(),
                             readOnly = true
                         )
 
                         AnimatedVisibility(visible = openState) {
                             FlatTextField(
-                                value = viewModel.currentContentCn[index],
-                                onValueChange = { viewModel.currentContentCn[index] = it },
+                                value = viewModel.currentContentCn[paragraphIndex],
+                                onValueChange = { viewModel.currentContentCn[paragraphIndex] = it },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 8.dp)
@@ -200,9 +200,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             when (it) {
                                 AnnotationState.TRANSLATION -> {
                                     FlatTextField(
-                                        value = viewModel.currentContentTr[index],
+                                        value = viewModel.currentContentTr[paragraphIndex],
                                         onValueChange = {
-                                            viewModel.currentContentTr[index] = it
+                                            viewModel.currentContentTr[paragraphIndex] = it
                                         },
                                         readOnly = true,
                                         modifier = Modifier
@@ -215,12 +215,13 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     }
                                 }
                                 AnnotationState.WORDS -> {
-                                    Text(text = ("word\nstate"))
+//                                    Text(text = ("word\nstate"))
 
-                                    LazyColumn() {
-                                        items(viewModel.currentContentWordList[index].toList()) {
+                                    Column {
+                                        repeat(viewModel.currentContentWordList[paragraphIndex].size) {
+                                            val wordId = viewModel.currentContentWordList[paragraphIndex][it]
                                             Row {
-                                                val word = viewModel.getWordById(it).collectAsState(
+                                                val word = viewModel.getWordById(wordId).collectAsState(
                                                     initial = EmptyWord.word
                                                 )
                                                 Text(
@@ -234,6 +235,24 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                             }
                                         }
                                     }
+
+//                                    LazyColumn() {
+//                                        items(viewModel.currentContentWordList[index].toList()) {
+//                                            Row {
+//                                                val word = viewModel.getWordById(it).collectAsState(
+//                                                    initial = EmptyWord.word
+//                                                )
+//                                                Text(
+//                                                    text = word.value.english,
+//                                                    modifier = Modifier.weight(1F)
+//                                                )
+//                                                Text(
+//                                                    text = word.value.chinese,
+//                                                    modifier = Modifier.weight(1F)
+//                                                )
+//                                            }
+//                                        }
+//                                    }
 
                                     LaunchedEffect(key1 = 1) {
                                         color.animateTo(Color.White)
@@ -250,7 +269,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         Row(modifier = Modifier.fillMaxWidth()) {
                             ClickableIcon(painter = painterResource(id = R.drawable.delete),
                                 onClick = {
-                                    viewModel.removeCurrentParagraph(index)
+                                    viewModel.removeCurrentParagraph(paragraphIndex)
                                 })
 
                             Spacer(modifier = Modifier
@@ -274,13 +293,13 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                                     // 1.檢測是否選取單字
                                     val contentText =
-                                        viewModel.currentContent[index].getSelectedText().text
+                                        viewModel.currentContent[paragraphIndex].getSelectedText().text
                                     if (contentText.isNotBlank()) {
                                         // 2.translate並且開啟annotation欄位
 
                                         val newWord = Word(english = contentText)
 
-                                        coroutineScope.launch {
+//                                        coroutineScope.launch {
 //                                            addWordInList(
 //                                                word = newWord,
 //                                                paragraphIndex = index,
@@ -289,7 +308,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                                wordRepository = viewModel.wordRepository,
 //                                                wordListRepository = viewModel.wordListRepository
 //                                            )
-                                        }
+//
+//                                        }
+                                        viewModel.addWordInList(contentText, paragraphIndex)
                                         AnnotationState.WORDS
                                     } else {
                                         // 3.檢測開啟狀態，決定開關annotation欄位

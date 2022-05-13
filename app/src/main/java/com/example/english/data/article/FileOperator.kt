@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
+import com.example.english.data.word.wordlist.itemToString
+import com.example.english.data.word.wordlist.room.EmptyWordList
 import com.example.english.data.word.wordlist.stringToItem
 import com.example.english.data.word.wordlist.wordListToPage
 import com.example.english.data.word.wordlist.wordListToStringFile
@@ -35,7 +37,8 @@ object FileOperator {
 
         // add blank wordList file
         val fosWordList = context.openFileOutput(FILE_NAME_WORDLIST + fileNum, Context.MODE_PRIVATE)
-        fosWordList.write("".toByteArray())
+        val wordListString = itemToString(EmptyWordList.emptyWordListItem)
+        fosWordList.write(wordListString.toByteArray())
         fosWordList.close()
 
         Log.d("!!!", "addFile: ")

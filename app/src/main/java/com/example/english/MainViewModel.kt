@@ -25,7 +25,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: Repository,
     val wordRepository: WordRepository,
-    val wordListRepository: WordListRepository,
+//    val wordListRepository: WordListRepository,
 ) : ViewModel() {
 
 
@@ -226,6 +226,20 @@ class MainViewModel @Inject constructor(
 
 
     /** WordList Operation */
+    //Insert
+    fun addWordInList(english: String, paragraphIndex: Int, ) {
+        viewModelScope.launch {
+            com.example.english.data.word.addWordInList(
+                english = english,
+                paragraphIndex = paragraphIndex,
+                wordListForPage = currentContentWordList,
+                wordRepository = wordRepository
+            )
+        }
+    }
+
+
+
 //    // Query
 //    private fun getWordListByNewsIndex(newsIndex: Int) {
 //        viewModelScope.launch {

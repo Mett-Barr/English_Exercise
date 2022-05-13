@@ -25,11 +25,11 @@ fun addNewWord(word: Word, repository: WordRepository) {
 suspend fun addWordInList(
     english: String,
     paragraphIndex: Int,
-    wordList: WordList,
-    wordListItem: WordListItem,
+//    wordList: WordList,
+//    wordListItem: WordListItem,
     wordRepository: WordRepository,
     wordListForPage: MutableList<MutableList<Int>>
-) {
+): MutableList<MutableList<Int>> {
     var wordId = 0
 
     // 檢查單字是否存在
@@ -40,11 +40,21 @@ suspend fun addWordInList(
             // 獲取ID並更新WordList
             wordId = it
 
-
+            // 更新wordListForPage
+            wordListForPage[paragraphIndex] += wordId
         }
-    }
-}
+    } else {
+        // word不存在
 
+        // 新增new word並獲取wordId
+        wordId = wordRepository.addNewWord(Word(english = english)).toInt()
+
+        // 更新wordListForPage
+        wordListForPage[paragraphIndex] += wordId
+    }
+
+    return wordListForPage
+}
 
 
 suspend fun oldaddWordInList(
@@ -123,6 +133,16 @@ suspend fun oldaddWordInList(
 //    )
 //    Log.d("!!!", "將已確定的Word資訊，更新到WordList上")
 }
+
+
+private fun updateWordListForPage(
+    wordId: Int,
+    paragraphIndex: Int,
+    wordListForPage: MutableList<MutableList<Int>>
+) {
+    wordListForPage[paragraphIndex] += wordId
+}
+
 
 private suspend fun oldupdateWordList(
     wordId: Int,
