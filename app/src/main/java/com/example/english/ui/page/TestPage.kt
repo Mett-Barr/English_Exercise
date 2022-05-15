@@ -2,6 +2,7 @@ package com.example.english.ui.page
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -168,6 +170,28 @@ fun Test04(viewModel: MainViewModel) {
 //                viewModel.wordTest("test")
             }) {
             Text(text = "Test")
+        }
+    }
+}
+
+
+@Composable
+fun Test05(viewModel: MainViewModel) {
+//    val list: SnapshotStateList<SnapshotStateList<Int>> = remember {
+//        mutableStateListOf(mutableStateListOf(1), mutableStateListOf(2), mutableStateListOf(3))
+//    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        viewModel.testList.forEachIndexed { index, snapshotStateList ->
+            Column(modifier = Modifier.clickable {
+                viewModel.testList[index] = (viewModel.testList[index] + (0..10).random()).toMutableStateList()
+            }.padding(30.dp)) {
+                Text(text = index.toString())
+                snapshotStateList.forEach {
+                    Text(text = it.toString())
+                }
+            }
+            Spacer(modifier = Modifier.size(16.dp))
         }
     }
 }

@@ -43,7 +43,10 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 8.dp),
-            contentPadding = WindowInsets.systemBars.asPaddingValues(),
+            contentPadding = PaddingValues(
+                top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding() + 8.dp,
+                bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 8.dp,
+            ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(list) {
@@ -60,8 +63,8 @@ fun NewsItem(news: News, viewModel: MainViewModel, navigation: () -> Unit, conte
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .clickable {
-                navigation.invoke()
                 viewModel.currentNews(news, context)
+                navigation.invoke()
             }
             .background(MaterialTheme.colors.background)
     ) {

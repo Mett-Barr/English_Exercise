@@ -1,20 +1,19 @@
 package com.example.english
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.english.data.article.*
 import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
-import com.example.english.data.word.oldaddWordInList
+import com.example.english.data.word.addWordTest
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
-import com.example.english.data.word.wordlist.WordListRepository
-import com.example.english.data.word.wordlist.room.EmptyWordList
-import com.example.english.data.word.wordlist.room.WordIndex
-import com.example.english.data.word.wordlist.room.WordListItem
+import com.example.english.data.word.wordlist.wordListToStringFile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -38,40 +37,26 @@ class MainViewModel @Inject constructor(
 
 
     /** current news */
-    var currentNewsId by mutableStateOf("0")
+    private var currentNewsId by mutableStateOf("0")
     private var currentNewsSize by mutableStateOf(0)
-    private var currentFileName by mutableStateOf(FILE_NAME + "0")
-    private var currentFileNameCn by mutableStateOf(FILE_NAME_CN + "0")
-    private var currentFileNameTr by mutableStateOf(FILE_NAME_Tr + "0")
-
-    private var currentFileNameWordList by mutableStateOf(FILE_NAME_WORDLIST + "0")
 
     var currentTitle by mutableStateOf("Title")
 
     var currentContent = mutableStateListOf<TextFieldValue>()
     var currentContentCn = mutableStateListOf<TextFieldValue>()
     var currentContentTr = mutableStateListOf<TextFieldValue>()
+    var currentContentWordList: SnapshotStateList<SnapshotStateList<Int>> =
+        mutableStateListOf(emptyList<Int>().toMutableStateList())
 
-//    var currentWordList = mutableStateOf(EmptyWordList.wordList)
-    var oldCurrentWordList = mutableStateOf(EmptyWordList.wordList)
-
-//    var currentWordList = mutableStateListOf<List<Int>>()
-
-    //    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
-    var currentContentWordList = mutableStateListOf<MutableList<Int>>()
+    val testList =
+        mutableStateListOf(mutableStateListOf(1), mutableStateListOf(2), mutableStateListOf(3))
 
     fun currentNews(news: News, context: Context) {
         currentNewsId = news.id.toString()
-//        currentFileName = FILE_NAME + news.id.toString()
-//        currentFileNameCn = FILE_NAME_CN + news.id.toString()
-//        currentFileNameTr = FILE_NAME_Tr + news.id.toString()
-//        currentFileNameWordList = FILE_NAME_WORDLIST + news.id.toString()
         currentTitle = news.title
 
         // get content for page
         getFile(context)
-
-//        getWordListByNewsIndex(news.id)
     }
 
     fun removeCurrentParagraph(index: Int) {
@@ -120,15 +105,20 @@ class MainViewModel @Inject constructor(
     private fun getFile(
         context: Context,
     ) {
-        val newsIdStr = currentNewsId.toString()
         viewModelScope.launch {
-            currentContent = FileOperator.getFile(FILE_NAME + newsIdStr, context)
+            currentContent = FileOperator.getFile(FILE_NAME + currentNewsId, context)
 
             currentNewsSize = currentContent.size
 
-            currentContentCn = FileOperator.getFileCn(FILE_NAME_CN + newsIdStr, context)
-            currentContentTr = FileOperator.getFile(FILE_NAME_Tr + newsIdStr, context)
-            currentContentWordList = FileOperator.getWordListFile(FILE_NAME_WORDLIST + newsIdStr, currentNewsSize, context)
+            currentContentCn = FileOperator.getFileCn(FILE_NAME_CN + currentNewsId, context)
+            currentContentTr = FileOperator.getFile(FILE_NAME_Tr + currentNewsId, context)
+            currentContentWordList = FileOperator.getWordListFile(
+                FILE_NAME_WORDLIST + currentNewsId,
+                currentNewsSize,
+                context)
+            currentContentWordList.forEach {
+                Log.d("!!!", it.toList().toString())
+            }
         }
     }
 
@@ -227,17 +217,54 @@ class MainViewModel @Inject constructor(
 
     /** WordList Operation */
     //Insert
-    fun addWordInList(english: String, paragraphIndex: Int, ) {
-        viewModelScope.launch {
-            com.example.english.data.word.addWordInList(
-                english = english,
-                paragraphIndex = paragraphIndex,
-                wordListForPage = currentContentWordList,
-                wordRepository = wordRepository
-            )
-        }
-    }
+    fun addWordInList(english: String, paragraphIndex: Int) {
 
+        Log.d("!!!", "addWordInList: $paragraphIndex")
+
+        Log.d("!!!", "addWordInList: $paragraphIndex")
+
+
+
+        viewModelScope.launch {
+//            Log.d("!!! 1", "addWordInList: ${wordListToStringFile(currentContentWordList)}")
+            currentContentWordList[paragraphIndex] = com.example.english.data.word.addWordInListTest(
+                english = english,
+                wordRepository = wordRepository,
+                wordListTable = currentContentWordList[paragraphIndex]
+            )
+
+//            currentContentWordList[paragraphIndex] = com.example.english.data.word.addWordInList(
+//                english = english,
+//                wordRepository = wordRepository,
+//                wordListTable = currentContentWordList[paragraphIndex]
+//            )
+
+//            currentContentWordList[paragraphIndex] +
+
+//            val wordId =
+//                addWordTest(english, wordRepository, currentContentWordList[paragraphIndex])
+//
+//            if (wordId != null) currentContentWordList[paragraphIndex].add(wordId)
+//
+//            Log.d("!!!", "addWordInList: $wordId")
+
+//            addWordTest(english,
+//                wordRepository,
+//                currentContentWordList[paragraphIndex]).also {
+//                Log.d("!!!", "addWordInList: addWordTest")
+//                if (it != null) currentContentWordList[paragraphIndex].add(it)
+//            }
+
+//            Log.d("!!! 2", "addWordInList: ${wordListToStringFile(currentContentWordList)}")
+//            currentContentWordList.toList().forEach {
+//                Log.d("!!! forEach", "$it：${it.toList()}")
+//            }
+//
+//            val list: List<List<Int>> = currentContentWordList.toList()
+//            Log.d("!!! list", list.toString())
+        }
+
+    }
 
 
 //    // Query

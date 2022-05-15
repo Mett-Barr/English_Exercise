@@ -34,10 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
+import com.example.english.data.word.addWordTest
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
+import com.example.english.ui.components.WordListTable
 import kotlinx.coroutines.launch
 
 
@@ -141,7 +143,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
 //            contentPadding = PaddingValues.,
-            contentPadding = WindowInsets.systemBars.asPaddingValues(),
+//            contentPadding = paddingValues,
+            contentPadding = PaddingValues(
+                top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding() + 8.dp,
+                bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 8.dp,
+            ),
             modifier = Modifier
                 .padding(paddingValues)
                 .padding(horizontal = 8.dp)
@@ -215,48 +221,19 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     }
                                 }
                                 AnnotationState.WORDS -> {
-//                                    Text(text = ("word\nstate"))
-
-                                    Column {
-                                        repeat(viewModel.currentContentWordList[paragraphIndex].size) {
-                                            val wordId = viewModel.currentContentWordList[paragraphIndex][it]
-                                            Row {
-                                                val word = viewModel.getWordById(wordId).collectAsState(
-                                                    initial = EmptyWord.word
-                                                )
-                                                Text(
-                                                    text = word.value.english,
-                                                    modifier = Modifier.weight(1F)
-                                                )
-                                                Text(
-                                                    text = word.value.chinese,
-                                                    modifier = Modifier.weight(1F)
-                                                )
-                                            }
-                                        }
-                                    }
-
-//                                    LazyColumn() {
-//                                        items(viewModel.currentContentWordList[index].toList()) {
-//                                            Row {
-//                                                val word = viewModel.getWordById(it).collectAsState(
-//                                                    initial = EmptyWord.word
-//                                                )
-//                                                Text(
-//                                                    text = word.value.english,
-//                                                    modifier = Modifier.weight(1F)
-//                                                )
-//                                                Text(
-//                                                    text = word.value.chinese,
-//                                                    modifier = Modifier.weight(1F)
-//                                                )
-//                                            }
-//                                        }
-//                                    }
+                                    WordListTable(
+                                        list = viewModel.currentContentWordList[paragraphIndex].toList(),
+                                        viewModel = viewModel)
 
                                     LaunchedEffect(key1 = 1) {
                                         color.animateTo(Color.White)
                                     }
+
+
+                                    viewModel.currentContentWordList.toList()
+                                        .forEachIndexed { index, snapshotStateList ->
+//                                        Log.d("!!! forEach", "$index：${snapshotStateList.toList()}")
+                                        }
                                 }
                                 AnnotationState.CLOSE -> {
                                     LaunchedEffect(key1 = 1) {
@@ -293,32 +270,33 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                                     // 1.檢測是否選取單字
                                     val contentText =
-                                        viewModel.currentContent[paragraphIndex].getSelectedText().text
-                                    if (contentText.isNotBlank()) {
+                                        paragraphContent.getSelectedText().text
+                                    annotationState = if (contentText.isNotBlank()) {
                                         // 2.translate並且開啟annotation欄位
+                                        viewModel.addWordInList(contentText, paragraphIndex)
 
-                                        val newWord = Word(english = contentText)
+                                        Log.d("!!! ClickableIcon", "$contentText $paragraphIndex")
+
 
 //                                        coroutineScope.launch {
-//                                            addWordInList(
-//                                                word = newWord,
-//                                                paragraphIndex = index,
-//                                                wordList = wordList.value,
-//                                                wordListItem = stringToItem(wordListItemString),
-//                                                wordRepository = viewModel.wordRepository,
-//                                                wordListRepository = viewModel.wordListRepository
-//                                            )
-//
+//                                            addWordTest(contentText,
+//                                                viewModel.wordRepository,
+//                                                viewModel.currentContentWordList[paragraphIndex]).also {
+//                                                Log.d("!!!", "addWordInList: addWordTest")
+//                                                if (it != null) viewModel.currentContentWordList[paragraphIndex].add(
+//                                                    it)
+//                                            }
 //                                        }
-                                        viewModel.addWordInList(contentText, paragraphIndex)
+
+
+
+
                                         AnnotationState.WORDS
                                     } else {
                                         // 3.檢測開啟狀態，決定開關annotation欄位
-                                        annotationState =
-                                            if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
-                                            else AnnotationState.WORDS
+                                        if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
+                                        else AnnotationState.WORDS
                                     }
-
 
 //                                    annotationState =
 //                                        if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
@@ -326,6 +304,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
 
 //                                    viewModel.translation2(paragraph.text)
+
+//                                    val list: List<List<Int>> = viewModel.currentContentWordList.toList()
+//                                    list.forEach {
+//                                        Log.d("!!! list", it.toList().toString())
+//                                    }
+
                                 })
                             AnimatedContent(targetState = openState) {
                                 ClickableIcon(painter = painterResource(id = getRid(it)),

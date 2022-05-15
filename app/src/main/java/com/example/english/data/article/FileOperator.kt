@@ -1,14 +1,13 @@
 package com.example.english.data.article
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.english.data.word.wordlist.itemToString
 import com.example.english.data.word.wordlist.room.EmptyWordList
 import com.example.english.data.word.wordlist.stringToItem
-import com.example.english.data.word.wordlist.wordListToPage
+import com.example.english.data.word.wordlist.wordListToTable
 import com.example.english.data.word.wordlist.wordListToStringFile
 import com.example.english.stringconverter.StringConverter
 import com.example.english.translation.json.Translation
@@ -41,7 +40,7 @@ object FileOperator {
         fosWordList.write(wordListString.toByteArray())
         fosWordList.close()
 
-        Log.d("!!!", "addFile: ")
+//        Log.d("!!!", "addFile: ")
     }
 
     private fun addTranslatedFile(fileNum: String, originContent: String, context: Context) {
@@ -70,20 +69,12 @@ object FileOperator {
         fileName: String,
         newsSize: Int,
         context: Context
-    ): SnapshotStateList<MutableList<Int>> {
+    ): SnapshotStateList<SnapshotStateList<Int>> {
         val fos = context.openFileInput(fileName)
         val reader = BufferedReader(InputStreamReader(fos))
-//        val tmpList = reader.readLines()
-//        val currentContent = emptyList<List<Int>>().toMutableStateList()
-//        tmpList.forEach {
-//            currentContent.add(TextFieldValue(it))
-//        }
-//        return currentContent
-
-
         val wordListItemString = reader.readText()
         val wordListItem = stringToItem(wordListItemString)
-        return wordListToPage(wordListItem, newsSize)
+        return wordListToTable(wordListItem, newsSize)
     }
 
 
@@ -136,7 +127,7 @@ fun saveFileCn(
         currentContent: SnapshotStateList<TextFieldValue>,
         currentContentCn: SnapshotStateList<TextFieldValue>,
         currentContentTr: SnapshotStateList<TextFieldValue>,
-        currentContentWordList: SnapshotStateList<MutableList<Int>>,
+        currentContentWordList: SnapshotStateList<SnapshotStateList<Int>>,
 
         context: Context,
     ) {
@@ -167,7 +158,7 @@ fun saveFileCn(
 
         // save wordList file
         val fosWordList = context.openFileOutput(currentFileNameWordList, Context.MODE_PRIVATE)
-        val wordListForStringFile = wordListToStringFile(currentContentWordList)
+        val wordListForStringFile = wordListToStringFile(currentContentWordList.toList())
         fosWordList.write(wordListForStringFile.toByteArray())
 
         fosWordList.close()

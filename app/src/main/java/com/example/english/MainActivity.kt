@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.page.Test04
+import com.example.english.ui.page.Test05
 import com.example.english.ui.theme.EnglishTheme
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     MainNavigation(viewModel)
-//                    Test04(viewModel)
+//                    Test05(viewModel)
                 }
             }
         }
