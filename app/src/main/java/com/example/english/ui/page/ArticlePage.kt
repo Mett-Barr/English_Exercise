@@ -14,7 +14,6 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -28,19 +27,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
-import com.example.english.data.word.addWordTest
-import com.example.english.data.word.word.room.EmptyWord
-import com.example.english.data.word.word.room.Word
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordListTable
-import kotlinx.coroutines.launch
 
 
 @OptIn(
@@ -96,22 +92,6 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         popBack()
         Log.d("!!!", "NewsArticlePage: BackHandler")
     }
-
-
-//    val wordList = viewModel.getCurrentWordList().collectAsState(initial = EmptyWordList.wordList)
-//    val wordListItemString by remember(wordList) {
-//        derivedStateOf {
-//            wordList.value.wordListItemString
-//        }
-//    }
-
-//    val wordListForPage by remember(wordListItemString) {
-//        derivedStateOf {
-//            val wordListItem = stringToItem(wordListItemString)
-//            wordListToPage(wordListItem, viewModel.currentContent.size)
-//        }
-//    }
-
 
     Scaffold(
         bottomBar = {
@@ -266,12 +246,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                    translate(context)
                                 })
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
+                                modifier = Modifier.focusable(),
                                 onClick = {
-
-//                                    viewModel.wordListTest(paragraphIndex)
-
-
-
                                     // 1.檢測是否選取單字
                                     val contentText =
                                         paragraphContent.getSelectedText().text
@@ -279,23 +255,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                                         viewModel.addWordListTable(contentText, paragraphIndex)
 
+                                        viewModel.currentContent[paragraphIndex] =
+                                            viewModel.currentContent[paragraphIndex].copy(
+                                                selection = TextRange.Zero
+                                            )
+
                                         // 2.translate並且開啟annotation欄位
-//                                        viewModel.addWordInList(contentText, paragraphIndex)
-//                                        viewModel.addWordByVM(contentText, paragraphIndex)
-
-//                                        Log.d("!!! ClickableIcon", "$contentText $paragraphIndex")
-
-
-//                                        coroutineScope.launch {
-//                                            addWordTest(contentText,
-//                                                viewModel.wordRepository,
-//                                                viewModel.currentContentWordList[paragraphIndex]).also {
-//                                                Log.d("!!!", "addWordInList: addWordTest")
-//                                                if (it != null) viewModel.currentContentWordList[paragraphIndex].add(
-//                                                    it)
-//                                            }
-//                                        }
-
 
                                         AnnotationState.WORDS
                                     } else {
@@ -303,19 +268,6 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
                                         else AnnotationState.WORDS
                                     }
-
-//                                    annotationState =
-//                                        if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
-//                                        else AnnotationState.WORDS
-
-
-//                                    viewModel.translation2(paragraph.text)
-
-//                                    val list: List<List<Int>> = viewModel.currentContentWordList.toList()
-//                                    list.forEach {
-//                                        Log.d("!!! list", it.toList().toString())
-//                                    }
-
                                 })
                             AnimatedContent(targetState = openState) {
                                 ClickableIcon(painter = painterResource(id = getRid(it)),

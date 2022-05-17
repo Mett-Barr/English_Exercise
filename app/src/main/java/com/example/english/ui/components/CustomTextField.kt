@@ -8,9 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -20,8 +18,22 @@ fun FlatTextField(
     textLabel: String = "",
     value: TextFieldValue,
     readOnly: Boolean = false,
-    onValueChange: (TextFieldValue) -> Unit
+    isError: Boolean = false,
+    onValueChange: (TextFieldValue) -> Unit,
 ) {
+    val normalColor = MaterialTheme.colors.error
+    val errorColor = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+
+    val placeholderColor by remember(isError) {
+        derivedStateOf {
+            if (!isError) {
+                errorColor
+            } else {
+                normalColor
+            }
+        }
+    }
+
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -33,11 +45,13 @@ fun FlatTextField(
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
+            placeholderColor = placeholderColor
         ),
         textStyle = Typography().h6,
         maxLines = maxLines,
         shape = RoundedCornerShape(0.dp),
         readOnly = readOnly,
+        isError = isError,
         placeholder = @Composable { Text(text = textLabel) }
     )
 }
@@ -48,7 +62,7 @@ fun SimpleTextField(
     maxLines: Int = Int.MAX_VALUE,
     textLabel: String = "",
     value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit
+    onValueChange: (TextFieldValue) -> Unit,
 ) {
     TextField(
         value = value,
@@ -61,5 +75,6 @@ fun SimpleTextField(
             unfocusedIndicatorColor = Color.Transparent,
             backgroundColor = Color.Transparent
         ),
-        shape = RoundedCornerShape(0.dp),)
+        shape = RoundedCornerShape(0.dp),
+    )
 }

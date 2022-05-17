@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
@@ -58,21 +59,32 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
         )
 
         // Title
+        var titleError by remember {
+            mutableStateOf(false)
+        }
         FlatTextField(
-            modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
+            modifier = Modifier
+                .padding(top = 4.dp, bottom = 4.dp)
+                .onFocusChanged { titleError = false },
             value = viewModel.draftTitle,
             maxLines = 5,
-            textLabel = "Title:"
+            textLabel = "Title:",
+            isError = titleError
         ) { viewModel.draftTitle = it }
 
         // Content
+        var contentError by remember {
+            mutableStateOf(false)
+        }
         FlatTextField(
             value = viewModel.draftContent,
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1F)
-                .padding(top = 4.dp, bottom = 4.dp),
-            textLabel = "Content:"
+                .padding(top = 4.dp, bottom = 4.dp)
+                .onFocusChanged { contentError = false },
+            textLabel = "Content:",
+            isError = contentError
         ) { viewModel.draftContent = it }
 
         OperationButton(
@@ -80,7 +92,9 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
                 navController.popBackStack()
             },
             clickOK = {
-                openDialog = true
+                titleError = viewModel.draftTitle.text.isBlank()
+                contentError = viewModel.draftContent.text.isBlank()
+                openDialog = !titleError && !contentError
             }
         )
     }
