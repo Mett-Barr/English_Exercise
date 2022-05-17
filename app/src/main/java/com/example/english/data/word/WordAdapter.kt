@@ -6,7 +6,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.english.MainViewModel
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
+import com.example.english.data.word.wordlist.room.WordList
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 fun wordIsExist(word: Word, repository: WordRepository) {
 
@@ -70,7 +73,7 @@ suspend fun addWordByVM(
     english: String,
     index: Int,
     viewModel: MainViewModel,
-){
+) {
     var wordId: Int? = null
 
     if (wordIsExistByEnglish(english, viewModel.wordRepository)) {
@@ -166,4 +169,28 @@ suspend fun addWordTest(
 
     Log.d("!!! addWordInList 2", wordListTable.toList().toString())
     return 0
+}
+
+
+suspend fun addInWordListTable(
+    english: String,
+    wordRepository: WordRepository,
+    list: SnapshotStateList<Int>,
+): SnapshotStateList<Int>  {
+    // check
+    var wordId: Int = 1
+
+    if (wordIsExistByEnglish(english, wordRepository)) {
+        wordRepository.getWordId(english).collect {
+            wordId = it
+            if (list.contains(wordId)) {
+                list.add(wordId)
+            }
+        }
+    } else {
+        wordId = wordRepository.addNewWord(Word(english = english)).toInt()
+        list.add(wordId)
+    }
+
+    return list
 }

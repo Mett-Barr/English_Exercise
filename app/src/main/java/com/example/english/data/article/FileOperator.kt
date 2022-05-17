@@ -1,11 +1,15 @@
 package com.example.english.data.article
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.english.data.word.wordlist.*
 import com.example.english.data.word.wordlist.room.EmptyWordList
+import com.example.english.data.word.wordlist.room.EmptyWordListTable.emptyWordList
+import com.example.english.data.word.wordlist.room.EmptyWordListTable.emptyWordListTable
+import com.example.english.data.word.wordlist.room.WordListTable
 import com.example.english.stringconverter.StringConverter
 import com.example.english.translation.json.Translation
 import com.example.english.translation.translateArticle
@@ -16,6 +20,7 @@ const val FILE_NAME = "News_"
 const val FILE_NAME_CN = "News_CN_"
 const val FILE_NAME_Tr = "News_TR_"
 const val FILE_NAME_WORDLIST = "News_WordList_"
+const val FILE_NAME_WORDLISTTABLE = "News_WordListTable_"
 
 object FileOperator {
     fun addFile(fileNum: String, draftContent: String, context: Context) {
@@ -37,6 +42,18 @@ object FileOperator {
         fosWordList.write(wordListString.toByteArray())
         fosWordList.close()
 
+        // add blank wordListTable file
+        val fosWordListTable = context.openFileOutput(FILE_NAME_WORDLISTTABLE + fileNum, Context.MODE_PRIVATE)
+//        val wordListTableString = wordListTableToString(EmptyWordList.emptyWordListItem)
+//        var newWordListTable: WordListTable = emptyWordListTable
+        val wordListTable: MutableList<List<Int>> = mutableListOf(emptyList())
+        repeat(list.size) {
+            wordListTable.add(emptyList())
+        }
+        val wordListTableString = wordListTableToString(WordListTable(wordListTable))
+        fosWordListTable.write(wordListTableString.toByteArray())
+        fosWordListTable.close()
+
 //        Log.d("!!!", "addFile: ")
     }
 
@@ -45,6 +62,8 @@ object FileOperator {
         translateArticle(fileNum, list, context)
     }
 
+
+    // for file Tr
     fun addFileByList(fileNum: String, contentList: List<Translation>, context: Context) {
         val fos = context.openFileOutput(FILE_NAME_Tr + fileNum, Context.MODE_PRIVATE)
         contentList.forEach { fos.write(it.translatedText.toByteArray()) }
@@ -72,6 +91,21 @@ object FileOperator {
         val wordListItemString = reader.readText()
         val wordListItem = stringToItem(wordListItemString)
         return wordListToTable(wordListItem, newsSize)
+    }
+
+    fun getWordListTableFile(
+        fileName: String,
+        context: Context
+    ): SnapshotStateList<SnapshotStateList<Int>> {
+        val fos = context.openFileInput(fileName)
+        val reader = BufferedReader(InputStreamReader(fos))
+        val wordListTableString = reader.readText()
+        val wordListTable = stringToWordListTable(wordListTableString).wordListTable
+        val list: SnapshotStateList<SnapshotStateList<Int>> = mutableStateListOf(emptyWordList.toMutableStateList())
+        wordListTable.forEach {
+            list.add(it.toMutableStateList())
+        }
+        return list
     }
 
 
@@ -120,11 +154,13 @@ fun saveFileCn(
         currentFileNameCn: String,
         currentFileNameTr: String,
         currentFileNameWordList: String,
+        currentFileNameWordListTable: String,
 
         currentContent: SnapshotStateList<TextFieldValue>,
         currentContentCn: SnapshotStateList<TextFieldValue>,
         currentContentTr: SnapshotStateList<TextFieldValue>,
         currentContentWordList: SnapshotStateList<SnapshotStateList<Int>>,
+        wordListTable: SnapshotStateList<SnapshotStateList<Int>>,
 
         context: Context,
     ) {
@@ -157,14 +193,20 @@ fun saveFileCn(
         val fosWordList = context.openFileOutput(currentFileNameWordList, Context.MODE_PRIVATE)
         val wordListForStringFile = wordListToStringFile(currentContentWordList.toList())
         fosWordList.write(wordListForStringFile.toByteArray())
-
         fosWordList.close()
+
+
+        // save wordListTable
+        val fosWordListTable = context.openFileOutput(currentFileNameWordList, Context.MODE_PRIVATE)
+        val wordListTableForStringFile = wordListTableToString(WordListTable(wordListTable))
+        fosWordListTable.write(wordListTableForStringFile.toByteArray())
+        fosWordListTable.close()
     }
 }
 
 
 
-fun addwordListTableFile(fileNum: String, size: Int, context: Context) {
+fun addWordListTableFile(fileNum: String, size: Int, context: Context) {
     val fosWordListTable = context.openFileOutput(FILE_NAME_WORDLIST + fileNum, Context.MODE_PRIVATE)
 //    val wordListString = itemToString(EmptyWordList.emptyWordListItem)
 //    val wordListTableString = wordListToStringFile(EmptyWordList.emptyWordListItem)

@@ -222,7 +222,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 }
                                 AnnotationState.WORDS -> {
                                     WordListTable(
-                                        list = viewModel.currentContentWordList[paragraphIndex].toList(),
+                                        list = viewModel.wordListTable[paragraphIndex].toList(),
                                         viewModel = viewModel)
 
                                     LaunchedEffect(key1 = 1) {
@@ -230,10 +230,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     }
 
 
-                                    viewModel.currentContentWordList.toList()
-                                        .forEachIndexed { index, snapshotStateList ->
-//                                        Log.d("!!! forEach", "$index：${snapshotStateList.toList()}")
-                                        }
+//                                    viewModel.currentContentWordList.toList()
+//                                        .forEachIndexed { index, snapshotStateList ->
+////                                        Log.d("!!! forEach", "$index：${snapshotStateList.toList()}")
+//                                        }
                                 }
                                 AnnotationState.CLOSE -> {
                                     LaunchedEffect(key1 = 1) {
@@ -268,7 +268,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
                                 onClick = {
 
-                                    viewModel.wordListTest(paragraphIndex)
+//                                    viewModel.wordListTest(paragraphIndex)
 
 
 
@@ -276,6 +276,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     val contentText =
                                         paragraphContent.getSelectedText().text
                                     annotationState = if (contentText.isNotBlank()) {
+
+                                        viewModel.addWordListTable(contentText, paragraphIndex)
+
                                         // 2.translate並且開啟annotation欄位
 //                                        viewModel.addWordInList(contentText, paragraphIndex)
 //                                        viewModel.addWordByVM(contentText, paragraphIndex)
@@ -292,8 +295,6 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                                    it)
 //                                            }
 //                                        }
-
-
 
 
                                         AnnotationState.WORDS

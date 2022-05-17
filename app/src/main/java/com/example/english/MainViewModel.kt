@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.english.data.article.*
 import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
+import com.example.english.data.word.addInWordListTable
 import com.example.english.data.word.addWordTest
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
@@ -46,6 +47,9 @@ class MainViewModel @Inject constructor(
     var currentContentCn = mutableStateListOf<TextFieldValue>()
     var currentContentTr = mutableStateListOf<TextFieldValue>()
     var currentContentWordList: SnapshotStateList<SnapshotStateList<Int>> =
+        mutableStateListOf(emptyList<Int>().toMutableStateList())
+
+    var wordListTable: SnapshotStateList<SnapshotStateList<Int>> =
         mutableStateListOf(emptyList<Int>().toMutableStateList())
 
     val testList =
@@ -112,13 +116,17 @@ class MainViewModel @Inject constructor(
 
             currentContentCn = FileOperator.getFileCn(FILE_NAME_CN + currentNewsId, context)
             currentContentTr = FileOperator.getFile(FILE_NAME_Tr + currentNewsId, context)
+
             currentContentWordList = FileOperator.getWordListFile(
                 FILE_NAME_WORDLIST + currentNewsId,
                 currentNewsSize,
                 context)
-            currentContentWordList.forEach {
-                Log.d("!!!", it.toList().toString())
-            }
+//            currentContentWordList.forEach {
+//                Log.d("!!!", it.toList().toString())
+//            }
+
+            wordListTable =
+                FileOperator.getWordListTableFile(FILE_NAME_WORDLISTTABLE + currentNewsId, context)
         }
     }
 
@@ -138,11 +146,18 @@ class MainViewModel @Inject constructor(
 
                 currentFileNameWordList = FILE_NAME_WORDLIST + currentNewsId,
 
+                currentFileNameWordListTable = FILE_NAME_WORDLISTTABLE + currentNewsId,
+
+
                 currentContent = currentContent,
                 currentContentCn = currentContentCn,
                 currentContentTr = currentContentTr,
 
                 currentContentWordList = currentContentWordList,
+
+                wordListTable = wordListTable,
+
+
 
                 context = context
             )
@@ -227,19 +242,26 @@ class MainViewModel @Inject constructor(
 
         viewModelScope.launch {
 //            Log.d("!!! 1", "addWordInList: ${wordListToStringFile(currentContentWordList)}")
-            currentContentWordList[paragraphIndex] = com.example.english.data.word.addWordInListTest(
-                english = english,
-                wordRepository = wordRepository,
-                wordListTable = currentContentWordList[paragraphIndex]
-            )
+            currentContentWordList[paragraphIndex] =
+                com.example.english.data.word.addWordInListTest(
+                    english = english,
+                    wordRepository = wordRepository,
+                    wordListTable = currentContentWordList[paragraphIndex]
+                )
 
         }
 
     }
 
+    fun addWordListTable(english: String, index: Int) {
+        viewModelScope.launch {
+            addInWordListTable(english, wordRepository, wordListTable[index])
+        }
+    }
+
     fun addWordByVM(
         english: String,
-        index: Int
+        index: Int,
     ) {
         viewModelScope.launch {
             com.example.english.data.word.addWordByVM(

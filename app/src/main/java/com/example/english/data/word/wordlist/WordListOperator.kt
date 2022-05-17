@@ -129,10 +129,10 @@ fun stringToWordListTable(string: String): WordListTable {
     return jsonAdapter.fromJson(string) ?: emptyWordListTable
 }
 
-fun wordListTableToStringFile(wordListTable: WordListTable): String {
-    var string = ""
-
-    string = wordListTableToString(wordListTable)
-
-    return string
-}
+//fun wordListTableToStringFile(wordListTable: WordListTable): String {
+//    var string = ""
+//
+//    string = wordListTableToString(wordListTable)
+//
+//    return string
+//}
