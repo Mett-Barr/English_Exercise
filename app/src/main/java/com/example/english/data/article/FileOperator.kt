@@ -4,11 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
-import com.example.english.data.word.wordlist.itemToString
+import com.example.english.data.word.wordlist.*
 import com.example.english.data.word.wordlist.room.EmptyWordList
-import com.example.english.data.word.wordlist.stringToItem
-import com.example.english.data.word.wordlist.wordListToTable
-import com.example.english.data.word.wordlist.wordListToStringFile
 import com.example.english.stringconverter.StringConverter
 import com.example.english.translation.json.Translation
 import com.example.english.translation.translateArticle
@@ -163,4 +160,17 @@ fun saveFileCn(
 
         fosWordList.close()
     }
+}
+
+
+
+fun addwordListTableFile(fileNum: String, size: Int, context: Context) {
+    val fosWordListTable = context.openFileOutput(FILE_NAME_WORDLIST + fileNum, Context.MODE_PRIVATE)
+//    val wordListString = itemToString(EmptyWordList.emptyWordListItem)
+//    val wordListTableString = wordListToStringFile(EmptyWordList.emptyWordListItem)
+//    fosWordListTable.write(wordListString.toByteArray())
+    repeat(size) {
+//        wordListTableToString()
+    }
+    fosWordListTable.close()
 }

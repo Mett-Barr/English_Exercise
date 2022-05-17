@@ -18,3 +18,12 @@ object EmptyWordList {
     val emptyWordListItem = WordListItem(emptyList())
 }
 
+@JsonClass(generateAdapter = true)
+data class WordListTable(
+    var wordListTable: List<List<Int>>
+)
+
+object EmptyWordListTable {
+    val emptyWordList: List<Int> = emptyList()
+    val emptyWordListTable: WordListTable = WordListTable(listOf(emptyWordList))
+}

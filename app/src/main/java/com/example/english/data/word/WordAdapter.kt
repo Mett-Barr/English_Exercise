@@ -1,7 +1,9 @@
 package com.example.english.data.word
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.english.MainViewModel
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
 import kotlinx.coroutines.flow.first
@@ -62,6 +64,26 @@ suspend fun addWordInList(
 
     Log.d("!!! addWordInList 2", wordListTable.toList().toString())
     return wordListTable
+}
+
+suspend fun addWordByVM(
+    english: String,
+    index: Int,
+    viewModel: MainViewModel,
+){
+    var wordId: Int? = null
+
+    if (wordIsExistByEnglish(english, viewModel.wordRepository)) {
+
+        viewModel.wordRepository.getWordId(english).collect {
+            if (!viewModel.currentContentWordList[index].contains(it)) {
+                viewModel.currentContentWordList[index].add(it)
+            }
+        }
+    } else {
+        wordId = viewModel.wordRepository.addNewWord(Word(english = english)).toInt()
+        viewModel.currentContentWordList[index].add(wordId)
+    }
 }
 
 suspend fun addWordInListTest(

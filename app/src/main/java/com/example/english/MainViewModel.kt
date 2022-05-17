@@ -233,37 +233,25 @@ class MainViewModel @Inject constructor(
                 wordListTable = currentContentWordList[paragraphIndex]
             )
 
-//            currentContentWordList[paragraphIndex] = com.example.english.data.word.addWordInList(
-//                english = english,
-//                wordRepository = wordRepository,
-//                wordListTable = currentContentWordList[paragraphIndex]
-//            )
-
-//            currentContentWordList[paragraphIndex] +
-
-//            val wordId =
-//                addWordTest(english, wordRepository, currentContentWordList[paragraphIndex])
-//
-//            if (wordId != null) currentContentWordList[paragraphIndex].add(wordId)
-//
-//            Log.d("!!!", "addWordInList: $wordId")
-
-//            addWordTest(english,
-//                wordRepository,
-//                currentContentWordList[paragraphIndex]).also {
-//                Log.d("!!!", "addWordInList: addWordTest")
-//                if (it != null) currentContentWordList[paragraphIndex].add(it)
-//            }
-
-//            Log.d("!!! 2", "addWordInList: ${wordListToStringFile(currentContentWordList)}")
-//            currentContentWordList.toList().forEach {
-//                Log.d("!!! forEach", "$it：${it.toList()}")
-//            }
-//
-//            val list: List<List<Int>> = currentContentWordList.toList()
-//            Log.d("!!! list", list.toString())
         }
 
+    }
+
+    fun addWordByVM(
+        english: String,
+        index: Int
+    ) {
+        viewModelScope.launch {
+            com.example.english.data.word.addWordByVM(
+                english,
+                index,
+                this@MainViewModel
+            )
+        }
+    }
+
+    fun wordListTest(index: Int) {
+        currentContentWordList[index].add(1)
     }
 
 

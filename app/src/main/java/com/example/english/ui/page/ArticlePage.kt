@@ -167,7 +167,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 }
 
                 var annotationState by remember {
-                    mutableStateOf(AnnotationState.CLOSE)
+                    mutableStateOf(AnnotationState.WORDS)
                 }
 
                 Card(
@@ -268,14 +268,19 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
                                 onClick = {
 
+                                    viewModel.wordListTest(paragraphIndex)
+
+
+
                                     // 1.檢測是否選取單字
                                     val contentText =
                                         paragraphContent.getSelectedText().text
                                     annotationState = if (contentText.isNotBlank()) {
                                         // 2.translate並且開啟annotation欄位
-                                        viewModel.addWordInList(contentText, paragraphIndex)
+//                                        viewModel.addWordInList(contentText, paragraphIndex)
+//                                        viewModel.addWordByVM(contentText, paragraphIndex)
 
-                                        Log.d("!!! ClickableIcon", "$contentText $paragraphIndex")
+//                                        Log.d("!!! ClickableIcon", "$contentText $paragraphIndex")
 
 
 //                                        coroutineScope.launch {

@@ -4,8 +4,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.room.TypeConverter
 import com.example.english.data.word.wordlist.room.EmptyWordList.emptyWordListItem
+import com.example.english.data.word.wordlist.room.EmptyWordListTable.emptyWordListTable
 import com.example.english.data.word.wordlist.room.WordIndex
 import com.example.english.data.word.wordlist.room.WordListItem
+import com.example.english.data.word.wordlist.room.WordListTable
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -51,7 +53,6 @@ fun stringToItem(string: String): WordListItem {
     return jsonAdapter.fromJson(string) ?: emptyWordListItem
 }
 
-
 fun wordListToTable(wordListItem: WordListItem, size: Int): SnapshotStateList<SnapshotStateList<Int>> {
 
     val list = mutableStateListOf<SnapshotStateList<Int>>()
@@ -64,6 +65,13 @@ fun wordListToTable(wordListItem: WordListItem, size: Int): SnapshotStateList<Sn
     wordListItem.list.forEach {
         list[it.paragraphIndex] += it.wordIndex
     }
+
+    wordListItem.list.forEachIndexed { index, wordIndex ->
+
+    }
+//    {
+//        list[it.paragraphIndex] += it.wordIndex
+//    }
 
     return list
 }
@@ -96,4 +104,35 @@ fun wordListToStringFile(list: List<List<Int>>): String {
     }
 
     return itemToString(wordListItem)
+}
+
+
+
+
+
+
+
+
+
+
+@TypeConverter
+fun wordListTableToString(wordListTable: WordListTable): String {
+    val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    val jsonAdapter: JsonAdapter<WordListTable> = moshi.adapter(WordListTable::class.java)
+    return jsonAdapter.toJson(wordListTable)
+}
+
+@TypeConverter
+fun stringToWordListTable(string: String): WordListTable {
+    val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    val jsonAdapter: JsonAdapter<WordListTable> = moshi.adapter(WordListTable::class.java)
+    return jsonAdapter.fromJson(string) ?: emptyWordListTable
+}
+
+fun wordListTableToStringFile(wordListTable: WordListTable): String {
+    var string = ""
+
+    string = wordListTableToString(wordListTable)
+
+    return string
 }
