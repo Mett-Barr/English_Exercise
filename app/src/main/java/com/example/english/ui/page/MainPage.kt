@@ -66,7 +66,7 @@ fun NewsItem(news: News, viewModel: MainViewModel, navigation: () -> Unit, conte
                 viewModel.currentNews(news, context)
                 navigation.invoke()
             }
-            .background(MaterialTheme.colors.background)
+//            .background(MaterialTheme.colors.background)
     ) {
         Row {
             Column(

@@ -31,6 +31,8 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
@@ -38,6 +40,10 @@ import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordListTable
 
+
+enum class AnnotationState {
+    TRANSLATION, WORDS, CLOSE
+}
 
 @OptIn(
     ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class,
@@ -63,21 +69,6 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         keyboardController?.hide()
     }
 
-
-//    fun hideKeyboard() {
-//        focusManager.clearFocus()
-//        keyboardController?.hide()
-//    }
-//
-//    @RequiresApi(Build.VERSION_CODES.R)
-//    fun hideKeyboardView() {
-//        focusManager.clearFocus()
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            activity.window.insetsController?.hide(android.view.WindowInsets.Type.ime())
-//        }
-//    }
-
-
     fun getRid(boolean: Boolean): Int =
         if (boolean) R.drawable.arrow_less else R.drawable.arrow_more
 
@@ -91,6 +82,18 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     BackHandler {
         popBack()
         Log.d("!!!", "NewsArticlePage: BackHandler")
+    }
+
+    var openDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var currentParagraphIndex by remember {
+        mutableStateOf(0)
+    }
+
+    var currentParagraphContent by remember {
+        mutableStateOf("")
     }
 
     Scaffold(
@@ -155,7 +158,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colors.background)
+//                        .background(MaterialTheme.colors.background)
 //                        .animateItemPlacement(TweenSpec())
 //                        .then(hideKeyboardModifier)
                 ) {
@@ -203,7 +206,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 AnnotationState.WORDS -> {
                                     WordListTable(
                                         list = viewModel.wordListTable[paragraphIndex].toList(),
-                                        viewModel = viewModel)
+                                        viewModel = viewModel
+                                    )
 
                                     LaunchedEffect(key1 = 1) {
                                         color.animateTo(Color.White)
@@ -226,7 +230,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         Row(modifier = Modifier.fillMaxWidth()) {
                             ClickableIcon(painter = painterResource(id = R.drawable.delete),
                                 onClick = {
-                                    viewModel.removeCurrentParagraph(paragraphIndex)
+                                    currentParagraphIndex = paragraphIndex
+                                    currentParagraphContent = paragraphContent.text
+                                    openDialog = true
                                 })
 
                             Spacer(modifier = Modifier
@@ -235,7 +241,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 .clickable { })
 
                             ClickableIcon(painter = painterResource(id = R.drawable.translation),
-                                tint = color.value,
+//                                tint = color.value,
                                 onClick = {
                                     annotationState =
                                         if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
@@ -281,8 +287,32 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
             }
         }
     }
-}
 
-enum class AnnotationState {
-    TRANSLATION, WORDS, CLOSE
+    if (openDialog) {
+        AlertDialog(
+            onDismissRequest = { openDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.removeCurrentParagraph(
+                        currentParagraphIndex
+                    )
+                    openDialog = false
+                }) {
+                    Text(text = "Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {openDialog = false}) {
+                    Text(text = "Cancel")
+                }
+            },
+            title = {
+                    Text(text = "Delete paragraph?")
+            },
+            text = {
+                   Text(text = "Delete paragraph：\"$currentParagraphContent\"", )
+            },
+            properties = DialogProperties()
+        )
+    }
 }
