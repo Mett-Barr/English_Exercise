@@ -8,7 +8,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,7 +30,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
@@ -205,8 +203,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 }
                                 AnnotationState.WORDS -> {
                                     WordListTable(
-                                        list = viewModel.wordListTable[paragraphIndex].toList(),
-                                        viewModel = viewModel
+                                        list = viewModel.wordListTable[paragraphIndex],
+                                        getWordById = { viewModel.getWordById(it) },
+                                        updateWord = { viewModel.updateWord(it) }
                                     )
 
                                     LaunchedEffect(key1 = 1) {
@@ -310,7 +309,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     Text(text = "Delete paragraph?")
             },
             text = {
-                   Text(text = "Delete paragraph：\"$currentParagraphContent\"", )
+                   Text(text = "\"$currentParagraphContent\"")
             },
             properties = DialogProperties()
         )
