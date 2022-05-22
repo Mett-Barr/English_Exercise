@@ -30,7 +30,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
@@ -55,7 +54,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    val coroutineScope = rememberCoroutineScope()
+//    val coroutineScope = rememberCoroutineScope()
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -73,6 +72,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     val dispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
 
     fun popBack() {
+        focusManager.clearFocus()
         viewModel.saveCurrentFile(context)
         navController.popBackStack()
     }
@@ -82,9 +82,24 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         Log.d("!!!", "NewsArticlePage: BackHandler")
     }
 
-    var openDialog by remember {
+
+    // Dialog State
+    var deleteParagraphDialog by remember {
         mutableStateOf(false)
     }
+
+    var deleteArticleDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var editTagDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var editTitleDialog by remember {
+        mutableStateOf(false)
+    }
+
 
     var currentParagraphIndex by remember {
         mutableStateOf(0)
@@ -111,7 +126,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             .fillMaxWidth()
                             .weight(1F)
                     )
-                    ClickableIcon(painter = painterResource(R.drawable.delete))
+                    ClickableIcon(painter = painterResource(R.drawable.delete)) {
+                        deleteArticleDialog = true
+                    }
                     ClickableIcon(painter = painterResource(R.drawable.lable))
                     ClickableIcon(painter = painterResource(R.drawable.edit))
                 }
@@ -148,7 +165,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 }
 
                 var annotationState by remember {
-                    mutableStateOf(AnnotationState.WORDS)
+                    mutableStateOf(AnnotationState.CLOSE)
                 }
 
                 Card(
@@ -169,6 +186,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             readOnly = true
                         )
 
+//                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // chinese
                         AnimatedVisibility(visible = openState) {
                             FlatTextField(
                                 value = viewModel.currentContentCn[paragraphIndex],
@@ -179,59 +199,14 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             )
                         }
 
-                        val color = remember {
-                            Animatable(Color.White)
-                        }
 
-                        AnimatedContent(targetState = annotationState) { it ->
-                            when (it) {
-                                AnnotationState.TRANSLATION -> {
-                                    FlatTextField(
-                                        value = viewModel.currentContentTr[paragraphIndex],
-                                        onValueChange = {
-                                            viewModel.currentContentTr[paragraphIndex] = it
-                                        },
-                                        readOnly = true,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 8.dp)
-                                    )
-
-                                    LaunchedEffect(key1 = 1) {
-                                        color.animateTo(Color.Yellow)
-                                    }
-                                }
-                                AnnotationState.WORDS -> {
-                                    WordListTable(
-                                        list = viewModel.wordListTable[paragraphIndex],
-                                        getWordById = { viewModel.getWordById(it) },
-                                        updateWord = { viewModel.updateWord(it) }
-                                    )
-
-                                    LaunchedEffect(key1 = 1) {
-                                        color.animateTo(Color.White)
-                                    }
-
-
-//                                    viewModel.currentContentWordList.toList()
-//                                        .forEachIndexed { index, snapshotStateList ->
-////                                        Log.d("!!! forEach", "$index：${snapshotStateList.toList()}")
-//                                        }
-                                }
-                                AnnotationState.CLOSE -> {
-                                    LaunchedEffect(key1 = 1) {
-                                        color.animateTo(Color.White)
-                                    }
-                                }
-                            }
-                        }
-
+                        // button row
                         Row(modifier = Modifier.fillMaxWidth()) {
                             ClickableIcon(painter = painterResource(id = R.drawable.delete),
                                 onClick = {
                                     currentParagraphIndex = paragraphIndex
                                     currentParagraphContent = paragraphContent.text
-                                    openDialog = true
+                                    deleteParagraphDialog = true
                                 })
 
                             Spacer(modifier = Modifier
@@ -250,12 +225,25 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                    viewModel.translateTest(context, paragraph.text)
 //                                    translate(context)
                                 })
+
+                            // do not work
+//                            val contentText by remember {
+//                                derivedStateOf { paragraphContent.getSelectedText().text }
+//                            }
+                            val contentText by remember {
+                                derivedStateOf { viewModel.currentContent[paragraphIndex].getSelectedText().text }
+                            }
+
+
+                            val wordIconState by remember {
+                                derivedStateOf { contentText.isNotBlank() || viewModel.wordListTable[paragraphIndex].size != 0 }
+                            }
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
+                                enabled = wordIconState,
                                 modifier = Modifier.focusable(),
                                 onClick = {
                                     // 1.檢測是否選取單字
-                                    val contentText =
-                                        paragraphContent.getSelectedText().text
+//                                    val contentText = paragraphContent.getSelectedText().text
                                     annotationState = if (contentText.isNotBlank()) {
 
                                         viewModel.addWordListTable(contentText, paragraphIndex)
@@ -281,37 +269,133 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     })
                             }
                         }
+
+                        val color = remember {
+                            Animatable(Color.White)
+                        }
+
+                        AnimatedContent(targetState = annotationState) { it ->
+                            when (it) {
+                                AnnotationState.TRANSLATION -> {
+                                    Card(elevation = 4.dp,
+                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier.padding(bottom = 8.dp)) {
+                                        Text(
+                                            text = viewModel.currentContentTr[paragraphIndex].text,
+                                            style = Typography().h6,
+                                            modifier = Modifier.padding(16.dp)
+                                        )
+                                    }
+//                                    FlatTextField(
+//                                        value = viewModel.currentContentTr[paragraphIndex],
+//                                        onValueChange = {
+//                                            viewModel.currentContentTr[paragraphIndex] = it
+//                                        },
+//                                        readOnly = true,
+//                                        modifier = Modifier
+//                                            .fillMaxWidth()
+////                                            .padding(top = 8.dp)
+//                                    )
+
+                                    LaunchedEffect(key1 = 1) {
+                                        color.animateTo(Color.Yellow)
+                                    }
+                                }
+                                AnnotationState.WORDS -> {
+
+                                    val list = remember {
+                                        viewModel.wordListTable[paragraphIndex]
+                                    }
+
+                                    WordListTable(
+                                        list = list,
+                                        getWordById = { viewModel.getWordById(it) },
+                                        deleteWord = { list.remove(it) },
+                                        updateWord = { viewModel.updateWord(it) },
+                                        paragraphIndex,
+                                        viewModel
+                                    )
+
+                                    LaunchedEffect(key1 = 1) {
+                                        color.animateTo(Color.White)
+                                    }
+
+
+//                                    viewModel.currentContentWordList.toList()
+//                                        .forEachIndexed { index, snapshotStateList ->
+////                                        Log.d("!!! forEach", "$index：${snapshotStateList.toList()}")
+//                                        }
+                                }
+                                AnnotationState.CLOSE -> {
+                                    LaunchedEffect(key1 = 1) {
+                                        color.animateTo(Color.White)
+                                    }
+                                }
+                            }
+                        }
+//                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
         }
     }
 
-    if (openDialog) {
+    if (deleteParagraphDialog) {
         AlertDialog(
-            onDismissRequest = { openDialog = false },
+            onDismissRequest = { deleteParagraphDialog = false },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.removeCurrentParagraph(
                         currentParagraphIndex
                     )
-                    openDialog = false
+                    deleteParagraphDialog = false
                 }) {
                     Text(text = "Delete")
                 }
             },
             dismissButton = {
-                TextButton(onClick = {openDialog = false}) {
+                TextButton(onClick = { deleteParagraphDialog = false }) {
                     Text(text = "Cancel")
                 }
             },
             title = {
-                    Text(text = "Delete paragraph?")
+                Text(text = "Delete Paragraph?", style = Typography().h5)
             },
             text = {
-                   Text(text = "\"$currentParagraphContent\"")
+                Text(text = "\"$currentParagraphContent\"")
             },
-            properties = DialogProperties()
         )
     }
+
+    if (deleteArticleDialog) {
+        AlertDialog(
+            onDismissRequest = { deleteArticleDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    deleteArticleDialog = false
+                    popBack()
+                    viewModel.deleteNews(context)
+                }) {
+                    Text(text = "Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteArticleDialog = false }) {
+                    Text(text = "Cancel")
+                }
+            },
+            title = {
+                Text(text = "Delete Article?", style = Typography().h5)
+            },
+            text = {
+                Text(text = "\"${viewModel.currentTitle}\"")
+            },
+        )
+    }
+
+//    if (editTagDialog) {
+//    }
+
+//    if (editTitleDialog) {
+//    }
 }

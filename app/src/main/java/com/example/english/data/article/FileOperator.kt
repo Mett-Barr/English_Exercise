@@ -10,6 +10,9 @@ import com.example.english.data.word.wordlist.wordListTableToString
 import com.example.english.stringconverter.StringConverter
 import com.example.english.translation.json.Translation
 import com.example.english.translation.translateArticle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -131,5 +134,26 @@ object FileOperator {
         val wordListTableForStringFile = wordListTableToString(WordListTable(wordListTable))
         fosWordListTable.write(wordListTableForStringFile.toByteArray())
         fosWordListTable.close()
+    }
+
+
+
+    // Delete
+    suspend fun deleteCurrentFile(fileNum: String, context: Context) {
+        withContext(Dispatchers.IO) {
+            context.apply {
+                val fileName = FILE_NAME + fileNum
+                deleteFile(fileName)
+
+                val fileNameCn = FILE_NAME_CN + fileNum
+                deleteFile(fileNameCn)
+
+                val fileNameTr = FILE_NAME_Tr + fileNum
+                deleteFile(fileNameTr)
+
+                val fileNameWordListTable = FILE_NAME_WORDLISTTABLE + fileNum
+                deleteFile(fileNameWordListTable)
+            }
+        }
     }
 }

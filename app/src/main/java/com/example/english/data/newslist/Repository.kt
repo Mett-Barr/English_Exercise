@@ -12,4 +12,6 @@ interface Repository {
     fun isEmpty(): Boolean
 
     suspend fun addNews(news: News): Long
+
+    suspend fun deleteNews(news: News)
 }

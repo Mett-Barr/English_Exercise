@@ -1,113 +1,215 @@
 package com.example.english.ui.components
 
-import androidx.compose.foundation.background
+import android.util.Log
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.Typography
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.english.MainViewModel
+import com.example.english.R
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
-import com.example.english.data.word.wordlist.WordListTable
 import kotlinx.coroutines.flow.Flow
+import kotlin.math.roundToInt
 
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun WordListTable(
     list: SnapshotStateList<Int>,
     getWordById: (Int) -> Flow<Word>,
-    updateWord: (Word) -> Unit
+    deleteWord: (Int) -> Unit,
+    updateWord: (Word) -> Unit,
+    id: Int,
+    viewModel: MainViewModel,
 ) {
-    Column(
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .padding(horizontal = 4.dp)
-    ) {
-        Divider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            color = MaterialTheme.colors.onBackground
-        )
 
-        list.forEachIndexed { index, wordId ->
-            val originWord by getWordById(wordId).collectAsState(initial = EmptyWord.word)
-            var word by originWord
-            var chineseState by remember {
-                mutableStateOf(false)
-            }
+    val wordList: SnapshotStateList<State<Word>> = emptyList<State<Word>>().toMutableStateList()
+    list.forEachIndexed { index, it ->
+        wordList.add(getWordById(it).collectAsState(initial = EmptyWord.word))
+        Log.d("!!!", "WordListTable: $index")
+    }
 
-            fun getWord() {
-                if (word.value == EmptyWord.word) {
-                    chineseState = false
-                }
-            }
+    val swipeRange = with(LocalDensity.current) { (48.dp).toPx() }
 
-            fun update() {
-                updateWord(word.value)
-            }
+    Column(modifier = Modifier.padding(bottom = 8.dp).animateContentSize()) {
 
 
-            Row(
-                modifier = Modifier
-                    .height(IntrinsicSize.Min)
-                    .padding(8.dp)
+        wordList.forEachIndexed { index, word ->
+
+            val anchors = mapOf(0f to "normal", -swipeRange to "delete")
+            val swipeableState = rememberSwipeableState("normal")
+
+            Box(modifier = Modifier
+                .swipeable(
+                    state = swipeableState,
+                    anchors = anchors,
+                    thresholds = { _, _ -> FractionalThreshold(1f) },
+                    orientation = Orientation.Horizontal)
             ) {
-                Text(
-                    text = word.value.english,
-                    modifier = Modifier
-                        .weight(1F)
-                        .padding(horizontal = 8.dp),
-                    style = Typography().h6
-                )
-                Divider(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp),
-                    color = MaterialTheme.colors.onBackground
-                )
-                BasicTextField(
-                    value = word.value.chinese,
-                    onValueChange = { word.value = word.value.copy(chinese = it) },
-                    modifier = Modifier
-                        .weight(1F)
-                        .padding(horizontal = 8.dp),
-                    textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
-//                    textStyle = TextStyle(),
-                    cursorBrush = SolidColor(MaterialTheme.colors.onBackground)
-                )
-//                Text(
-//                    text = word.chinese,
-//                    modifier = Modifier
-//                        .weight(1F)
-//                        .padding(horizontal = 8.dp),
-//                    style = Typography().h6
-//                )
-            }
 
-            if (index != list.lastIndex) {
-                Divider(
+                val scale by remember {
+                    derivedStateOf {
+                        (-swipeableState.offset.value + swipeRange) / swipeRange / 2
+                    }
+                }
+
+                ClickableIcon(
+                    painter = painterResource(id = R.drawable.delete),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp),
-                    color = MaterialTheme.colors.onBackground
-                )
+                        .scale(scale)
+                        .align(Alignment.CenterEnd),
+                    onClick = {
+                        wordList.removeAt(index)
+                        list.removeAt(index)
+                    })
+
+                Card(elevation = 4.dp,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .heightIn(min = 48.dp)
+                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .height(IntrinsicSize.Max)
+                            .padding(4.dp)
+                    ) {
+                        Text(
+                            text = word.value.english,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(1F)
+                                .padding(horizontal = 8.dp),
+                            style = Typography().h6
+                        )
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(1.dp),
+                            color = MaterialTheme.colors.onBackground
+                        )
+
+                        BasicTextField(
+                            value = word.value.chinese,
+                            onValueChange = { wordList[index] = mutableStateOf(Word(word.value.id, word.value.english, it)) },
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(1F)
+                                .padding(horizontal = 8.dp)
+                                .onFocusChanged { updateWord(word.value) },
+                            textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
+                            cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
+                        )
+                    }
+                }
             }
         }
 
-        Divider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            color = MaterialTheme.colors.onBackground
-        )
+
+
+
+
+
+
+
+//        list.forEachIndexed { index, wordId ->
+//            val originWord by getWordById(wordId).collectAsState(initial = EmptyWord.word)
+//            val isInitialized by remember(originWord) {
+//                derivedStateOf { originWord == EmptyWord.word }
+//            }
+//            var word by remember {
+//                mutableStateOf(EmptyWord.word)
+//            }
+//
+//            DisposableEffect(isInitialized) {
+//                onDispose {
+//                    word = originWord
+//                }
+//            }
+//
+//
+//            val anchors = mapOf(0f to "normal", -swipeRange to "delete")
+//            val swipeableState = rememberSwipeableState("normal")
+//
+//            Box(modifier = Modifier
+//                .swipeable(
+//                    state = swipeableState,
+//                    anchors = anchors,
+//                    thresholds = { _, _ -> FractionalThreshold(1f) },
+//                    orientation = Orientation.Horizontal)
+//            ) {
+//
+//                val scale by remember {
+//                    derivedStateOf {
+//                        (-swipeableState.offset.value + swipeRange) / swipeRange / 2
+//                    }
+//                }
+//
+//                ClickableIcon(
+//                    painter = painterResource(id = R.drawable.delete),
+//                    modifier = Modifier
+//                        .scale(scale)
+//                        .align(Alignment.CenterEnd),
+//                    onClick = {
+//                        deleteWord(wordId)
+//                    })
+//
+//                Card(elevation = 4.dp,
+//                    modifier = Modifier
+//                        .padding(4.dp)
+//                        .heightIn(min = 48.dp)
+//                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
+//                    shape = RoundedCornerShape(4.dp)
+//                ) {
+//                    Row(
+//                        modifier = Modifier
+//                            .height(IntrinsicSize.Max)
+//                            .padding(4.dp)
+//                    ) {
+//                        Text(
+//                            text = "$index $wordId ${word.english}",
+//                            modifier = Modifier
+//                                .align(Alignment.CenterVertically)
+//                                .weight(1F)
+//                                .padding(horizontal = 8.dp),
+//                            style = Typography().h6
+//                        )
+//                        Divider(
+//                            modifier = Modifier
+//                                .fillMaxHeight()
+//                                .width(1.dp),
+//                            color = MaterialTheme.colors.onBackground
+//                        )
+//
+//                        BasicTextField(
+//                            value = word.chinese,
+//                            onValueChange = { word = Word(word.id, word.english, it) },
+//                            modifier = Modifier
+//                                .align(Alignment.CenterVertically)
+//                                .weight(1F)
+//                                .padding(horizontal = 8.dp)
+//                                .onFocusChanged { updateWord(word) },
+//                            textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
+//                            cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
+//                        )
+//                    }
+//                }
+//            }
+//        }
     }
 }

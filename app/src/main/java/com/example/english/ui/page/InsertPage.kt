@@ -114,7 +114,7 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
                 Column(
                     modifier = Modifier
                         .selectableGroup()
-                        .padding(horizontal = 4.dp)
+//                        .padding(horizontal = 4.dp)
                         .padding(top = 4.dp, bottom = 4.dp)
                 ) {
                     Text(
@@ -127,8 +127,6 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
                             Modifier
                                 .fillMaxWidth()
                                 .height(56.dp)
-                                .padding(vertical = 4.dp)
-                                .clip(RoundedCornerShape(12.dp))
                                 .selectable(
                                     selected = (it == radioOption),
                                     onClick = {
@@ -137,7 +135,7 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
                                     },
                                     role = Role.RadioButton
                                 )
-                                .padding(4.dp),
+                                .padding(start = 16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(

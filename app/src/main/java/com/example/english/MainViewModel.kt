@@ -14,6 +14,7 @@ import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,6 +34,7 @@ class MainViewModel @Inject constructor(
 
 
     /** current news */
+    private var currentNews by mutableStateOf(News())
     private var currentNewsId by mutableStateOf("0")
     private var currentNewsSize by mutableStateOf(0)
 
@@ -49,6 +51,7 @@ class MainViewModel @Inject constructor(
         mutableStateListOf(mutableStateListOf(1), mutableStateListOf(2), mutableStateListOf(3))
 
     fun currentNews(news: News, context: Context) {
+        currentNews = news
         currentNewsId = news.id.toString()
         currentTitle = news.title
 
@@ -80,9 +83,22 @@ class MainViewModel @Inject constructor(
 
     }
 
+    // Delete
+    fun deleteNews(context: Context) {
+        viewModelScope.launch {
+
+            // Room
+            repository.deleteNews(currentNews)
+
+            // File
+            deleteCurrentFile(context)
+        }
+    }
+
 
     /** File operation */
 
+    // Add
     private fun addNewFile(fileNum: Long, context: Context) {
         viewModelScope.launch {
             FileOperator.addFile(
@@ -93,6 +109,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // Get
     private fun getFile(
         context: Context,
     ) {
@@ -128,11 +145,29 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // Delete
+    private fun deleteCurrentFile(context: Context) {
+        viewModelScope.launch {
+            FileOperator.deleteCurrentFile(currentNewsId, context)
+        }
+    }
+
+
 
     /** Word Operation  */
     // Query
     fun getWordById(id: Int): Flow<Word> {
         return wordRepository.getWord(id)
+    }
+
+    fun getWordList(list: List<Int>): List<Flow<Word>> {
+        val wordList: MutableList<Flow<Word>> = emptyList<Flow<Word>>().toMutableList()
+
+        list.forEach {
+            wordList.add(wordRepository.getWord(it))
+        }
+
+        return wordList
     }
 
     // Insert

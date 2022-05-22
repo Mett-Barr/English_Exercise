@@ -41,7 +41,7 @@ fun FlatTextField(
             .fillMaxWidth()
             .background(Color.Transparent)
             .then(modifier)
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(RoundedCornerShape(12.dp)),
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,

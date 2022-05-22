@@ -42,7 +42,7 @@ fun MainNavigation(viewModel: MainViewModel) {
                 darkIcons = useDarkIcons
             )
             setStatusBarColor(
-                color = Color.Transparent.copy(alpha = 0.3F),
+                color = Color.Transparent.copy(alpha = 0.8F),
                 darkIcons = useDarkIcons
             )
         }
