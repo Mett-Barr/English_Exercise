@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -33,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
+import com.example.english.data.word.word.room.EmptyWord
+import com.example.english.data.word.word.room.Word
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordListTable
@@ -307,8 +310,14 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         viewModel.wordListTable[paragraphIndex]
                                     }
 
+                                    val wordList: SnapshotStateList<State<Word>> = emptyList<State<Word>>().toMutableStateList()
+                                    list.forEachIndexed { index, it ->
+                                        wordList.add(viewModel.getWordById(it).collectAsState(initial = EmptyWord.word))
+                                        Log.d("!!!", "WordListTable: $index")
+                                    }
+
                                     WordListTable(
-                                        list = list,
+                                        wordList = wordList,
                                         getWordById = { viewModel.getWordById(it) },
                                         deleteWord = { list.remove(it) },
                                         updateWord = { viewModel.updateWord(it) },
