@@ -3,10 +3,7 @@ package com.example.english.ui.page
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.animation.Animatable
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -38,6 +35,7 @@ import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
+import com.example.english.ui.components.WordComponent
 import com.example.english.ui.components.WordListTable
 
 
@@ -280,11 +278,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         AnimatedContent(targetState = annotationState) { it ->
                             when (it) {
                                 AnnotationState.TRANSLATION -> {
-                                    Card(
-                                        elevation = 4.dp,
+                                    Card(elevation = 4.dp,
                                         shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
-                                    ) {
+                                        modifier = Modifier
+                                            .padding(bottom = 8.dp)
+                                            .fillMaxWidth()) {
                                         Text(
                                             text = viewModel.currentContentTr[paragraphIndex].text,
                                             style = Typography().h6,
@@ -314,22 +312,37 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                                     val wordList: SnapshotStateList<State<Word>> =
                                         emptyList<State<Word>>().toMutableStateList()
-                                    list.forEachIndexed { index, it ->
-                                        wordList.add(
-                                            viewModel.getWordById(it)
-                                                .collectAsState(initial = EmptyWord.word)
-                                        )
+                                    list.forEachIndexed { index, wordId ->
+                                        wordList.add(viewModel.getWordById(wordId)
+                                            .collectAsState(initial = EmptyWord.word))
                                         Log.d("!!!", "WordListTable: $index")
                                     }
 
-                                    WordListTable(
-                                        wordList = wordList,
-                                        getWordById = { viewModel.getWordById(it) },
-                                        deleteWord = { list.remove(it) },
-                                        updateWord = { viewModel.updateWord(it) },
-                                        paragraphIndex,
-                                        viewModel
-                                    )
+                                    Column(modifier = Modifier
+                                        .padding(bottom = 8.dp)
+                                        .focusable()) {
+
+                                        wordList.forEachIndexed { index, word ->
+                                            WordComponent(word = word,
+                                                onValueChange = {
+                                                    wordList[index] =
+                                                        mutableStateOf(Word(word.value.id,
+                                                            word.value.english,
+                                                            it))
+                                                },
+                                                remove = { list.remove(word.value.id) },
+                                                updateWord = { viewModel.updateWord(word.value) })
+                                        }
+                                    }
+
+//                                    WordListTable(
+//                                        wordList = wordList,
+//                                        getWordById = { viewModel.getWordById(it) },
+//                                        deleteWord = { list.remove(it) },
+//                                        updateWord = { viewModel.updateWord(it) },
+//                                        paragraphIndex,
+//                                        viewModel
+//                                    )
 
                                     LaunchedEffect(key1 = 1) {
                                         color.animateTo(Color.White)
