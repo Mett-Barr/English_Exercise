@@ -280,9 +280,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         AnimatedContent(targetState = annotationState) { it ->
                             when (it) {
                                 AnnotationState.TRANSLATION -> {
-                                    Card(elevation = 4.dp,
+                                    Card(
+                                        elevation = 4.dp,
                                         shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.padding(bottom = 8.dp)) {
+                                        modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
+                                    ) {
                                         Text(
                                             text = viewModel.currentContentTr[paragraphIndex].text,
                                             style = Typography().h6,
@@ -310,9 +312,13 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         viewModel.wordListTable[paragraphIndex]
                                     }
 
-                                    val wordList: SnapshotStateList<State<Word>> = emptyList<State<Word>>().toMutableStateList()
+                                    val wordList: SnapshotStateList<State<Word>> =
+                                        emptyList<State<Word>>().toMutableStateList()
                                     list.forEachIndexed { index, it ->
-                                        wordList.add(viewModel.getWordById(it).collectAsState(initial = EmptyWord.word))
+                                        wordList.add(
+                                            viewModel.getWordById(it)
+                                                .collectAsState(initial = EmptyWord.word)
+                                        )
                                         Log.d("!!!", "WordListTable: $index")
                                     }
 

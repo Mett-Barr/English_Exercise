@@ -2,6 +2,8 @@ package com.example.english.ui.components
 
 import android.util.Log
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
@@ -19,6 +21,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.english.MainViewModel
@@ -52,10 +55,12 @@ fun WordListTable(
 
     val swipeRange = with(LocalDensity.current) { (48.dp).toPx() }
 
-    Column(modifier = Modifier
-        .padding(bottom = 8.dp)
-        .animateContentSize()
-        .focusable()) {
+    Column(
+        modifier = Modifier
+            .padding(bottom = 8.dp)
+//            .animateContentSize()
+            .focusable()
+    ) {
 
 
         wordList.forEachIndexed { index, word ->
@@ -63,103 +68,108 @@ fun WordListTable(
             val anchors = mapOf(0f to "normal", -swipeRange to "delete")
             val swipeableState = rememberSwipeableState("normal")
 
+
             var visible by remember {
                 mutableStateOf(true)
             }
 
-            AnimatedVisibility(visible = visible, enter = scaleIn(), exit = scaleOut()) {
-
-
-                Box(modifier = Modifier
-//                    .scale()
-                    .swipeable(
-                        state = swipeableState,
-                        anchors = anchors,
-                        thresholds = { _, _ -> FractionalThreshold(1f) },
-                        orientation = Orientation.Horizontal
-                    )
-                    .focusable()
-                    .onFocusChanged {
-                        coroutineScope.launch {
-                            swipeableState.animateTo("normal")
-                        }
+            val anim: Dp by animateDpAsState(
+                targetValue = (if (visible) 48.dp else 0.dp),
+                finishedListener = {
+                    if (it == 0.dp) {
+                        deleteWord(word.value.id)
                     }
-                ) {
+                })
 
-                    val scale by remember {
-                        derivedStateOf {
-                            (-swipeableState.offset.value + swipeRange) / swipeRange / 2
-                        }
+            Box(modifier = Modifier
+                .height(anim)
+                .swipeable(
+                    state = swipeableState,
+                    anchors = anchors,
+                    thresholds = { _, _ -> FractionalThreshold(1f) },
+                    orientation = Orientation.Horizontal
+                )
+                .focusable()
+                .onFocusChanged {
+                    coroutineScope.launch {
+                        swipeableState.animateTo("normal")
                     }
+                }
+            ) {
 
-                    ClickableIcon(
-                        painter = painterResource(id = R.drawable.delete),
-                        modifier = Modifier
-                            .scale(scale)
-                            .align(Alignment.CenterEnd),
-                        onClick = {
-
-                            visible = false
-
-                            wordList.removeAt(index)
-//                        list.removeAt(index)
-
-                            coroutineScope.launch {
-                                swipeableState.snapTo("normal")
-                            }
-                        })
-
-                    Card(elevation = 4.dp,
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .heightIn(min = 48.dp)
-                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
-                        shape = RoundedCornerShape(4.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .height(IntrinsicSize.Max)
-                                .padding(4.dp)
-                        ) {
-                            Text(
-                                text = word.value.english,
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .weight(1F)
-                                    .padding(horizontal = 8.dp),
-                                style = Typography().h6
-                            )
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .width(1.dp),
-                                color = MaterialTheme.colors.onBackground
-                            )
-
-                            BasicTextField(
-                                value = word.value.chinese,
-                                onValueChange = { wordList[index] = mutableStateOf(Word(word.value.id, word.value.english, it)) },
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .weight(1F)
-                                    .padding(horizontal = 8.dp)
-                                    .onFocusChanged { updateWord(word.value) },
-                                textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
-                                cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
-                            )
-                        }
+                val scale by remember {
+                    derivedStateOf {
+                        (-swipeableState.offset.value + swipeRange) / swipeRange / 2
                     }
                 }
 
+                ClickableIcon(
+                    painter = painterResource(id = R.drawable.delete),
+                    modifier = Modifier
+                        .scale(scale)
+                        .align(Alignment.CenterEnd),
+                    onClick = {
+
+                        visible = false
+
+//                        wordList.removeAt(index)
+//                        list.removeAt(index)
+
+//                        coroutineScope.launch {
+//                            swipeableState.snapTo("normal")
+//                        }
+                    })
+
+                Card(
+                    elevation = 4.dp,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .heightIn(min = 48.dp)
+                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .height(IntrinsicSize.Max)
+                            .padding(4.dp)
+                    ) {
+                        Text(
+                            text = word.value.english,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(1F)
+                                .padding(horizontal = 8.dp),
+                            style = Typography().h6
+                        )
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(1.dp),
+                            color = MaterialTheme.colors.onBackground
+                        )
+
+                        BasicTextField(
+                            value = word.value.chinese,
+                            onValueChange = {
+                                wordList[index] =
+                                    mutableStateOf(Word(word.value.id, word.value.english, it))
+                            },
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(1F)
+                                .padding(horizontal = 8.dp)
+                                .onFocusChanged { updateWord(word.value) },
+                            textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
+                            cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
+                        )
+                    }
+                }
             }
 
+//            if () {
+//                wordList.remove(word)
+//            }
         }
-
-
-
-
-
-
 
 
 //        list.forEachIndexed { index, wordId ->
