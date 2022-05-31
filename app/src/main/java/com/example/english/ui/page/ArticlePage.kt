@@ -36,7 +36,6 @@ import com.example.english.data.word.word.room.Word
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordComponent
-import com.example.english.ui.components.WordListTable
 
 
 enum class AnnotationState {
@@ -310,30 +309,72 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         viewModel.wordListTable[paragraphIndex]
                                     }
 
-                                    val wordList: SnapshotStateList<State<Word>> =
-                                        emptyList<State<Word>>().toMutableStateList()
+                                    val wordList: SnapshotStateList<MutableState<Word>> =
+                                        emptyList<MutableState<Word>>().toMutableStateList()
                                     list.forEachIndexed { index, wordId ->
                                         wordList.add(viewModel.getWordById(wordId)
-                                            .collectAsState(initial = EmptyWord.word))
+                                            .collectAsState(initial = EmptyWord.word) as MutableState<Word>)
                                         Log.d("!!!", "WordListTable: $index")
                                     }
 
-                                    Column(modifier = Modifier
+                                    LazyColumn(modifier = Modifier
                                         .padding(bottom = 8.dp)
-                                        .focusable()) {
+                                        .focusable()
+                                        .animateContentSize()
+                                        .heightIn(max = 300.dp)) {
 
-                                        wordList.forEachIndexed { index, word ->
+//                                        items(wordList, key = { it -> it }) { word ->
+//                                            WordComponent(word = word,
+//                                                onValueChange = {
+//                                                    wordList[index].value =
+//                                                        word.value.copy(chinese = it)
+//                                                },
+//                                                remove = {
+//                                                    viewModel.wordListTable[index].remove(word.value.id)
+//                                                },
+//                                                updateWord = { viewModel.updateWord(word.value) },
+//                                                updateChinese = {
+//                                                    viewModel.updateWord(Word(word.value.id,
+//                                                        word.value.english,
+//                                                        it))
+//                                                })
+//                                        }
+
+                                        itemsIndexed(wordList) { index, word ->
                                             WordComponent(word = word,
                                                 onValueChange = {
-                                                    wordList[index] =
-                                                        mutableStateOf(Word(word.value.id,
-                                                            word.value.english,
-                                                            it))
+                                                    wordList[index].value =
+                                                        word.value.copy(chinese = it)
                                                 },
-                                                remove = { list.remove(word.value.id) },
+                                                remove = {
+                                                    viewModel.wordListTable[index].remove(word.value.id)
+                                                },
                                                 updateWord = { viewModel.updateWord(word.value) })
                                         }
                                     }
+
+//                                    Column(modifier = Modifier
+//                                        .padding(bottom = 8.dp)
+////                                        .animateContentSize()
+//                                        .focusable()) {
+//
+//                                        wordList.forEachIndexed { index, word ->
+//                                            WordComponent(word = word,
+//                                                onValueChange = {
+//                                                    wordList[index].value =
+//                                                        word.value.copy(chinese = it)
+//                                                },
+//                                                remove = {
+//                                                    viewModel.wordListTable[index].remove(word.value.id)
+//                                                },
+//                                                updateWord = { viewModel.updateWord(word.value) },
+//                                                updateChinese = {
+//                                                    viewModel.updateWord(Word(word.value.id,
+//                                                        word.value.english,
+//                                                        it))
+//                                                })
+//                                        }
+//                                    }
 
 //                                    WordListTable(
 //                                        wordList = wordList,
