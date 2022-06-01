@@ -23,6 +23,7 @@ sealed class MainRoute(val route: String) {
     object Main : MainRoute("MainPage")
     object Insert : MainRoute("InsertPage")
     object News : MainRoute("NewsPage")
+    object Dictionary : MainRoute("DictionaryPage")
 }
 
 @Composable
@@ -68,6 +69,9 @@ fun MainNavigation(viewModel: MainViewModel) {
                 viewModel.currentTitle,
                 navController = navController
             )
+        }
+        composable(MainRoute.Dictionary.route) {
+
         }
     }
 }

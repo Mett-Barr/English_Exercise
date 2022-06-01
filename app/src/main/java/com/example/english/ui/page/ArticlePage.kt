@@ -347,7 +347,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                                         word.value.copy(chinese = it)
                                                 },
                                                 remove = {
-                                                    viewModel.wordListTable[index].remove(word.value.id)
+                                                    viewModel.wordListTable[paragraphIndex].remove(word.value.id)
                                                 },
                                                 updateWord = { viewModel.updateWord(word.value) })
                                         }
