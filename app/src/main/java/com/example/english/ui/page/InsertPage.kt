@@ -94,7 +94,8 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
             clickOK = {
                 titleError = viewModel.draftTitle.text.isBlank()
                 contentError = viewModel.draftContent.text.isBlank()
-                openDialog = !titleError && !contentError
+//                openDialog = !titleError && !contentError
+                if (!titleError && !contentError) addNews()
             }
         )
     }

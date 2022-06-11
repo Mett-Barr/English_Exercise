@@ -18,6 +18,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -111,28 +112,30 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
     Scaffold(
         bottomBar = {
-            BottomAppBar {
-                Row(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .height(64.dp)
-                        .align(Alignment.CenterVertically)
-                ) {
-                    ClickableIcon(painter = painterResource(R.drawable.back)) {
-                        dispatcher.onBackPressed()
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1F)
-                    )
-                    ClickableIcon(painter = painterResource(R.drawable.delete)) {
-                        deleteArticleDialog = true
-                    }
-                    ClickableIcon(painter = painterResource(R.drawable.lable))
-                    ClickableIcon(painter = painterResource(R.drawable.edit))
-                }
-            }
+//            BottomAppBar {
+//                Row(
+//                    modifier = Modifier
+//                        .wrapContentHeight()
+//                        .height(64.dp)
+//                        .align(Alignment.CenterVertically)
+//                ) {
+//                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+//                        ClickableIcon(painter = painterResource(R.drawable.back)) {
+//                            dispatcher.onBackPressed()
+//                        }
+//                    }
+//                    Spacer(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .weight(1F)
+//                    )
+//                    ClickableIcon(painter = painterResource(R.drawable.delete), enabled = false) {
+//                        deleteArticleDialog = true
+//                    }
+//                    ClickableIcon(painter = painterResource(R.drawable.lable), enabled = false)
+//                    ClickableIcon(painter = painterResource(R.drawable.edit), enabled = false)
+//                }
+//            }
         },
 
         modifier = hideKeyboardModifier
@@ -309,13 +312,26 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         viewModel.wordListTable[paragraphIndex]
                                     }
 
+
+                                    // 測試中
                                     val wordList: SnapshotStateList<MutableState<Word>> =
-                                        emptyList<MutableState<Word>>().toMutableStateList()
-                                    list.forEachIndexed { index, wordId ->
-                                        wordList.add(viewModel.getWordById(wordId)
-                                            .collectAsState(initial = EmptyWord.word) as MutableState<Word>)
-                                        Log.d("!!!", "WordListTable: $index")
-                                    }
+                                        list.map {
+                                            viewModel.getWordById(it)
+                                                .collectAsState(initial = EmptyWord.word) as MutableState<Word>
+                                        }.toMutableStateList()
+//                                        emptyList<MutableState<Word>>().toMutableStateList()
+
+//                                    wordList = list
+//                                        .map { viewModel.getWordById(it)
+//                                            .collectAsState(initial = EmptyWord.word) as MutableState<Word>}
+//                                        .map(it -> viewModel.getWordById(it))
+//                                        .toCollection()
+
+//                                    list.forEachIndexed { index, wordId ->
+//                                        wordList.add(viewModel.getWordById(wordId)
+//                                            .collectAsState(initial = EmptyWord.word) as MutableState<Word>)
+//                                        Log.d("!!!", "WordListTable: $index")
+//                                    }
 
                                     LazyColumn(modifier = Modifier
                                         .padding(bottom = 8.dp)
@@ -347,7 +363,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                                         word.value.copy(chinese = it)
                                                 },
                                                 remove = {
-                                                    viewModel.wordListTable[paragraphIndex].remove(word.value.id)
+                                                    viewModel.wordListTable[paragraphIndex].remove(
+                                                        word.value.id)
                                                 },
                                                 updateWord = { viewModel.updateWord(word.value) })
                                         }

@@ -43,7 +43,8 @@ fun MainNavigation(viewModel: MainViewModel) {
                 darkIcons = useDarkIcons
             )
             setStatusBarColor(
-                color = Color.Transparent.copy(alpha = 0.8F),
+//                color = Color.Transparent,
+                color = Color.Transparent.copy(alpha = 0.5F),
                 darkIcons = useDarkIcons
             )
         }
@@ -61,6 +62,7 @@ fun MainNavigation(viewModel: MainViewModel) {
             MainPage(viewModel = viewModel, navController)
         }
         composable(MainRoute.Insert.route) {
+            viewModel.navToInsertPage()
             InsertPage(viewModel = viewModel, navController = navController)
         }
         composable(MainRoute.News.route) {

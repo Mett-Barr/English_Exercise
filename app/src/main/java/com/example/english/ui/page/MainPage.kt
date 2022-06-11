@@ -33,7 +33,10 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(MainRoute.Insert.route) }) {
+            FloatingActionButton(
+//                modifier = Modifier.padding(bottom = WindowInsets.systemBars.asPaddingValues()
+//                .calculateBottomPadding()),
+                onClick = { navController.navigate(MainRoute.Insert.route) }) {
                 Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
             }
         },
@@ -45,7 +48,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                 .padding(horizontal = 8.dp),
             contentPadding = PaddingValues(
                 top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding() + 8.dp,
-                bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 8.dp,
+                bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 8.dp + 80.dp,
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
@@ -81,13 +84,13 @@ fun NewsItem(news: News, viewModel: MainViewModel, navigation: () -> Unit, conte
                 )
                 Text(text = news.caption, maxLines = 2, style = Typography.caption)
             }
-            Spacer(
-                modifier = Modifier
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .aspectRatio(1F)
-                    .fillMaxHeight()
-                    .background(Color.Magenta)
-            )
+//            Spacer(
+//                modifier = Modifier
+//                    .clip(shape = RoundedCornerShape(4.dp))
+//                    .aspectRatio(1F)
+//                    .fillMaxHeight()
+//                    .background(Color.Magenta)
+//            )
         }
     }
 }

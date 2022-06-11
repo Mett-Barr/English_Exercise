@@ -29,6 +29,11 @@ class MainViewModel @Inject constructor(
     /** draft news */
     var draftTitle by mutableStateOf(TextFieldValue(""))
     var draftContent by mutableStateOf(TextFieldValue(""))
+    //
+    fun navToInsertPage() {
+        draftTitle = TextFieldValue("新聞標題")
+        draftContent = TextFieldValue("文章內容")
+    }
 
     val list = repository.newsList()
 

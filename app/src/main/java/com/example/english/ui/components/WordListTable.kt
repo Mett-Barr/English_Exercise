@@ -391,5 +391,4 @@ fun WordComponent(
             }
         }
     }
-
 }
