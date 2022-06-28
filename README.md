@@ -5,10 +5,6 @@ English Exercise Android App
 
 <img src="https://github.com/Mett-Barr/image/blob/main/%E5%9C%96/%E5%B1%95%E7%A4%BA.png"/>
 
-1. 新增原文新聞　　　　　　　　　　　 2. 原文段落和翻譯　　　　　　　　　　　 3. 新增單字
-
-<img src="https://github.com/Mett-Barr/image/blob/main/%E5%9C%96/Screenshot_20220627-223208.png" width="288" height="512"/><img src="https://github.com/Mett-Barr/image/blob/main/%E5%9C%96/Screenshot_20220627-223232.png" width="288" height="512"/><img src="https://github.com/Mett-Barr/image/blob/main/%E5%9C%96/Screenshot_20220627-223345.png" width="288" height="512"/>
-
 
 about project：  
 UI與架構：MVVM + Jetpack compose  
