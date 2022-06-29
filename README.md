@@ -1,5 +1,6 @@
 # English_Exercise
-English Exercise Android App
+English Exercise Android App  
+## [PPT簡介](https://docs.google.com/presentation/d/1EwMEW-fzQlBkggozDoUhtsAYR_T-BPfO3zc0GX-VXdw/edit?usp=sharing)
 目標：以「方便」為核心所打造的英文練習App  
 
 功能：
