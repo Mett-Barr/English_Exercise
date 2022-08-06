@@ -34,8 +34,8 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-//                modifier = Modifier.padding(bottom = WindowInsets.systemBars.asPaddingValues()
-//                .calculateBottomPadding()),
+                modifier = Modifier.padding(bottom = WindowInsets.systemBars.asPaddingValues()
+                .calculateBottomPadding()),
                 onClick = { navController.navigate(MainRoute.Insert.route) }) {
                 Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
             }

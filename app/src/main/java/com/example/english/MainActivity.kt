@@ -13,6 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import com.example.english.network.TestJsoupImage
 import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.page.Test04
 import com.example.english.ui.page.Test05
@@ -47,12 +48,14 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainNavigation(viewModel)
 //                    Test05(viewModel)
+//                    TestJsoupImage()
                 }
             }
         }
 
 
-        viewModel.addNewsByJsoup(url = "https://www.bbc.com/news/world-asia-62419858", this)
+        // Jsoup test
+//        viewModel.addNewsByJsoup(url = "https://www.bbc.com/news/world-asia-62419858", this)
 
     }
 
