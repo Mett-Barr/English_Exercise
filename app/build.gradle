@@ -120,4 +120,9 @@ dependencies {
     // Material 3
     implementation "androidx.compose.material3:material3:1.0.0-alpha11"
     implementation "androidx.compose.material3:material3-window-size-class:1.0.0-alpha11"
+
+
+    // Jsoup
+    implementation 'org.jsoup:jsoup:1.14.1'
+
 }

@@ -50,6 +50,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+
+        viewModel.addNewsByJsoup(url = "https://www.bbc.com/news/world-asia-62419858", this)
+
     }
 
     override fun onBackPressed() {

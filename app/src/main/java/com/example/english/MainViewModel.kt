@@ -12,7 +12,9 @@ import com.example.english.data.newslist.room.News
 import com.example.english.data.word.addInWordListTable
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
+import com.example.english.network.JsoupNews
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -211,5 +213,21 @@ class MainViewModel @Inject constructor(
     /** Navigation */
     fun newsPagePopBack() {
 
+    }
+
+
+
+
+
+    /**  Jsoup  */
+    fun addNewsByJsoup(url: String, context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val jsoupNews = JsoupNews(url)
+
+            draftTitle = TextFieldValue(jsoupNews.getTitle())
+            draftContent = TextFieldValue(jsoupNews.getContent())
+
+            suspendAddNews(context)
+        }
     }
 }
