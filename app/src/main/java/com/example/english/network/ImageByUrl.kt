@@ -5,9 +5,12 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
 import coil.compose.AsyncImage
+import com.example.english.MainViewModel
+import com.example.english.data.image.ImageOperator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -30,34 +33,48 @@ fun TestJsoupImage() {
         mutableStateOf("")
     }
 
+    var image by remember {
+        mutableStateOf<Bitmap?>(null)
+    }
+
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = Unit) {
         coroutineScope.launch(Dispatchers.IO) {
-            url = jsoupImageTest()
+            jsoupImageTest().also {
+                url = it
+                image = imageStore(it, context)
+            }
         }
     }
 
-    AsyncImage(
-        model = url,
-        contentDescription = null
-    )
-}
+//    AsyncImage(
+//        model = url,
+//        contentDescription = null
+//    )
 
+//    if (image != null) {
+    image?.let { Image(bitmap = it.asImageBitmap(), contentDescription = null) }
+//    }
+}
 
 
 @Composable
 fun ImageTest() {
-    var bitmap: Bitmap? = null
+    val bitmap = remember {
+        mutableStateOf<Bitmap?>(null)
+    }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-    if (bitmap != null) {
-        Image(bitmap = bitmap.asImageBitmap(), contentDescription = null)
+    if (bitmap.value != null) {
+        Image(bitmap = bitmap.value!!.asImageBitmap(), contentDescription = null)
     }
 
-    LaunchedEffect(key1 = Unit ) {
+    LaunchedEffect(key1 = Unit) {
         coroutineScope.launch {
-//            bitmap = imageStore(, LocalContext.current)
+            bitmap.value = ImageOperator().imageTest(context)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.english
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -13,16 +12,19 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.english.data.image.ImageOperatorObject
+import com.example.english.network.ImageTest
 import com.example.english.network.TestJsoupImage
-import com.example.english.ui.navigation.MainNavigation
-import com.example.english.ui.page.Test04
-import com.example.english.ui.page.Test05
+import com.example.english.network.imageStore
 import com.example.english.ui.theme.EnglishTheme
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -46,9 +48,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainNavigation(viewModel)
+//                    MainNavigation(viewModel)
 //                    Test05(viewModel)
 //                    TestJsoupImage()
+                    ImageTest()
                 }
             }
         }
@@ -56,6 +59,13 @@ class MainActivity : ComponentActivity() {
 
         // Jsoup test
 //        viewModel.addNewsByJsoup(url = "https://www.bbc.com/news/world-asia-62419858", this)
+
+        // image store test
+        val imageUrl = "https://ichef.bbci.co.uk/news/976/cpsprodpb/FD2F/production/_126151846_sun.jpg"
+        lifecycleScope.launch(Dispatchers.IO) {
+            val bitmap = imageStore(imageUrl, this@MainActivity)
+            ImageOperatorObject.addImage("1", bitmap!!, this@MainActivity)
+        }
 
     }
 

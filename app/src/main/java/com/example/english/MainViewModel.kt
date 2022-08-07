@@ -1,12 +1,14 @@
 package com.example.english
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.english.data.article.*
+import com.example.english.data.image.ImageOperatorObject
 import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
 import com.example.english.data.word.addInWordListTable
@@ -16,7 +18,6 @@ import com.example.english.network.JsoupNews
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -228,6 +229,12 @@ class MainViewModel @Inject constructor(
             draftContent = TextFieldValue(jsoupNews.getContent())
 
             suspendAddNews(context)
+        }
+    }
+
+    fun addImage(bitmap: Bitmap, context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            ImageOperatorObject.addImage("10", bitmap, context)
         }
     }
 }
