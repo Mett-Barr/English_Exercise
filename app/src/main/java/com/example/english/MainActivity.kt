@@ -14,9 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.english.data.image.ImageOperatorObject
-import com.example.english.network.ImageTest
-import com.example.english.network.TestJsoupImage
 import com.example.english.network.imageStore
+import com.example.english.ui.page.test.WebViewTest
 import com.example.english.ui.theme.EnglishTheme
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
@@ -49,9 +48,13 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
 //                    MainNavigation(viewModel)
+
+
 //                    Test05(viewModel)
 //                    TestJsoupImage()
-                    ImageTest()
+//                    ImageTest()
+
+                    WebViewTest()
                 }
             }
         }
