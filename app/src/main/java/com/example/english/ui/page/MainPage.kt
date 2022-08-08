@@ -13,12 +13,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -87,6 +89,7 @@ fun NewsCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
+            .clip(RoundedCornerShape(16.dp))
             .clickable {
                 viewModel.currentNews(news, context)
                 navigation.invoke()
@@ -138,7 +141,7 @@ fun NewsCard(
 }
 
 object Obj {
-    val colorTop = Color(0f, 0f, 0f, 0f)
-    val colorBottom = Color(38, 38, 38, 128)
+    private val colorTop = Color(0f, 0f, 0f, 0f)
+    private val colorBottom = Color(38, 38, 38, 128)
     val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
 }

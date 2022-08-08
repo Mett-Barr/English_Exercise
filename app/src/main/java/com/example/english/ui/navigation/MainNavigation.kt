@@ -17,6 +17,7 @@ import com.example.english.MainViewModel
 import com.example.english.ui.page.InsertPage
 import com.example.english.ui.page.MainPage
 import com.example.english.ui.page.NewsArticlePage
+import com.example.english.ui.page.WebPage
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 sealed class MainRoute(val route: String) {
@@ -63,7 +64,8 @@ fun MainNavigation(viewModel: MainViewModel) {
         }
         composable(MainRoute.Insert.route) {
             viewModel.navToInsertPage()
-            InsertPage(viewModel = viewModel, navController = navController)
+//            InsertPage(viewModel = viewModel, navController = navController)
+            WebPage()
         }
         composable(MainRoute.News.route) {
             NewsArticlePage(

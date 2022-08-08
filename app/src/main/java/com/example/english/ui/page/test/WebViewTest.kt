@@ -89,10 +89,6 @@ fun WebViewTest() {
                 webViewClient = WebViewClientTest { urlTest(it) }
 
                 loadUrl("https://www.bbc.com/news/newsbeat-44124396")
-
-                webViewClient.apply {
-
-                }
             }
         })
     }
