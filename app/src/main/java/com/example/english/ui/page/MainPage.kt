@@ -1,25 +1,36 @@
 package com.example.english.ui.page
 
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
+import com.example.english.R
+import com.example.english.data.image.ImageOperator
 import com.example.english.ui.navigation.MainRoute
 import com.example.english.data.newslist.room.News
 import com.example.english.ui.theme.Typography
@@ -31,11 +42,13 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
     val list by viewModel.list.collectAsState(initial = emptyList())
 
+//    val placeHolder = BitmapFactory.decodeResource(context.resources, R.drawable.darkgrayimage)
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.padding(bottom = WindowInsets.systemBars.asPaddingValues()
-                .calculateBottomPadding()),
+                    .calculateBottomPadding()),
                 onClick = { navController.navigate(MainRoute.Insert.route) }) {
                 Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
             }
@@ -48,19 +61,28 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                 .padding(horizontal = 8.dp),
             contentPadding = PaddingValues(
                 top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding() + 8.dp,
-                bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 8.dp + 80.dp,
+                bottom = WindowInsets.systemBars.asPaddingValues()
+                    .calculateBottomPadding() + 8.dp + 80.dp,
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(list) {
-                NewsItem(it, viewModel, { navController.navigate(MainRoute.News.route) }, context)
+                NewsCard(it,
+                    viewModel,
+                    { navController.navigate(MainRoute.News.route) },
+                    context)
             }
         }
     }
 }
 
 @Composable
-fun NewsItem(news: News, viewModel: MainViewModel, navigation: () -> Unit, context: Context) {
+fun NewsCard(
+    news: News,
+    viewModel: MainViewModel,
+    navigation: () -> Unit,
+    context: Context,
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -71,11 +93,38 @@ fun NewsItem(news: News, viewModel: MainViewModel, navigation: () -> Unit, conte
             }
 //            .background(MaterialTheme.colors.background)
     ) {
-        Row {
+
+        var bitmap by remember {
+            mutableStateOf<Bitmap?>(null)
+        }
+
+        LaunchedEffect(key1 = Unit) {
+            bitmap = ImageOperator().imageTest(context)
+        }
+
+        Box {
+            Crossfade(targetState = bitmap) {
+                if (it != null) {
+                    Image(bitmap = it!!.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .aspectRatio(16f / 9f)
+                            .fillMaxWidth())
+                } else {
+                    Spacer(modifier = Modifier
+                        .aspectRatio(16f / 9f)
+                        .fillMaxWidth()
+                        .background(Color.DarkGray)
+                    )
+                }
+            }
+
             Column(
                 modifier = Modifier
-                    .weight(1F)
+                    .fillMaxWidth()
                     .padding(8.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(brush = Obj.brush)
             ) {
                 Text(
                     text = news.title,
@@ -84,13 +133,12 @@ fun NewsItem(news: News, viewModel: MainViewModel, navigation: () -> Unit, conte
                 )
                 Text(text = news.caption, maxLines = 2, style = Typography.caption)
             }
-//            Spacer(
-//                modifier = Modifier
-//                    .clip(shape = RoundedCornerShape(4.dp))
-//                    .aspectRatio(1F)
-//                    .fillMaxHeight()
-//                    .background(Color.Magenta)
-//            )
         }
     }
+}
+
+object Obj {
+    val colorTop = Color(0f, 0f, 0f, 0f)
+    val colorBottom = Color(38, 38, 38, 128)
+    val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
 }

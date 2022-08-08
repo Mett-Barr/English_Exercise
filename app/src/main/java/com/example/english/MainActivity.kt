@@ -15,6 +15,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.english.data.image.ImageOperatorObject
 import com.example.english.network.imageStore
+import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.page.test.WebViewTest
 import com.example.english.ui.theme.EnglishTheme
 import com.google.mlkit.common.model.DownloadConditions
@@ -47,14 +48,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-//                    MainNavigation(viewModel)
+                    MainNavigation(viewModel)
 
 
 //                    Test05(viewModel)
 //                    TestJsoupImage()
 //                    ImageTest()
 
-                    WebViewTest()
+//                    WebViewTest()
                 }
             }
         }
