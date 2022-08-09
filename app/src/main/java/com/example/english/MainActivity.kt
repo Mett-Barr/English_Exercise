@@ -12,20 +12,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.lifecycleScope
-import com.example.english.data.image.ImageOperatorObject
-import com.example.english.network.imageStore
 import com.example.english.ui.navigation.MainNavigation
-import com.example.english.ui.page.WebPage
-import com.example.english.ui.page.test.WebViewTest
 import com.example.english.ui.theme.EnglishTheme
-import com.google.mlkit.common.model.DownloadConditions
-import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.Translation
-import com.google.mlkit.nl.translate.TranslatorOptions
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -72,6 +61,10 @@ class MainActivity : ComponentActivity() {
 //            val bitmap = imageStore(imageUrl, this@MainActivity)
 //            ImageOperatorObject.addImage("1", bitmap!!, this@MainActivity)
 //        }
+
+
+        // add news by url
+        viewModel.addBBCNews("https://www.bbc.com/news/world-asia-62462275", this)
 
     }
 

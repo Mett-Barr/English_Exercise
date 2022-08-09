@@ -109,7 +109,7 @@ fun NewsCard(
         }
 
         LaunchedEffect(key1 = Unit) {
-            bitmap = ImageOperator().imageTest(context)
+            bitmap = ImageOperator().getImage(news.id.toString() ,context)
         }
 
         /**  brush animation  */
@@ -164,7 +164,7 @@ fun NewsCard(
                     text = news.title,
                     maxLines = 2,
                     style = Typography.h5,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 16.dp)
                 )
 //                Text(text = news.caption, maxLines = 2, style = Typography.caption)
             }
@@ -174,7 +174,7 @@ fun NewsCard(
 
 object Obj {
     val colorTop = Color(0f, 0f, 0f, 0f)
-    val colorBottom = Color(38, 38, 38, 128)
+    val colorBottom = Color(38, 38, 38, 200)
 //    val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
 
 

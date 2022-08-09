@@ -15,6 +15,7 @@ import com.example.english.data.word.addInWordListTable
 import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
 import com.example.english.network.JsoupNews
+import com.example.english.network.imageStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -90,6 +91,11 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch { suspendAddNews(context) }
     }
 
+    fun addNewsByUrl(context: Context, url: String) {
+        viewModelScope.launch { suspendAddNews(context) }
+    }
+
+
     private suspend fun suspendAddNews(context: Context) {
 
         // Room
@@ -100,6 +106,21 @@ class MainViewModel @Inject constructor(
         addNewFile(newsId, context)
 
     }
+
+
+    private suspend fun addUrlNews(context: Context): String {
+
+        // Room
+        val caption = draftContent.text.split("\n")[0]
+        val newsId = repository.addNews(News(0, draftTitle.text, caption))
+
+        // add file
+        addNewFile(newsId, context)
+
+        return newsId.toString()
+    }
+
+
 
     // Delete
     fun deleteNews(context: Context) {
@@ -245,6 +266,29 @@ class MainViewModel @Inject constructor(
     fun addImage(bitmap: Bitmap, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             ImageOperatorObject.addImage("10", bitmap, context)
+        }
+    }
+
+
+
+
+    /**  BBC  */
+    fun addBBCNews(url: String, context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            // get Article
+            val jsoupNews = JsoupNews(url)
+
+            draftTitle = TextFieldValue(jsoupNews.getTitle())
+            draftContent = TextFieldValue(jsoupNews.getContent())
+
+            
+            val newsId = addUrlNews(context)
+
+            // get Image
+            val imageUrl = jsoupNews.getImageUrl()
+            val bitmap = imageStore(imageUrl, context)
+            bitmap?.let { ImageOperatorObject.addImage(newsId, it, context) }
         }
     }
 }
