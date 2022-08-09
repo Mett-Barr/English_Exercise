@@ -137,6 +137,12 @@ fun NewsCard(
                             .aspectRatio(16f / 9f)
                             .fillMaxWidth()
                     )
+//                    Spacer(
+//                        modifier = Modifier
+//                            .aspectRatio(16f / 9f)
+//                            .fillMaxWidth()
+//                            .background(Color.White)
+//                    )
                 } else {
                     Spacer(
                         modifier = Modifier
@@ -157,9 +163,10 @@ fun NewsCard(
                 Text(
                     text = news.title,
                     maxLines = 2,
-                    style = Typography.h5
+                    style = Typography.h5,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
-                Text(text = news.caption, maxLines = 2, style = Typography.caption)
+//                Text(text = news.caption, maxLines = 2, style = Typography.caption)
             }
         }
     }

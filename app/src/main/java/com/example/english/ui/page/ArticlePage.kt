@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -15,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,6 +38,7 @@ import com.example.english.data.word.word.room.Word
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordComponent
+import com.example.english.ui.theme.ColorDone
 
 
 enum class AnnotationState {
@@ -183,7 +185,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)) {
 
                         FlatTextField(
-                            value = paragraphContent,
+                            value = if (paragraphContent.text.first() == '^') {
+                                paragraphContent.copy(text = paragraphContent.text.removeRange(0,
+                                    1))
+                            } else paragraphContent,
                             onValueChange = { viewModel.currentContent[paragraphIndex] = it },
                             modifier = Modifier.fillMaxWidth(),
                             readOnly = true
@@ -205,12 +210,33 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                         // button row
                         Row(modifier = Modifier.fillMaxWidth()) {
-                            ClickableIcon(painter = painterResource(id = R.drawable.delete),
+
+                            fun isDone(): Boolean {
+                                return if (paragraphContent.text.isNotEmpty()) {
+                                    paragraphContent.text.first() == '^'
+                                } else false
+                            }
+
+                            val transition = updateTransition(targetState = isDone(), label = "transition")
+
+                            val doneColor by transition.animateColor(label = "") {
+                                if (it) ColorDone else LocalContentColor.current
+                            }
+                            val doneAlpha by transition.animateFloat(label = "") {
+                                if (it) LocalContentAlpha.current else 0.80f
+                            }
+//                            val doneColor by animateColorAsState(targetValue = if (isDone()) ColorDone else LocalContentColor.current)
+                            ClickableIcon(painter = painterResource(id = R.drawable.done_broad),
                                 onClick = {
-                                    currentParagraphIndex = paragraphIndex
-                                    currentParagraphContent = paragraphContent.text
-                                    deleteParagraphDialog = true
-                                })
+//                                    currentParagraphIndex = paragraphIndex
+//                                    curr；entParagraphContent = paragraphContent.text
+//                                    deleteParagraphDialog = true
+                                    viewModel.changeDoneState(paragraphIndex)
+                                    Log.d("!!",
+                                        "NewsArticlePage: \n${paragraphContent.text}\n${paragraphContent.text.firstOrNull()}")
+                                },
+                                modifier = Modifier.alpha(doneAlpha),
+                                tint = doneColor)
 
                             Spacer(modifier = Modifier
                                 .weight(1F)

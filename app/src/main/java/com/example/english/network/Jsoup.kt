@@ -40,7 +40,8 @@ class JsoupNews(url: String) {
 
     private val html = Jsoup.connect(url).get()
 
-    fun getTitle(): String = html.getElementById("main-heading")?.text() ?: ""
+//    fun getTitle(): String = html.getElementById("main-heading")?.text() ?: ""
+    fun getTitle(): String = html.getElementById(BBC_TITLE)?.text() ?: ""
 
     fun getContent(): String {
         var content = ""

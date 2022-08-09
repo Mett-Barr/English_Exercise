@@ -10,3 +10,5 @@ val Teal200 = Color(0xFF03DAC5)
 val Primary = Color(0xFFa9c7ff)
 val PrimaryVariant = Color(0xFF004787)
 val Secondary = Color(0xFFbdc7dc)
+
+val ColorDone = Color(0xFF89E8FF)

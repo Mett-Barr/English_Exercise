@@ -73,6 +73,16 @@ class MainViewModel @Inject constructor(
         currentContentTr.removeAt(index)
     }
 
+    fun changeDoneState(index: Int) {
+        currentContent.also {
+            if (it[index].text.first() == '^') {
+                it[index] = it[index].copy(text = it[index].text.removeRange(0, 1))
+            } else {
+                it[index] = it[index].copy(text = '^' + it[index].text)
+            }
+        }
+    }
+
 
     /** Repository operation */
     // Insert
