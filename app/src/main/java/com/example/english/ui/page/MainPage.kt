@@ -35,6 +35,8 @@ import com.example.english.R
 import com.example.english.data.image.ImageOperator
 import com.example.english.ui.navigation.MainRoute
 import com.example.english.data.newslist.room.News
+import com.example.english.ui.page.Obj.colorBottom
+import com.example.english.ui.page.Obj.colorTop
 import com.example.english.ui.theme.Typography
 
 @Composable
@@ -49,8 +51,10 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier.padding(bottom = WindowInsets.systemBars.asPaddingValues()
-                    .calculateBottomPadding()),
+                modifier = Modifier.padding(
+                    bottom = WindowInsets.systemBars.asPaddingValues()
+                        .calculateBottomPadding()
+                ),
                 onClick = { navController.navigate(MainRoute.Insert.route) }) {
                 Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
             }
@@ -69,10 +73,12 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(list) {
-                NewsCard(it,
+                NewsCard(
+                    it,
                     viewModel,
                     { navController.navigate(MainRoute.News.route) },
-                    context)
+                    context
+                )
             }
         }
     }
@@ -105,29 +111,47 @@ fun NewsCard(
             bitmap = ImageOperator().imageTest(context)
         }
 
+        /**  brush animation  */
+
+        val color by animateColorAsState(
+            targetValue = if (bitmap == null) colorTop else colorBottom,
+            animationSpec = tween(1500)
+        )
+
+        val brush by remember {
+            derivedStateOf {
+                Brush.verticalGradient(listOf(colorTop, color))
+            }
+        }
+
+        /**  --------------------  */
+
         Box {
             Crossfade(targetState = bitmap) {
                 if (it != null) {
-                    Image(bitmap = it!!.asImageBitmap(),
+                    Image(
+                        bitmap = it.asImageBitmap(),
                         contentDescription = null,
                         modifier = Modifier
                             .aspectRatio(16f / 9f)
-                            .fillMaxWidth())
+                            .fillMaxWidth()
+                    )
                 } else {
-                    Spacer(modifier = Modifier
-                        .aspectRatio(16f / 9f)
-                        .fillMaxWidth()
-                        .background(Color.DarkGray)
+                    Spacer(
+                        modifier = Modifier
+                            .aspectRatio(16f / 9f)
+                            .fillMaxWidth()
+                            .background(Color.White)
                     )
                 }
             }
 
             Column(
                 modifier = Modifier
+                    .background(brush = brush)
                     .fillMaxWidth()
                     .padding(8.dp)
                     .align(Alignment.BottomCenter)
-                    .background(brush = Obj.brush)
             ) {
                 Text(
                     text = news.title,
@@ -141,7 +165,7 @@ fun NewsCard(
 }
 
 object Obj {
-    private val colorTop = Color(0f, 0f, 0f, 0f)
-    private val colorBottom = Color(38, 38, 38, 128)
-    val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
+    val colorTop = Color(0f, 0f, 0f, 0f)
+    val colorBottom = Color(38, 38, 38, 128)
+//    val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
 }

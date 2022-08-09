@@ -64,8 +64,8 @@ fun MainNavigation(viewModel: MainViewModel) {
         }
         composable(MainRoute.Insert.route) {
             viewModel.navToInsertPage()
-//            InsertPage(viewModel = viewModel, navController = navController)
-            WebPage()
+            InsertPage(viewModel = viewModel, navController = navController)
+//            WebPage()
         }
         composable(MainRoute.News.route) {
             NewsArticlePage(

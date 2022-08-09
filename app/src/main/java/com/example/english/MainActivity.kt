@@ -67,11 +67,11 @@ class MainActivity : ComponentActivity() {
 //        viewModel.addNewsByJsoup(url = "https://www.bbc.com/news/world-asia-62419858", this)
 
         // image store test
-        val imageUrl = "https://ichef.bbci.co.uk/news/976/cpsprodpb/FD2F/production/_126151846_sun.jpg"
-        lifecycleScope.launch(Dispatchers.IO) {
-            val bitmap = imageStore(imageUrl, this@MainActivity)
-            ImageOperatorObject.addImage("1", bitmap!!, this@MainActivity)
-        }
+//        val imageUrl = "https://ichef.bbci.co.uk/news/976/cpsprodpb/FD2F/production/_126151846_sun.jpg"
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            val bitmap = imageStore(imageUrl, this@MainActivity)
+//            ImageOperatorObject.addImage("1", bitmap!!, this@MainActivity)
+//        }
 
     }
 
@@ -81,46 +81,46 @@ class MainActivity : ComponentActivity() {
     }
 
 
-    private fun init() {
-        // Create an English-German translator:
-        val options = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.ENGLISH)
-            .setTargetLanguage(TranslateLanguage.CHINESE)
-            .build()
-        val englishGermanTranslator = Translation.getClient(options)
-
-        Log.d("!!!", "init fun")
-
-        var conditions = DownloadConditions.Builder()
-            .requireWifi()
-            .build()
-        englishGermanTranslator.downloadModelIfNeeded(conditions)
-            .addOnSuccessListener {
-                // Model downloaded successfully. Okay to start translating.
-                // (Set a flag, unhide the translation UI, etc.)
-
-                Log.d("!!!", "addOnSuccessListener")
-            }
-            .addOnFailureListener { exception ->
-                // Model couldn’t be downloaded or other internal error.
-                // ...
-                Log.d("!!!", exception.toString())
-            }
-
-        englishGermanTranslator.translate("\"Especially at a time when the COVID situation is still serious, IPs being swiftly revealed can effectively reduce the appearance of disgusting content from rumor-makers and rumor-spreaders,\" wrote user UltraScarry.\n")
-            .addOnSuccessListener { translatedText ->
-                // com.example.english.translation.format.Translation successful.
-                Log.d("!!!", "init: $translatedText")
-            }
-            .addOnFailureListener { exception ->
-                // Error.
-                // ...
-                Log.d("!!!", "error")
-            }
-
-//        val translator = com.example.english.translation.format.Translation.getClient(options)
-        lifecycle.addObserver(englishGermanTranslator)
-    }
+//    private fun init() {
+//        // Create an English-German translator:
+//        val options = TranslatorOptions.Builder()
+//            .setSourceLanguage(TranslateLanguage.ENGLISH)
+//            .setTargetLanguage(TranslateLanguage.CHINESE)
+//            .build()
+//        val englishGermanTranslator = Translation.getClient(options)
+//
+//        Log.d("!!!", "init fun")
+//
+//        var conditions = DownloadConditions.Builder()
+//            .requireWifi()
+//            .build()
+//        englishGermanTranslator.downloadModelIfNeeded(conditions)
+//            .addOnSuccessListener {
+//                // Model downloaded successfully. Okay to start translating.
+//                // (Set a flag, unhide the translation UI, etc.)
+//
+//                Log.d("!!!", "addOnSuccessListener")
+//            }
+//            .addOnFailureListener { exception ->
+//                // Model couldn’t be downloaded or other internal error.
+//                // ...
+//                Log.d("!!!", exception.toString())
+//            }
+//
+//        englishGermanTranslator.translate("\"Especially at a time when the COVID situation is still serious, IPs being swiftly revealed can effectively reduce the appearance of disgusting content from rumor-makers and rumor-spreaders,\" wrote user UltraScarry.\n")
+//            .addOnSuccessListener { translatedText ->
+//                // com.example.english.translation.format.Translation successful.
+//                Log.d("!!!", "init: $translatedText")
+//            }
+//            .addOnFailureListener { exception ->
+//                // Error.
+//                // ...
+//                Log.d("!!!", "error")
+//            }
+//
+////        val translator = com.example.english.translation.format.Translation.getClient(options)
+//        lifecycle.addObserver(englishGermanTranslator)
+//    }
 }
 
 //@Composable
