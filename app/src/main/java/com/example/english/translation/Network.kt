@@ -46,6 +46,36 @@ const val TRANSLATE_REQUEST = "&q="
 fun translateArticle(fileNum: String, content: List<String>, context: Context) {
     val queue = Volley.newRequestQueue(context)
 
+//    var text = BASIC_SETTING
+//    content.forEach {
+////        text += TRANSLATE_REQUEST + it
+//        val stringRequest = StringRequest(
+//            Request.Method.POST, BASE_URL + TRANSLATE_REQUEST + it,
+//            { response ->
+//                Log.d("!!!", response)
+//                val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+//                val adapter: JsonAdapter<Translations> = moshi.adapter(Translations::class.java)
+//                val translations = adapter.fromJson(response)
+//                if (translations != null) {
+//                    translations.data.translations.forEach {
+//                        it.translatedText += "\n"
+//                    }
+//                    FileOperator.addFileByList(fileNum, translations.data.translations, context)
+//                }
+////            Log.d("!!!", translations.toString())
+//            },
+//            {
+//                Log.d("!!!", it.toString())
+//            }
+//        )
+//
+//        queue.add(stringRequest)
+//    }
+
+
+
+
+
     var text = BASIC_SETTING
     content.forEach {
         text += TRANSLATE_REQUEST + it

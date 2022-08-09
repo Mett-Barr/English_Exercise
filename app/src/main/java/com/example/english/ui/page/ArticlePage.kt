@@ -161,7 +161,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
             ),
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(horizontal = 8.dp)
+//                .padding(horizontal = 8.dp)
         ) {
             item {
                 Box {
@@ -208,6 +208,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                 Card(
                     modifier = Modifier
+                        .padding(horizontal = 8.dp)
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
