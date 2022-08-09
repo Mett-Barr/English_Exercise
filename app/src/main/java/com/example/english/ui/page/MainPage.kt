@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -168,4 +169,6 @@ object Obj {
     val colorTop = Color(0f, 0f, 0f, 0f)
     val colorBottom = Color(38, 38, 38, 128)
 //    val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
+
+
 }

@@ -17,4 +17,23 @@ data class News(
 
     @ColumnInfo(name = "tag")
     var tag: String = "",
+
+
+    // add url and image column
+//    @ColumnInfo(name = "tag")
+//    val imageFile: String = "",
+
+//    @ColumnInfo(name = "url")
+//    val url: String = "",
+
+// progress state
+//    @ColumnInfo
+//    var progss: Int = 0,
+
+    // date
+//@ColumInfo(name = "start")
+//val start: String
+
+//@ColumnInfo(name = "end")
+//var end = ""
 )
