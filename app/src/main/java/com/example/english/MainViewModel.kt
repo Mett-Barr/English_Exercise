@@ -2,6 +2,7 @@ package com.example.english
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
@@ -47,6 +48,7 @@ class MainViewModel @Inject constructor(
     private var currentNewsId by mutableStateOf("0")
     private var currentNewsSize by mutableStateOf(0)
 
+    var currentImage by mutableStateOf<Bitmap?>(null)
     var currentTitle by mutableStateOf("Title")
 
     var currentContent = mutableStateListOf<TextFieldValue>()
@@ -282,7 +284,7 @@ class MainViewModel @Inject constructor(
             draftTitle = TextFieldValue(jsoupNews.getTitle())
             draftContent = TextFieldValue(jsoupNews.getContent())
 
-            
+
             val newsId = addUrlNews(context)
 
             // get Image

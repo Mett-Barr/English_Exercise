@@ -6,9 +6,7 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,11 +15,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -95,13 +97,13 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         mutableStateOf(false)
     }
 
-    var editTagDialog by remember {
-        mutableStateOf(false)
-    }
-
-    var editTitleDialog by remember {
-        mutableStateOf(false)
-    }
+//    var editTagDialog by remember {
+//        mutableStateOf(false)
+//    }
+//
+//    var editTitleDialog by remember {
+//        mutableStateOf(false)
+//    }
 
 
     var currentParagraphIndex by remember {
@@ -111,6 +113,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     var currentParagraphContent by remember {
         mutableStateOf("")
     }
+
+
+    val brush = Brush.verticalGradient(listOf(Color(0f, 0f, 0f, 0f),
+        MaterialTheme.colors.surface.copy(alpha = 1f)))
+
+
 
     Scaffold(
         bottomBar = {
@@ -148,7 +156,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //            contentPadding = PaddingValues.,
 //            contentPadding = paddingValues,
             contentPadding = PaddingValues(
-                top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding() + 8.dp,
+//                top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding() + 8.dp,
                 bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 8.dp,
             ),
             modifier = Modifier
@@ -156,12 +164,37 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 .padding(horizontal = 8.dp)
         ) {
             item {
-                Text(
-                    text = viewModel.currentTitle,
-                    style = Typography().h5,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
-                )
+                Box {
+                    Crossfade(targetState = viewModel.currentImage) {
+                        if (it != null) {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .aspectRatio(16f / 9f)
+                                    .fillMaxWidth()
+//                                    .blur(8.dp)
+                            )
+                        } else {
+                            Spacer(
+                                modifier = Modifier
+                                    .aspectRatio(16f / 9f)
+                                    .fillMaxWidth()
+                                    .background(Color.DarkGray)
+                            )
+                        }
+                    }
+                    Text(
+                        text = viewModel.currentTitle,
+                        style = Typography().h5,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .background(brush)
+                            .padding(top = 32.dp)
+                            .padding(vertical = 8.dp, horizontal = 16.dp)
+                            .align(Alignment.BottomCenter)
+                    )
+                }
             }
             itemsIndexed(viewModel.currentContent) { paragraphIndex, paragraphContent ->
 
@@ -217,7 +250,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 } else false
                             }
 
-                            val transition = updateTransition(targetState = isDone(), label = "transition")
+                            val transition =
+                                updateTransition(targetState = isDone(), label = "transition")
 
                             val doneColor by transition.animateColor(label = "") {
                                 if (it) ColorDone else LocalContentColor.current

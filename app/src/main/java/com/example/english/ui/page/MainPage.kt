@@ -92,6 +92,15 @@ fun NewsCard(
     navigation: () -> Unit,
     context: Context,
 ) {
+
+    var bitmap by remember {
+        mutableStateOf<Bitmap?>(null)
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        bitmap = ImageOperator().getImage(news.id.toString() ,context)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,18 +108,12 @@ fun NewsCard(
             .clip(RoundedCornerShape(16.dp))
             .clickable {
                 viewModel.currentNews(news, context)
+                viewModel.currentImage = bitmap
                 navigation.invoke()
             }
 //            .background(MaterialTheme.colors.background)
     ) {
 
-        var bitmap by remember {
-            mutableStateOf<Bitmap?>(null)
-        }
-
-        LaunchedEffect(key1 = Unit) {
-            bitmap = ImageOperator().getImage(news.id.toString() ,context)
-        }
 
         /**  brush animation  */
 
@@ -137,18 +140,12 @@ fun NewsCard(
                             .aspectRatio(16f / 9f)
                             .fillMaxWidth()
                     )
-//                    Spacer(
-//                        modifier = Modifier
-//                            .aspectRatio(16f / 9f)
-//                            .fillMaxWidth()
-//                            .background(Color.White)
-//                    )
                 } else {
                     Spacer(
                         modifier = Modifier
                             .aspectRatio(16f / 9f)
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(Color.DarkGray)
                     )
                 }
             }
@@ -175,7 +172,5 @@ fun NewsCard(
 object Obj {
     val colorTop = Color(0f, 0f, 0f, 0f)
     val colorBottom = Color(38, 38, 38, 200)
-//    val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
-
-
+    val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
 }

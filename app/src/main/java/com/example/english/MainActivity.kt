@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
 
 
         // add news by url
-        viewModel.addBBCNews("https://www.bbc.com/news/world-asia-62462275", this)
+//        viewModel.addBBCNews("https://www.bbc.com/news/world-asia-62462275", this)
 
     }
 
