@@ -66,6 +66,17 @@ class MainActivity : ComponentActivity() {
         // add news by url
         viewModel.addBBCNews("https://www.bbc.com/news/world-us-canada-62427084", this)
 
+//        viewModel
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            delay(5000)
+//            Log.d("!!", "onCreate: start")
+//            viewModel.currentNews(viewModel.list.first()[1], this@MainActivity)
+//            viewModel.list.first()[0]
+//            test(viewModel.currentContent.toList().map { it.text }, this@MainActivity)
+
+//            RetrofitObj.test(viewModel.currentContent.toList().map { it.text })
+//        }
+
     }
 
     override fun onBackPressed() {

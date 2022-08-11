@@ -189,6 +189,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         style = Typography().h5,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
+                            .fillMaxWidth()
                             .background(brush)
                             .padding(top = 32.dp)
                             .padding(vertical = 8.dp, horizontal = 16.dp)
