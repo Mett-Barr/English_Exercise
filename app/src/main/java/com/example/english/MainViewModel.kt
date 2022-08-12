@@ -3,6 +3,7 @@ package com.example.english
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
@@ -30,10 +31,16 @@ class MainViewModel @Inject constructor(
     private val wordRepository: WordRepository,
 ) : ViewModel() {
 
+    var isDownloading by mutableStateOf(-1)
+
+    val done = {
+        isDownloading = -1
+    }
 
     /** draft news */
     var draftTitle by mutableStateOf(TextFieldValue(""))
     var draftContent by mutableStateOf(TextFieldValue(""))
+
     //
     fun navToInsertPage() {
         draftTitle = TextFieldValue("新聞標題")
@@ -123,7 +130,6 @@ class MainViewModel @Inject constructor(
     }
 
 
-
     // Delete
     fun deleteNews(context: Context) {
         viewModelScope.launch {
@@ -145,8 +151,11 @@ class MainViewModel @Inject constructor(
             FileOperator.addFile(
                 fileNum = fileNum.toString(),
                 draftContent = draftContent.text,
-                context = context
+                context = context,
+                done
             )
+
+            Log.d("??? 1", "addNewFile: ")
         }
     }
 
@@ -194,7 +203,6 @@ class MainViewModel @Inject constructor(
     }
 
 
-
     /** Word Operation  */
     // Query
     fun getWordById(id: Int): Flow<Word> {
@@ -233,7 +241,6 @@ class MainViewModel @Inject constructor(
     }
 
 
-
     /** WordList Operation */
     //Insert
     fun addWordListTable(english: String, index: Int) {
@@ -243,14 +250,10 @@ class MainViewModel @Inject constructor(
     }
 
 
-
     /** Navigation */
     fun newsPagePopBack() {
 
     }
-
-
-
 
 
     /**  Jsoup  */
@@ -272,8 +275,6 @@ class MainViewModel @Inject constructor(
     }
 
 
-
-
     /**  BBC  */
     fun addBBCNews(url: String, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -286,6 +287,7 @@ class MainViewModel @Inject constructor(
 
 
             val newsId = addUrlNews(context)
+            isDownloading = newsId.toInt()
 
             // get Image
             val imageUrl = jsoupNews.getImageUrl()

@@ -12,3 +12,5 @@ val PrimaryVariant = Color(0xFF004787)
 val Secondary = Color(0xFFbdc7dc)
 
 val ColorDone = Color(0xFF89E8FF)
+
+val ColorDone2 = Color(0xFF6CB1C2)

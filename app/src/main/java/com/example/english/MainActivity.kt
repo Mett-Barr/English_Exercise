@@ -12,10 +12,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import com.example.english.translation.BUG_URL
+import com.example.english.ui.components.Loader
+import com.example.english.ui.components.Movement
 import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.theme.EnglishTheme
 import dagger.hilt.android.AndroidEntryPoint
-
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -40,6 +42,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainNavigation(viewModel)
 
+//                    Loader()
+//                    Movement()
 
 //                    WebPage()
 //                    Test05(viewModel)
@@ -53,7 +57,7 @@ class MainActivity : ComponentActivity() {
 
 
         // Jsoup test
-//        viewModel.addNewsByJsoup(url = "https://www.bbc.com/news/world-asia-62419858", this)
+//        viewModel.addNewsByJsoup(url = BUG_URL, this)
 
         // image store test
 //        val imageUrl = "https://ichef.bbci.co.uk/news/976/cpsprodpb/FD2F/production/_126151846_sun.jpg"
@@ -64,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
 
         // add news by url
-        viewModel.addBBCNews("https://www.bbc.com/news/world-us-canada-62427084", this)
+        viewModel.addBBCNews(BUG_URL, this)
 
 //        viewModel
 //        lifecycleScope.launch(Dispatchers.IO) {

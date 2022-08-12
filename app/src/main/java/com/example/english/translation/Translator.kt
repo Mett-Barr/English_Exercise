@@ -19,37 +19,15 @@ const val BASE_URL = "https://translation.googleapis.com/language/translate/v2/"
 const val BASIC_SETTING = "?key=AIzaSyBjmgx_l-kWKBO1L2Bci7bCxvKM83BQLgY&source=en&target=zh-TW"
 const val TRANSLATE_REQUEST = "&q="
 
+const val BUG_URL = "https://www.bbc.com/news/world-us-canada-62427084"
 
-
-fun translateArticle(fileNum: String, content: List<String>, context: Context) {
+suspend fun translateArticle(
+    fileNum: String,
+    content: List<String>,
+    context: Context,
+    done: () -> Unit,
+) {
     val queue = Volley.newRequestQueue(context)
-
-//    var text = BASIC_SETTING
-//    content.forEach {
-////        text += TRANSLATE_REQUEST + it
-//        val stringRequest = StringRequest(
-//            Request.Method.POST, BASE_URL + TRANSLATE_REQUEST + it,
-//            { response ->
-//                Log.d("!!!", response)
-//                val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-//                val adapter: JsonAdapter<Translations> = moshi.adapter(Translations::class.java)
-//                val translations = adapter.fromJson(response)
-//                if (translations != null) {
-//                    translations.data.translations.forEach {
-//                        it.translatedText += "\n"
-//                    }
-//                    FileOperator.addFileByList(fileNum, translations.data.translations, context)
-//                }
-////            Log.d("!!!", translations.toString())
-//            },
-//            {
-//                Log.d("!!!", it.toString())
-//            }
-//        )
-//
-//        queue.add(stringRequest)
-//    }
-
 
     var text = BASIC_SETTING
     content.forEach {
@@ -68,19 +46,25 @@ fun translateArticle(fileNum: String, content: List<String>, context: Context) {
                     it.translatedText += "\n"
                 }
                 FileOperator.addFileByList(fileNum, translations.data.translations, context)
+                done()
             }
 //            Log.d("!!!", translations.toString())
         },
         {
             Log.d("!!!", it.toString())
-            test(fileNum, content, context)
+            test(fileNum, content, context, done)
         }
     )
 
     queue.add(stringRequest)
 }
 
-fun test(fileNum: String, content: List<String>, context: Context, list: MutableList<Translation> = mutableListOf()) {
+fun test(
+    fileNum: String,
+    content: List<String>,
+    context: Context,
+    done: () -> Unit,
+) {
     val queue = Volley.newRequestQueue(context)
 
     var index = 0
@@ -104,12 +88,16 @@ fun test(fileNum: String, content: List<String>, context: Context, list: Mutable
 
                     translatedList.add(Translation(translations.data.translations.first().translatedText))
 
-                    index ++
+                    index++
                     if (index < content.size) {
                         que()
                     } else {
                         FileOperator.addFileByList(fileNum, translatedList, context)
                         AppToast.show(context, "done!")
+
+                        Log.d("??? 4", "que: ")
+
+                        done()
                     }
                 }
 //            Log.d("!!!", translations.toString())
@@ -119,12 +107,14 @@ fun test(fileNum: String, content: List<String>, context: Context, list: Mutable
 
                 translatedList.add(Translation("\n"))
 
-                index ++
+                index++
                 if (index < content.size) {
                     que()
                 } else {
                     FileOperator.addFileByList(fileNum, translatedList, context)
                     AppToast.show(context, "done!")
+
+                    done()
                 }
 
             }
@@ -137,7 +127,6 @@ fun test(fileNum: String, content: List<String>, context: Context, list: Mutable
 
     if (content.isNotEmpty()) que()
 }
-
 
 
 fun translateParagraph(context: Context, paragraph: String) {
