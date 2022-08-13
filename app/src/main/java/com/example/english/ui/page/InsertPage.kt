@@ -37,7 +37,7 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
 
     fun addNews() {
         viewModel.addNews(context)
-        StringConverter().stringToListNull(viewModel.draftContent.text)
+//        StringConverter().stringToListNull(viewModel.draftContent.text)
         openDialog = false
         navController.popBackStack()
     }

@@ -12,7 +12,7 @@ class StringConverter {
         list.addAll(string.split("\n"))
 //        list.removeAll(listOf("\n"))
 //        list.removeAll(listOf(" "))
-//        Log.d("!!!", "stringToList: $list")
+        Log.d("!!!", "stringToList: $list")
     }
 
     fun stringToList(string: String): List<String> {

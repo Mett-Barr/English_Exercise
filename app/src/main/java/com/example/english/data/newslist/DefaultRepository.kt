@@ -22,4 +22,7 @@ class DefaultRepository(private val dao: NewsDao) : Repository {
 
 
     override suspend fun deleteNews(news: News) = dao.deleteNews(news)
+
+
+    override suspend fun updateProgress(news: News) = dao.updateProgress(news)
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -35,10 +36,12 @@ import com.example.english.R
 import com.example.english.data.image.ImageOperator
 import com.example.english.ui.navigation.MainRoute
 import com.example.english.data.newslist.room.News
+import com.example.english.translation.BUG_URL
 import com.example.english.ui.components.Movement
 import com.example.english.ui.page.Obj.colorBottom
 import com.example.english.ui.page.Obj.colorTop
 import com.example.english.ui.theme.Typography
+import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun MainPage(viewModel: MainViewModel, navController: NavController) {
@@ -46,6 +49,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
     val context = LocalContext.current
 
     val list by viewModel.list.collectAsState(initial = emptyList())
+
 
 //    val placeHolder = BitmapFactory.decodeResource(context.resources, R.drawable.darkgrayimage)
 
@@ -56,12 +60,18 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                     bottom = WindowInsets.systemBars.asPaddingValues()
                         .calculateBottomPadding()
                 ),
-                onClick = { navController.navigate(MainRoute.Insert.route) }) {
+                onClick = {
+                    navController.navigate(MainRoute.Insert.route)
+//                    viewModel.addBBCNews(BUG_URL, context)
+                }) {
                 Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
             }
         },
         modifier = Modifier.fillMaxSize()
     ) {
+
+        val state = rememberLazyListState()
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,6 +81,8 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                 bottom = WindowInsets.systemBars.asPaddingValues()
                     .calculateBottomPadding() + 8.dp + 80.dp,
             ),
+            reverseLayout = true,
+            state = state,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(list) {
@@ -82,6 +94,27 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                 )
             }
         }
+
+        if (list.isNotEmpty()) {
+            LaunchedEffect(viewModel.isDownloading) {
+                if (viewModel.isDownloading.isEmpty()) {
+                    coroutineScope {
+                        state.animateScrollToItem(list.size)
+                    }
+                } else {
+                    coroutineScope {
+//                        state.scrollToItem()
+                    }
+                }
+            }
+
+//            LaunchedEffect(Unit) {
+//                coroutineScope {
+//                    state.animateScrollToItem(list.size)
+//                }
+//            }
+        }
+
     }
 }
 
@@ -95,7 +128,7 @@ fun NewsCard(
 
     val isDownloading by remember {
         derivedStateOf() {
-            viewModel.isDownloading == news.id
+            viewModel.isDownloading.contains(news.id)
         }
     }
 
@@ -161,6 +194,14 @@ fun NewsCard(
                     }
                 }
 
+                if (news.progress < 100) {
+                    Text(text = news.progress.toString() + "%",
+                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
+                } else {
+                    Icon(painter = painterResource(id = R.drawable.done_broad),
+                        contentDescription = "done",
+                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(24.dp))
+                }
 
                 Column(
                     modifier = Modifier
@@ -170,7 +211,8 @@ fun NewsCard(
                         .align(Alignment.BottomCenter)
                 ) {
                     Text(
-                        text = news.title,
+//                        text = news.title,
+                        text = "${news.id}  $isDownloading",
                         maxLines = 2,
                         style = Typography.h5,
                         modifier = Modifier.padding(top = 16.dp)
@@ -180,11 +222,13 @@ fun NewsCard(
             }
         }
 
-        if (isDownloading) {
-            Movement()
-        } else {
-            LaunchedEffect(key1 = Unit) {
-                bitmap = ImageOperator().getImage(news.id.toString(), context)
+        Crossfade(targetState = isDownloading) {
+            if (it) {
+                Movement()
+            } else {
+                LaunchedEffect(key1 = Unit) {
+                    bitmap = ImageOperator().getImage(news.id.toString(), context)
+                }
             }
         }
     }

@@ -28,7 +28,9 @@ object DatabaseModule {
             appContext,
             NewsDatabase::class.java,
             "news_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -42,9 +44,6 @@ object DatabaseModule {
     fun getRepository(newsDao: NewsDao) = DefaultRepository(newsDao) as Repository
 
 
-
-
-
     @Provides
     @Singleton
     fun provideWordDatabase(@ApplicationContext appContext: Context): WordDatabase {
@@ -54,7 +53,7 @@ object DatabaseModule {
             "word_database"
         )
 
-                // test
+            // test
             .fallbackToDestructiveMigration()
             .build()
     }

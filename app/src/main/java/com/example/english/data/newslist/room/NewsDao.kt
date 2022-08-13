@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NewsDao {
 
-    @Query("SELECT * from News ORDER BY id DESC")
+    @Query("SELECT * from News ORDER BY id")
     fun getNewsList(): Flow<List<News>>
 
     @Query("SELECT COUNT(*) from News")
@@ -17,4 +17,7 @@ interface NewsDao {
 
     @Delete
     suspend fun deleteNews(mews: News)
+
+    @Update
+    suspend fun updateProgress(news: News)
 }

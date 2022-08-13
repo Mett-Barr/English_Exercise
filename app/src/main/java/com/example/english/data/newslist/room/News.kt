@@ -19,6 +19,11 @@ data class News(
     var tag: String = "",
 
 
+// progress state
+    @ColumnInfo
+    var progress: Int = 0,
+
+
     // add url and image column
 //    @ColumnInfo(name = "tag")
 //    val imageFile: String = "",
@@ -26,9 +31,6 @@ data class News(
 //    @ColumnInfo(name = "url")
 //    val url: String = "",
 
-// progress state
-//    @ColumnInfo
-//    var progss: Int = 0,
 
     // date
 //@ColumInfo(name = "start")

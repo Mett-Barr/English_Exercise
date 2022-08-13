@@ -31,10 +31,10 @@ class MainViewModel @Inject constructor(
     private val wordRepository: WordRepository,
 ) : ViewModel() {
 
-    var isDownloading by mutableStateOf(-1)
+    val isDownloading = mutableStateListOf<Int>()
 
-    val done = {
-        isDownloading = -1
+    val done: (Int) -> Unit = { newId: Int ->
+        isDownloading.remove(newId)
     }
 
     /** draft news */
@@ -143,6 +143,20 @@ class MainViewModel @Inject constructor(
     }
 
 
+    // update
+    fun updateProgress() {
+        viewModelScope.launch {
+            var done = 0
+            currentContent.forEach { if (it.text.first() == '^') done ++}
+            Log.d("!!!", "updateProgress: $done")
+
+            val progress = (done * 100 / currentContent.size)
+            Log.d("!!!", "updateProgress: $progress")
+            repository.updateProgress(currentNews.copy(progress = progress))
+        }
+    }
+
+
     /** File operation */
 
     // Add
@@ -151,9 +165,8 @@ class MainViewModel @Inject constructor(
             FileOperator.addFile(
                 fileNum = fileNum.toString(),
                 draftContent = draftContent.text,
-                context = context,
-                done
-            )
+                context = context
+            ) { done(fileNum.toInt()) }
 
             Log.d("??? 1", "addNewFile: ")
         }
@@ -287,7 +300,7 @@ class MainViewModel @Inject constructor(
 
 
             val newsId = addUrlNews(context)
-            isDownloading = newsId.toInt()
+            isDownloading.add(newsId.toInt())
 
             // get Image
             val imageUrl = jsoupNews.getImageUrl()

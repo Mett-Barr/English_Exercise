@@ -105,8 +105,6 @@ fun Movement() {
 
         if (state) {
 
-            Log.d("!!!", "Movement: ")
-
             val offset = remember {
                 MutableList(NUMBER) {
                     Animatable(Offset(width.toFloat() / 2, height.toFloat() / 2),
@@ -152,7 +150,6 @@ fun Movement() {
                 Spacer(
                     modifier = Modifier
                         .offset {
-                            Log.d("!!!", it.toString())
                             offset[it].value.toIntOffset()
                         }
                         .size(18.dp)

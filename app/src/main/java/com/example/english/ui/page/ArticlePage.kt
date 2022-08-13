@@ -78,6 +78,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
     fun popBack() {
         focusManager.clearFocus()
+        viewModel.updateProgress()
         viewModel.saveCurrentFile(context)
         navController.popBackStack()
     }

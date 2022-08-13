@@ -49,12 +49,16 @@ fun WebPage(viewModel: MainViewModel) {
 
         coroutineScope.launch(Dispatchers.IO) {
             val html = Jsoup.connect(url).get()
-            isNewsPage = html.getElementsByClass("ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6").isNotEmpty()
+            isNewsPage =
+                html.getElementsByClass("ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6").isNotEmpty()
 
-            Log.d("!!", "urlTest: ${html.getElementsByClass("ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6")}")
+            Log.d("!!",
+                "urlTest: ${html.getElementsByClass("ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6")}")
         }
     }
 
+    var webViewClient: WebViewClient? = null
+    var webView: WebView? = null
 
     Scaffold(
         bottomBar = {
@@ -64,35 +68,35 @@ fun WebPage(viewModel: MainViewModel) {
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colors.surface.copy(alpha = 0.8f))
                 .padding(8.dp)) {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { }) {
                     Icon(painter = painterResource(id = R.drawable.out),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
                         tint = LocalContentColor.current)
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { webView?.goBack() },
+                    enabled = webView?.canGoBack() ?: false) {
                     Icon(painter = painterResource(id = R.drawable.back),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
                         tint = LocalContentColor.current)
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { webView?.goForward() },
+                    enabled = webView?.canGoForward() ?: false) {
                     Icon(painter = painterResource(id = R.drawable.forward),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
                         tint = LocalContentColor.current)
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { viewModel.addBBCNews(currentUrl, context) },
+                    enabled = isNewsPage) {
                     val contentAlpha by animateFloatAsState(if (isNewsPage) LocalContentAlpha.current else ContentAlpha.disabled)
                     Icon(painter = painterResource(id = R.drawable.download),
                         contentDescription = null,
                         modifier = Modifier
                             .size(24.dp)
-                            .alpha(contentAlpha)
-                            .clickable(isNewsPage) {
-                                viewModel.addBBCNews(currentUrl, context)
-                            },
+                            .alpha(contentAlpha),
                         tint = LocalContentColor.current)
                 }
             }
@@ -107,6 +111,8 @@ fun WebPage(viewModel: MainViewModel) {
 
                     this.settings.javaScriptEnabled = true
                     this.settings.domStorageEnabled = true
+
+                    webView = this
                 }
             })
     }

@@ -14,4 +14,6 @@ interface Repository {
     suspend fun addNews(news: News): Long
 
     suspend fun deleteNews(news: News)
+
+    suspend fun updateProgress(news: News)
 }
