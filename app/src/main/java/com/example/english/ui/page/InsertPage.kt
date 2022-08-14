@@ -100,60 +100,60 @@ fun InsertPage(viewModel: MainViewModel, navController: NavController) {
         )
     }
 
-    if (openDialog) {
-
-        var radioOption by remember {
-            mutableStateOf(Tag.TECH)
-        }
-
-        Dialog(onDismissRequest = { openDialog = false }) {
-            Card(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colors.primaryVariant)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .selectableGroup()
-//                        .padding(horizontal = 4.dp)
-                        .padding(top = 4.dp, bottom = 4.dp)
-                ) {
-                    Text(
-                        text = "Tag", style = Typography.h4, modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(8.dp)
-                    )
-                    for (it in enumValues<Tag>()) {
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .selectable(
-                                    selected = (it == radioOption),
-                                    onClick = {
-                                        radioOption = it
-                                        addNews()
-                                    },
-                                    role = Role.RadioButton
-                                )
-                                .padding(start = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = (it == radioOption),
-                                onClick = null // null recommended for accessibility with screenreaders
-                            )
-                            Text(
-                                text = it.tag,
-                                style = MaterialTheme.typography.body1.merge(),
-                                modifier = Modifier.padding(start = 16.dp),
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    if (openDialog) {
+//
+//        var radioOption by remember {
+//            mutableStateOf(Tag.TECH)
+//        }
+//
+//        Dialog(onDismissRequest = { openDialog = false }) {
+//            Card(
+//                modifier = Modifier
+//                    .clip(RoundedCornerShape(12.dp))
+//                    .background(MaterialTheme.colors.primaryVariant)
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//                        .selectableGroup()
+////                        .padding(horizontal = 4.dp)
+//                        .padding(top = 4.dp, bottom = 4.dp)
+//                ) {
+//                    Text(
+//                        text = "Tag", style = Typography.h4, modifier = Modifier
+//                            .align(Alignment.CenterHorizontally)
+//                            .padding(8.dp)
+//                    )
+//                    for (it in enumValues<Tag>()) {
+//                        Row(
+//                            Modifier
+//                                .fillMaxWidth()
+//                                .height(56.dp)
+//                                .selectable(
+//                                    selected = (it == radioOption),
+//                                    onClick = {
+//                                        radioOption = it
+//                                        addNews()
+//                                    },
+//                                    role = Role.RadioButton
+//                                )
+//                                .padding(start = 16.dp),
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            RadioButton(
+//                                selected = (it == radioOption),
+//                                onClick = null // null recommended for accessibility with screenreaders
+//                            )
+//                            Text(
+//                                text = it.tag,
+//                                style = MaterialTheme.typography.body1.merge(),
+//                                modifier = Modifier.padding(start = 16.dp),
+//                            )
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 
 enum class Tag(val tag: String) {

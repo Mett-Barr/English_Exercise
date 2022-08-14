@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
         }
 
         // add news by url
-        viewModel.addBBCNews(BUG_URL, this)
+//        viewModel.addBBCNews(BUG_URL, this)
 
         // Jsoup test
 //        viewModel.addNewsByJsoup(url = BUG_URL, this)

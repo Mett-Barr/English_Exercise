@@ -2,15 +2,14 @@ package com.example.english.ui.page
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,25 +18,30 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
+import com.example.english.NewsWebsite
 import com.example.english.R
 import com.example.english.data.image.ImageOperator
-import com.example.english.ui.navigation.MainRoute
 import com.example.english.data.newslist.room.News
 import com.example.english.translation.BUG_URL
 import com.example.english.ui.components.Movement
+import com.example.english.ui.navigation.MainRoute
 import com.example.english.ui.page.Obj.colorBottom
 import com.example.english.ui.page.Obj.colorTop
 import com.example.english.ui.theme.Typography
@@ -50,21 +54,126 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
     val list by viewModel.list.collectAsState(initial = emptyList())
 
+    var fabIsOpening by remember { mutableStateOf(false) }
 
-//    val placeHolder = BitmapFactory.decodeResource(context.resources, R.drawable.darkgrayimage)
+    val transition = updateTransition(targetState = fabIsOpening, label = "fab state")
+
+    val fabRotateAnimation by transition.animateFloat(transitionSpec = {
+        if (false isTransitioningTo true) spring(0.5f, Spring.StiffnessLow)
+        else spring()
+    }, label = "fabRotateAnimation") { if (it) -135f else 0f }
+
+    val fabColorAnimation by transition.animateColor(label = "fabColorAnimation") {
+        if (it) Color(150, 150, 150) else MaterialTheme.colors.secondary
+    }
+
+    val fabAlphaAnimation by transition.animateFloat(transitionSpec = {
+        if (false isTransitioningTo true) spring(Spring.DampingRatioNoBouncy, Spring.StiffnessLow)
+        else spring()
+    }, label = "fabAlphaAnimation") { if (it) 1f else 0f }
+
+    val fabPaddingAdd by transition.animateDp(label = "fabPaddingAnimation") {
+        if (it) 144.dp else 128.dp
+    }
+
+    val fabPaddingBBC by transition.animateDp(label = "fabPaddingAnimation") {
+        if (it) 72.dp else 56.dp
+    }
+
+    val fabScaleAnimation by transition.animateFloat(label = "fabScaleAnimation") {
+        if (it) 1f else 0f
+    }
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.padding(
-                    bottom = WindowInsets.systemBars.asPaddingValues()
+            Box(modifier = Modifier
+                .padding(
+                    bottom = WindowInsets.systemBars
+                        .asPaddingValues()
                         .calculateBottomPadding()
-                ),
-                onClick = {
-                    navController.navigate(MainRoute.Insert.route)
+                )
+                .width(IntrinsicSize.Max)) {
+
+
+                // Insert
+                Row(modifier = Modifier
+                    .alpha(fabAlphaAnimation)
+                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = fabPaddingAdd)) {
+//                    .padding(bottom = 144.dp)) {
+                    Text(text = "新增", modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .align(Alignment.CenterVertically), textAlign = TextAlign.Left)
+//                    Spacer(modifier = Modifier.weight(1f))
+                    FloatingActionButton(
+                        modifier = Modifier.scale(fabScaleAnimation),
+//                            .align(Alignment.BottomEnd),
+                        onClick = {
+                        navController.navigate(MainRoute.Insert.route)
 //                    viewModel.addBBCNews(BUG_URL, context)
-                }) {
-                Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
+                            fabIsOpening = !fabIsOpening
+                        }) {
+                        Icon(imageVector = Icons.Rounded.Edit, contentDescription = "add")
+                    }
+                }
+
+
+                // BBC
+                Row(modifier = Modifier
+                    .alpha(fabAlphaAnimation)
+                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = fabPaddingBBC)) {
+//                    .padding(bottom = 72.dp)) {
+                    Text(text = "BBC", modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .align(Alignment.CenterVertically), textAlign = TextAlign.Left)
+//                    Spacer(modifier = Modifier.weight(1f))
+                    FloatingActionButton(
+                        modifier = Modifier.scale(fabScaleAnimation), backgroundColor = Color.White,
+//                            .align(Alignment.BottomEnd),
+                        onClick = {
+                            viewModel.currentWebsite = NewsWebsite.BBC
+                            navController.navigate(MainRoute.Website.route)
+//                            viewModel.addBBCNews(BUG_URL, context)
+//                            fabIsOpening = !fabIsOpening
+                        }) {
+                        Icon(painter = painterResource(id = R.drawable.bbc),
+                            contentDescription = "add",
+//                        modifier = Modifier.size(24.dp),
+                            tint = Color.Black)
+                    }
+                }
+
+
+
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)) {
+                    Text(text = "取消", modifier = Modifier
+                        .alpha(fabAlphaAnimation)
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .align(Alignment.CenterVertically), textAlign = TextAlign.Left)
+//                    Spacer(modifier = Modifier.weight(1f))
+                    FloatingActionButton(
+                        modifier = Modifier,
+//                            .align(Alignment.BottomEnd),
+                        backgroundColor = fabColorAnimation,
+                        onClick = {
+//                        navController.navigate(MainRoute.Insert.route)
+//                    viewModel.addBBCNews(BUG_URL, context)
+                            fabIsOpening = !fabIsOpening
+                        }) {
+                        Icon(imageVector = Icons.Rounded.Add,
+                            contentDescription = "add",
+                            modifier = Modifier.rotate(fabRotateAnimation),
+                            tint = Color.Black)
+                    }
+                }
             }
         },
         modifier = Modifier.fillMaxSize()
@@ -74,6 +183,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
         LazyColumn(
             modifier = Modifier
+                .alpha((1f - fabAlphaAnimation) / 2 + 0.5f)
                 .fillMaxSize()
                 .padding(horizontal = 8.dp),
             contentPadding = PaddingValues(
@@ -94,6 +204,22 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                 )
             }
         }
+
+        val modifier = if (fabIsOpening) Modifier.clickable(indication = null,
+            interactionSource = remember { MutableInteractionSource() }) {
+            fabIsOpening = false
+        } else Modifier
+
+
+        val spacerAlphaAnimation by transition.animateColor(label = "spacerAlphaAnimation") {
+            if (it) Color.Black.copy(alpha = ContentAlpha.disabled) else Color.Transparent
+        }
+
+        Spacer(modifier = modifier
+            .fillMaxSize()
+            .background(spacerAlphaAnimation))
+//            .background(if (fabIsOpening) Color.Black.copy(alpha = ContentAlpha.disabled) else Color.Transparent))
+
 
         if (list.isNotEmpty()) {
             LaunchedEffect(viewModel.isDownloading) {
@@ -196,11 +322,16 @@ fun NewsCard(
 
                 if (news.progress < 100) {
                     Text(text = news.progress.toString() + "%",
-                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp))
                 } else {
                     Icon(painter = painterResource(id = R.drawable.done_broad),
                         contentDescription = "done",
-                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(24.dp))
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .size(24.dp))
                 }
 
                 Column(
@@ -236,6 +367,7 @@ fun NewsCard(
 
 object Obj {
     val colorTop = Color(0f, 0f, 0f, 0f)
-    val colorBottom = Color(38, 38, 38, 200)
+    val colorBottom = Color(30, 30, 30, 200)
+//    val colorBottom = Color(20, 20, 20, 200)
     val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
 }

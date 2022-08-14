@@ -21,7 +21,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
 import com.example.english.MainViewModel
+import com.example.english.NewsWebsite
 import com.example.english.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +31,7 @@ import org.jsoup.Jsoup
 
 //@Preview
 @Composable
-fun WebPage(viewModel: MainViewModel) {
+fun WebPage(viewModel: MainViewModel, navController: NavController) {
 
     val context = LocalContext.current
 
@@ -45,6 +47,8 @@ fun WebPage(viewModel: MainViewModel) {
 
     fun pageCheck(url: String) {
 
+        Log.d("!!", "pageCheck: ")
+
         currentUrl = url
 
         coroutineScope.launch(Dispatchers.IO) {
@@ -57,8 +61,17 @@ fun WebPage(viewModel: MainViewModel) {
         }
     }
 
-    var webViewClient: WebViewClient? = null
-    var webView: WebView? = null
+
+//    var webViewClient: WebViewClient? = null
+//    var webView: WebView? = null
+    var webView by remember { mutableStateOf<WebView?>(null) }
+
+    val isNews by remember {
+        derivedStateOf {
+            webView?.url
+        }
+    }
+
 
     Scaffold(
         bottomBar = {
@@ -68,7 +81,10 @@ fun WebPage(viewModel: MainViewModel) {
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colors.surface.copy(alpha = 0.8f))
                 .padding(8.dp)) {
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    Log.d("!!", "WebPage: ${webView?.canGoBack() ?: false}")
+                    navController.popBackStack()
+                }) {
                     Icon(painter = painterResource(id = R.drawable.out),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
@@ -76,6 +92,7 @@ fun WebPage(viewModel: MainViewModel) {
                 }
                 IconButton(onClick = { webView?.goBack() },
                     enabled = webView?.canGoBack() ?: false) {
+//                ) {
                     Icon(painter = painterResource(id = R.drawable.back),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
@@ -107,12 +124,15 @@ fun WebPage(viewModel: MainViewModel) {
                 WebView(context).apply {
                     webViewClient = MyWebViewClient { pageCheck(it) }
 
-                    loadUrl("https://www.bbc.com/news")
+//                    loadUrl(viewModel.currentWebsite.url)
+                    loadUrl(NewsWebsite.BBC.url)
 
                     this.settings.javaScriptEnabled = true
                     this.settings.domStorageEnabled = true
 
+//                    Log.d("!!", "WebPage: $webView")
                     webView = this
+//                    Log.d("!!", "WebPage: $webView")
                 }
             })
     }
@@ -121,10 +141,19 @@ fun WebPage(viewModel: MainViewModel) {
 class MyWebViewClient(private val function: (String) -> Unit) : WebViewClient() {
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        super.onPageStarted(view, url, favicon)
         if (url != null) {
             function(url)
         }
+
+        Log.d("!!", "onPageStarted: ")
+        super.onPageStarted(view, url, favicon)
     }
 
+
+    // 避免預設瀏覽器開啟連結
+    @Deprecated("Deprecated in Java", ReplaceWith("super.shouldOverrideUrlLoading(view, url)",
+        "android.webkit.WebViewClient"))
+    override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+        return false
+    }
 }

@@ -25,6 +25,7 @@ sealed class MainRoute(val route: String) {
     object Insert : MainRoute("InsertPage")
     object News : MainRoute("NewsPage")
     object Dictionary : MainRoute("DictionaryPage")
+    object Website : MainRoute("WebsitePage")
 }
 
 @Composable
@@ -63,7 +64,7 @@ fun MainNavigation(viewModel: MainViewModel) {
             MainPage(viewModel = viewModel, navController)
         }
         composable(MainRoute.Insert.route) {
-            viewModel.navToInsertPage()
+//            viewModel.navToInsertPage()
             InsertPage(viewModel = viewModel, navController = navController)
 //            WebPage(viewModel)
         }
@@ -76,6 +77,9 @@ fun MainNavigation(viewModel: MainViewModel) {
         }
         composable(MainRoute.Dictionary.route) {
 
+        }
+        composable(MainRoute.Website.route) {
+            WebPage(viewModel = viewModel, navController)
         }
     }
 }

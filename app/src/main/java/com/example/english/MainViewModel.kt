@@ -37,6 +37,8 @@ class MainViewModel @Inject constructor(
         isDownloading.remove(newId)
     }
 
+    var currentWebsite by mutableStateOf(NewsWebsite.BBC)
+
     /** draft news */
     var draftTitle by mutableStateOf(TextFieldValue(""))
     var draftContent by mutableStateOf(TextFieldValue(""))
@@ -308,4 +310,8 @@ class MainViewModel @Inject constructor(
             bitmap?.let { ImageOperatorObject.addImage(newsId, it, context) }
         }
     }
+}
+
+enum class NewsWebsite(val url: String) {
+    BBC("https://www.bbc.com/news")
 }
