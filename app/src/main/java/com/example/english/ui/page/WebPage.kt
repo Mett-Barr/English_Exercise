@@ -4,11 +4,15 @@ import android.graphics.Bitmap
 import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
@@ -66,14 +70,15 @@ fun WebPage(viewModel: MainViewModel, navController: NavController) {
 //    var webView: WebView? = null
     var webView by remember { mutableStateOf<WebView?>(null) }
 
-    val isNews by remember {
-        derivedStateOf {
-            webView?.url
-        }
+    BackHandler {
+        if (webView?.canGoBack() == true) webView?.goBack()
+        else navController.popBackStack()
     }
 
 
+
     Scaffold(
+//        modifier = Modifier.padding(WindowInsets.systemBars.asPaddingValues()),
         bottomBar = {
             Row(modifier = Modifier
                 .padding(WindowInsets.navigationBars.asPaddingValues())
@@ -92,17 +97,22 @@ fun WebPage(viewModel: MainViewModel, navController: NavController) {
                 }
                 IconButton(onClick = { webView?.goBack() },
                     enabled = webView?.canGoBack() ?: false) {
-//                ) {
+                    val contentAlpha by animateFloatAsState(if (webView?.canGoBack() == true) LocalContentAlpha.current else ContentAlpha.disabled)
                     Icon(painter = painterResource(id = R.drawable.back),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier
+                            .size(24.dp)
+                            .alpha(contentAlpha),
                         tint = LocalContentColor.current)
                 }
                 IconButton(onClick = { webView?.goForward() },
                     enabled = webView?.canGoForward() ?: false) {
+                    val contentAlpha by animateFloatAsState(if (webView?.canGoForward() == true) LocalContentAlpha.current else ContentAlpha.disabled)
                     Icon(painter = painterResource(id = R.drawable.forward),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier
+                            .size(24.dp)
+                            .alpha(contentAlpha),
                         tint = LocalContentColor.current)
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -119,22 +129,64 @@ fun WebPage(viewModel: MainViewModel, navController: NavController) {
             }
         }
     ) {
-        AndroidView(
-            factory = {
-                WebView(context).apply {
-                    webViewClient = MyWebViewClient { pageCheck(it) }
+
+//        LazyColumn {
+//            item {
+//                Spacer(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues()))
+//            }
+//            item {
+//                AndroidView(
+////            modifier = Modifier.padding(it),
+//                    factory = {
+//                        WebView(context).apply {
+//                            webViewClient = MyWebViewClient { pageCheck(it) }
+//
+////                    loadUrl(viewModel.currentWebsite.url)
+//                            loadUrl(NewsWebsite.BBC.url)
+//
+//                            this.settings.javaScriptEnabled = true
+//                            this.settings.domStorageEnabled = true
+//
+////                    Log.d("!!", "WebPage: $webView")
+//                            webView = this
+////                    Log.d("!!", "WebPage: $webView")
+//                        }
+//                    })
+//            }
+//            item {
+//                Spacer(modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues()))
+//            }
+//        }
+        Column(Modifier
+            .wrapContentSize()
+            .verticalScroll(rememberScrollState())) {
+            Spacer(modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth()
+                .height(WindowInsets.systemBars
+                    .asPaddingValues()
+                    .calculateTopPadding()))
+            AndroidView(
+//            modifier = Modifier.padding(it),
+                factory = {
+                    WebView(context).apply {
+                        webViewClient = MyWebViewClient { pageCheck(it) }
 
 //                    loadUrl(viewModel.currentWebsite.url)
-                    loadUrl(NewsWebsite.BBC.url)
+                        loadUrl(NewsWebsite.BBC.url)
 
-                    this.settings.javaScriptEnabled = true
-                    this.settings.domStorageEnabled = true
+                        this.settings.javaScriptEnabled = true
+                        this.settings.domStorageEnabled = true
 
 //                    Log.d("!!", "WebPage: $webView")
-                    webView = this
+                        webView = this
 //                    Log.d("!!", "WebPage: $webView")
-                }
-            })
+                    }
+                })
+            Spacer(modifier = Modifier
+                .background(Color.Black)
+                .padding(WindowInsets.navigationBars.asPaddingValues()))
+        }
     }
 }
 

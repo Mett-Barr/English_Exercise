@@ -54,6 +54,8 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
     val list by viewModel.list.collectAsState(initial = emptyList())
 
+
+    /**     FAB animation      */
     var fabIsOpening by remember { mutableStateOf(false) }
 
     val transition = updateTransition(targetState = fabIsOpening, label = "fab state")
@@ -83,6 +85,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
     val fabScaleAnimation by transition.animateFloat(label = "fabScaleAnimation") {
         if (it) 1f else 0f
     }
+    /**      FAB animation      */
 
     Scaffold(
         floatingActionButton = {
@@ -342,8 +345,8 @@ fun NewsCard(
                         .align(Alignment.BottomCenter)
                 ) {
                     Text(
-//                        text = news.title,
-                        text = "${news.id}  $isDownloading",
+                        text = news.title,
+//                        text = "${news.id}  $isDownloading",
                         maxLines = 2,
                         style = Typography.h5,
                         modifier = Modifier.padding(top = 16.dp)

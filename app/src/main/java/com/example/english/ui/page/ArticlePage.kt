@@ -47,10 +47,7 @@ enum class AnnotationState {
     TRANSLATION, WORDS, CLOSE
 }
 
-@OptIn(
-    ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class,
-    ExperimentalFoundationApi::class, ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class, )
 @Composable
 fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 //    val activity = LocalContext.current as Activity
