@@ -22,10 +22,7 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -339,7 +336,8 @@ fun NewsCard(
 
                 Column(
                     modifier = Modifier
-                        .background(brush = brush)
+                        .drawBehind { drawRect(brush) }
+//                        .background(brush = brush)
                         .fillMaxWidth()
                         .padding(8.dp)
                         .align(Alignment.BottomCenter)

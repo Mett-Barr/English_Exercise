@@ -119,19 +119,6 @@ class MainViewModel @Inject constructor(
     }
 
 
-    private suspend fun addUrlNews(context: Context): String {
-
-        // Room
-        val caption = draftContent.text.split("\n")[0]
-        val newsId = repository.addNews(News(0, draftTitle.text, caption))
-
-        // add file
-        addNewFile(newsId, context)
-
-        return newsId.toString()
-    }
-
-
     // Delete
     fun deleteNews(context: Context) {
         viewModelScope.launch {
@@ -149,7 +136,7 @@ class MainViewModel @Inject constructor(
     fun updateProgress() {
         viewModelScope.launch {
             var done = 0
-            currentContent.forEach { if (it.text.first() == '^') done ++}
+            currentContent.forEach { if (it.text.first() == '^') done++ }
             Log.d("!!!", "updateProgress: $done")
 
             val progress = (done * 100 / currentContent.size)
@@ -167,6 +154,18 @@ class MainViewModel @Inject constructor(
             FileOperator.addFile(
                 fileNum = fileNum.toString(),
                 draftContent = draftContent.text,
+                context = context
+            ) { done(fileNum.toInt()) }
+
+            Log.d("??? 1", "addNewFile: ")
+        }
+    }
+
+    private fun addUrlFile(fileNum: Long, content: String, context: Context) {
+        viewModelScope.launch {
+            FileOperator.addFile(
+                fileNum = fileNum.toString(),
+                draftContent = content,
                 context = context
             ) { done(fileNum.toInt()) }
 
@@ -279,7 +278,7 @@ class MainViewModel @Inject constructor(
             draftTitle = TextFieldValue(jsoupNews.getTitle())
             draftContent = TextFieldValue(jsoupNews.getContent())
 
-            suspendAddNews(context)
+//            suspendAddNews(context)
         }
     }
 
@@ -297,12 +296,15 @@ class MainViewModel @Inject constructor(
             // get Article
             val jsoupNews = JsoupNews(url)
 
-            draftTitle = TextFieldValue(jsoupNews.getTitle())
-            draftContent = TextFieldValue(jsoupNews.getContent())
+//            draftTitle = TextFieldValue(jsoupNews.getTitle())
+//            draftContent = TextFieldValue(jsoupNews.getContent())
 
+            val title = jsoupNews.getTitle()
+            val content = jsoupNews.getContent()
 
-            val newsId = addUrlNews(context)
-            isDownloading.add(newsId.toInt())
+            val caption = content.split("\n")[0]
+            val newsId = addUrlNews(context, title, content)
+//            isDownloading.add(newsId.toInt())
 
             // get Image
             val imageUrl = jsoupNews.getImageUrl()
@@ -310,6 +312,28 @@ class MainViewModel @Inject constructor(
             bitmap?.let { ImageOperatorObject.addImage(newsId, it, context) }
         }
     }
+
+    private suspend fun addUrlNews(
+        context: Context,
+        title: String,
+//        caption: String,
+        content: String
+    ): String {
+
+//         Room
+//        val caption = draftContent.text.split("\n")[0]
+        val newsId = repository.addNews(News(title = title))
+        isDownloading.add(newsId.toInt())
+
+        // add file
+        addUrlFile(newsId, content, context)
+        Log.d("!!", "addUrlFile $newsId")
+
+
+        return newsId.toString()
+    }
+
+
 }
 
 enum class NewsWebsite(val url: String) {

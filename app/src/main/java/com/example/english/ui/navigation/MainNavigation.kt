@@ -57,6 +57,7 @@ fun MainNavigation(viewModel: MainViewModel) {
 
     NavHost(
         navController = navController,
+//        startDestination = MainRoute.Website.route,
         startDestination = MainRoute.Main.route,
 //        modifier = Modifier.systemBarsPadding()
     ) {
