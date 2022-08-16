@@ -15,6 +15,11 @@ interface WordDao {
     @Query("SELECT id FROM WordTable WHERE english=:english")
     fun getWordId(english: String): Flow<Int>
 
+    @Query("SELECT id FROM WordTable WHERE english=:english")
+    suspend fun getWordIdSuspend(english: String): Int?
+
+    @Query("SELECT EXISTS(SELECT id FROM WordTable WHERE english=:english)")
+    suspend fun isWordExist(english: String): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addNewWord(word: Word): Long

@@ -1,5 +1,7 @@
 package com.example.english.ui.components
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
@@ -14,13 +16,17 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.data.word.word.room.Word
+import com.example.english.tool.AppToast
+import com.example.english.translation.wordTranslate
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -242,13 +248,6 @@ import kotlin.math.roundToInt
 //}
 
 
-
-
-
-
-
-
-
 @OptIn(ExperimentalMaterialApi::class, androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun WordComponent(
@@ -256,6 +255,7 @@ fun WordComponent(
     onValueChange: (String) -> Unit,
     remove: () -> Unit,
     updateWord: () -> Unit,
+    viewModel: MainViewModel,
 ) {
 
 //    val currentWord = remember {
@@ -263,12 +263,38 @@ fun WordComponent(
 //    }
 
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     val swipeRange = with(LocalDensity.current) { (48.dp).toPx() }
 
 
-    val anchors = mapOf(0f to "normal", -swipeRange to "delete")
+    val anchors = mapOf(0f to "normal", -swipeRange to "delete", swipeRange to "translate")
+//    val anchors = mapOf(0f to "normal", -swipeRange to "delete")
+//    val swipeableState =
+//        rememberSwipeableState(if (viewModel.currentWord == word.value.english) anchors[swipeRange]!! else anchors[0f]!!)
     val swipeableState = rememberSwipeableState("normal")
 
+
+//    if ((viewModel.currentWord == word.value.english)) AppToast.show(context, "${word.value.english}!!")
+    LaunchedEffect(key1 = Unit) {
+        coroutineScope.launch {
+
+            if (viewModel.currentWord == word.value.english && word.value.chinese.isBlank()) {
+//            if (viewModel.currentWord == word.value.english ) {
+//                if (word.value.chinese.isBlank()) {
+                    swipeableState.animateTo("translate")
+//                }
+
+                Log.d("!!", "WordComponent: if ${viewModel.currentWord == word.value.english && word.value.chinese.isBlank()}")
+            }
+
+            Log.d("!!", "WordComponent: $word")
+
+//            swipeableState.animateTo("translate")
+
+            Log.d("!!", "WordComponent: viewModel.currentWord == word.value.english:${viewModel.currentWord == word.value.english}\nword.value.chinese.isBlank() : ${word.value.chinese.isBlank()}")
+            viewModel.noCurrentWord()
+        }
+    }
 
 //    val sizeDp by remember {
 //        derivedStateOf { with(LocalDensity.current) { sizePx.toDp() } }
@@ -324,27 +350,49 @@ fun WordComponent(
         }
     ) {
 
-        val iconScale by remember {
+        val deleteIconScale by remember {
             derivedStateOf {
                 (-swipeableState.offset.value + swipeRange) / swipeRange / 2
+            }
+        }
+
+        val translateIconScale by remember {
+            derivedStateOf {
+                1f - deleteIconScale
+//                (swipeableState.offset.value + swipeRange) / swipeRange / 2
             }
         }
 
         ClickableIcon(
             painter = painterResource(id = R.drawable.delete),
             modifier = Modifier
-                .scale(iconScale)
+                .scale(deleteIconScale)
                 .align(Alignment.CenterEnd),
             onClick = {
 
 //                visible = false
 
-                remove.invoke()
+                remove()
 
                 coroutineScope.launch {
                     swipeableState.snapTo("normal")
                 }
             })
+
+
+        ClickableIcon(
+            painter = painterResource(id = R.drawable.translation),
+            modifier = Modifier
+                .scale(translateIconScale)
+                .align(Alignment.CenterStart),
+            onClick = {
+                coroutineScope.launch {
+                    swipeableState.animateTo("normal")
+                }
+
+                wordTranslate(context, word.value.english)
+            })
+
 
         Card(
             elevation = 3.dp,

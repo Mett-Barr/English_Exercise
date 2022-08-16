@@ -19,6 +19,10 @@ class DefaultWordRepository(private val dao: WordDao) : WordRepository {
         return dao.getWordId(english)
     }
 
+    override suspend fun getWordIdSuspend(english: String): Int? {
+        return dao.getWordIdSuspend(english)
+    }
+
     override suspend fun addNewWord(word: Word): Long {
         return dao.addNewWord(word)
     }
@@ -31,7 +35,7 @@ class DefaultWordRepository(private val dao: WordDao) : WordRepository {
         dao.deleteWord(word)
     }
 
-    override suspend fun isWordExist(english: String): Boolean {
-        return getWordByName(english).first() != null
+    override suspend fun wordIsExist(english: String): Boolean {
+        return dao.isWordExist(english)
     }
 }

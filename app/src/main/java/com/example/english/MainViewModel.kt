@@ -2,7 +2,6 @@ package com.example.english
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -21,6 +20,7 @@ import com.example.english.network.imageStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,8 +40,8 @@ class MainViewModel @Inject constructor(
     var currentWebsite by mutableStateOf(NewsWebsite.BBC)
 
     /** draft news */
-    var draftTitle by mutableStateOf(TextFieldValue(""))
-    var draftContent by mutableStateOf(TextFieldValue(""))
+    var draftTitle by mutableStateOf(TextFieldValue("test"))
+    var draftContent by mutableStateOf(TextFieldValue("test"))
 
     //
     fun navToInsertPage() {
@@ -66,6 +66,19 @@ class MainViewModel @Inject constructor(
 
     var wordListTable: SnapshotStateList<SnapshotStateList<Int>> =
         mutableStateListOf(emptyList<Int>().toMutableStateList())
+
+    var currentWord by mutableStateOf("")
+
+    private fun wordExistCheck(word: String, index: Int) {
+        viewModelScope.launch {
+            currentWord = if (wordListTable[index].contains(wordRepository.getWordIdSuspend(word))) word else ""
+//            currentWord = if (wordRepository.wordIsExist(word)) word else ""
+        }
+    }
+
+    fun noCurrentWord() {
+        currentWord = ""
+    }
 
     val testList =
         mutableStateListOf(mutableStateListOf(1), mutableStateListOf(2), mutableStateListOf(3))
@@ -258,9 +271,12 @@ class MainViewModel @Inject constructor(
     /** WordList Operation */
     //Insert
     fun addWordListTable(english: String, index: Int) {
+        wordExistCheck(english, index)
+
         viewModelScope.launch {
             addInWordListTable(english, wordRepository, wordListTable[index])
         }
+
     }
 
 
@@ -317,7 +333,7 @@ class MainViewModel @Inject constructor(
         context: Context,
         title: String,
 //        caption: String,
-        content: String
+        content: String,
     ): String {
 
 //         Room

@@ -40,6 +40,7 @@ import com.example.english.ui.components.Movement
 import com.example.english.ui.navigation.MainRoute
 import com.example.english.ui.page.Obj.colorTop
 import com.example.english.ui.theme.Typography
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.coroutineScope
 
 @Composable
@@ -48,6 +49,28 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
     val context = LocalContext.current
 
     val list by viewModel.list.collectAsState(initial = emptyList())
+
+
+    // system bar
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
+
+    SideEffect {
+        // Update all of the system bar colors to be transparent, and use
+        // dark icons if we're in light theme
+        systemUiController.apply {
+            setNavigationBarColor(
+                color = Color.Transparent,
+                darkIcons = useDarkIcons
+            )
+            setStatusBarColor(
+//                color = Color.Transparent,
+                color = Color.Transparent.copy(alpha = 0.5F),
+                darkIcons = useDarkIcons
+            )
+        }
+        // setStatusBarsColor() and setNavigationBarsColor() also exist
+    }
 
 
     /**     FAB animation      */
@@ -112,7 +135,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                         modifier = Modifier.scale(fabScaleAnimation),
 //                            .align(Alignment.BottomEnd),
                         onClick = {
-                        navController.navigate(MainRoute.Insert.route)
+                            navController.navigate(MainRoute.Insert.route)
 //                    viewModel.addBBCNews(BUG_URL, context)
                             fabIsOpening = !fabIsOpening
                         }) {
@@ -180,7 +203,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
         modifier = Modifier.fillMaxSize()
     ) {
 
-        val state = rememberLazyListState()
+//        val state = rememberLazyListState()
 
         LazyColumn(
             modifier = Modifier
@@ -192,8 +215,8 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                 bottom = WindowInsets.systemBars.asPaddingValues()
                     .calculateBottomPadding() + 8.dp + 80.dp,
             ),
-            reverseLayout = true,
-            state = state,
+//            reverseLayout = true,
+//            state = state,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(list) {
@@ -222,25 +245,25 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 //            .background(if (fabIsOpening) Color.Black.copy(alpha = ContentAlpha.disabled) else Color.Transparent))
 
 
-        if (list.isNotEmpty()) {
-            LaunchedEffect(viewModel.isDownloading) {
-                if (viewModel.isDownloading.isEmpty()) {
-                    coroutineScope {
-                        state.animateScrollToItem(list.size)
-                    }
-                } else {
-                    coroutineScope {
-//                        state.scrollToItem()
-                    }
-                }
-            }
-
-//            LaunchedEffect(Unit) {
-//                coroutineScope {
-//                    state.animateScrollToItem(list.size)
+//        if (list.isNotEmpty()) {
+//            LaunchedEffect(viewModel.isDownloading) {
+//                if (viewModel.isDownloading.isEmpty()) {
+//                    coroutineScope {
+//                        state.animateScrollToItem(list.size)
+//                    }
+//                } else {
+//                    coroutineScope {
+////                        state.scrollToItem()
+//                    }
 //                }
 //            }
-        }
+//
+////            LaunchedEffect(Unit) {
+////                coroutineScope {
+////                    state.animateScrollToItem(list.size)
+////                }
+////            }
+//        }
 
     }
 }
@@ -384,7 +407,8 @@ fun NewsCard(
 object Obj {
     val colorTop = Color(0f, 0f, 0f, 0f)
     val colorBottom = Color(30, 30, 30, 200)
-//    val colorBottom = Color(20, 20, 20, 200)
+
+    //    val colorBottom = Color(20, 20, 20, 200)
     val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
 
     var surfaceColor = colorTop

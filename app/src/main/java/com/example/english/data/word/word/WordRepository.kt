@@ -11,11 +11,13 @@ interface WordRepository {
 
     fun getWordId(english: String): Flow<Int>
 
+    suspend fun getWordIdSuspend(english: String): Int?
+
     suspend fun addNewWord(word: Word): Long
 
     suspend fun updateWord(word: Word)
 
     suspend fun deleteWord(word: Word)
 
-    suspend fun isWordExist(english: String): Boolean
+    suspend fun wordIsExist(english: String): Boolean
 }

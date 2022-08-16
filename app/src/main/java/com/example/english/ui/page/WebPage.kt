@@ -169,6 +169,14 @@ fun WebPage(viewModel: MainViewModel, navController: NavController) {
                         tint = LocalContentColor.current
                     )
                 }
+                IconButton(onClick = { webView?.reload() }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.refresh),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = LocalContentColor.current
+                    )
+                }
                 Spacer(modifier = Modifier.weight(1f))
 
 

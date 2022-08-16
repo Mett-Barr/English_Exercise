@@ -9,25 +9,47 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 
+
 fun translateApp(context: Context, text: String) {
     val intent = Intent()
-        intent.action = Intent.ACTION_PROCESS_TEXT
-        intent.type = "text/plain"
-        intent.setPackage("com.google.android.apps.translate")
-        intent.putExtra(Intent.EXTRA_PROCESS_TEXT, text)
-        context.startActivity(intent)
+//    intent.action = Intent.EXTRA_PROCESS_TEXT
+    intent.action = Intent.ACTION_PROCESS_TEXT
+    intent.type = "text/plain"
+//    intent.setPackage("com.google.android.apps.translate")
+//    intent.putExtra(Intent.EXTRA_TEXT, text)
+    intent.putExtra(Intent.EXTRA_PROCESS_TEXT, text)
+//    context.startActivity(intent)
+
+//    intent.component = ComponentName("com.google.android.apps.translate",
+//        "com.google.android.apps.translate.QuickTranslateActivity")
+
+    context.startActivity(intent)
+
+//    intent.component = ComponentName("com.google.android.apps.translate",
+//        "com.google.android.apps.translate.TranslateActivity")
+//    context.startActivity(intent)
+
+//    for (resolveInfo in context.packageManager.queryIntentActivities(intent, 0)) {
+//        if (resolveInfo.activityInfo.packageName.contains("com.google.android.apps.translate")) {
+//            intent.component = ComponentName(
+//                resolveInfo.activityInfo.packageName,
+//                resolveInfo.activityInfo.name)
+//            context.startActivity(intent)
+//        }
+//    }
 }
 
-fun wordTranslate(context: Context) {
+fun wordTranslate(context: Context, text: String) {
     try {
         val intent = Intent()
         intent.action = Intent.ACTION_SEND
+//        intent.action = Intent.ACTION_SEND
         intent.putExtra(Intent.EXTRA_TEXT, "hello")
-        intent.putExtra("key_text_input", "hello")
+        intent.putExtra("key_text_input", text)
         intent.putExtra("key_text_output", "")
-        intent.putExtra("key_language_from", "en")
-        intent.putExtra("key_language_to", "mal")
-        intent.putExtra("key_suggest_translation", "")
+//        intent.putExtra("key_language_from", "en")
+//        intent.putExtra("key_language_to", "mal")
+//        intent.putExtra("key_suggest_translation", "")
         intent.putExtra("key_from_floating_window", false)
         intent.component = ComponentName(
             "com.google.android.apps.translate",  //Change is here
@@ -50,7 +72,7 @@ fun createProcessTextIntent(): Intent {
 fun getSupportedActivities(context: Context): MutableList<ResolveInfo> {
     val packageManager = context.packageManager
     return packageManager.queryIntentActivities(
-        createProcessTextIntent(),0)
+        createProcessTextIntent(), 0)
 
 }
 

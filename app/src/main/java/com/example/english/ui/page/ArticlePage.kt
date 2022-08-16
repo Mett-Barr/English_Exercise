@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -37,11 +39,14 @@ import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
+import com.example.english.translation.translateApp
+import com.example.english.translation.wordTranslate
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordComponent
 import com.example.english.ui.theme.ColorDone
 import com.example.english.ui.theme.TextBackgroundAlphaLight
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 enum class AnnotationState {
@@ -53,6 +58,53 @@ enum class AnnotationState {
 fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 //    val activity = LocalContext.current as Activity
     val context = LocalContext.current
+
+
+    // system bar
+
+    val lazyListState = rememberLazyListState()
+
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
+
+    systemUiController.setStatusBarColor(color = Color.Transparent)
+
+    val statusBarHeight = with(LocalDensity.current) {
+        WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx() * 2
+    }
+
+    val statusBarAlpha by remember {
+        derivedStateOf {
+            if (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset <= statusBarHeight) {
+                lazyListState.firstVisibleItemScrollOffset / statusBarHeight / 2
+            } else 0.5f
+        }
+    }
+
+//    val
+
+//    SideEffect {
+    // Update all of the system bar colors to be transparent, and use
+    // dark icons if we're in light theme
+    systemUiController.apply {
+        setNavigationBarColor(
+            color = Color.Transparent,
+            darkIcons = useDarkIcons
+        )
+        setStatusBarColor(
+//                color = Color.Transparent,
+            color = Color.Transparent.copy(alpha = statusBarAlpha),
+            darkIcons = useDarkIcons
+        )
+    }
+    // setStatusBarsColor() and setNavigationBarsColor() also exist
+//    }
+
+//    LaunchedEffect(key1 = Unit) {
+//        systemUiController.setStatusBarColor(color = Color.Transparent.copy(alpha = statusBarAlpha),
+//            darkIcons = useDarkIcons)
+//    }
+
 
 //    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -162,9 +214,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding() + 8.dp,
                 bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 8.dp,
             ),
-            modifier = Modifier
-                .padding(paddingValues)
-//                .padding(horizontal = 8.dp)
+            modifier = Modifier.padding(paddingValues),
+//                .padding(horizontal = 8.dp),
+            state = lazyListState
         ) {
             item {
                 Box {
@@ -315,15 +367,21 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
 
                             val wordIconState by remember {
-                                derivedStateOf { contentText.isNotBlank() || viewModel.wordListTable[paragraphIndex].size != 0 }
+                                derivedStateOf { contentText.isNotBlank() || viewModel.wordListTable[paragraphIndex].isNotEmpty() }
                             }
                             ClickableIcon(painter = painterResource(id = R.drawable.word),
                                 enabled = wordIconState,
                                 modifier = Modifier.focusable(),
                                 onClick = {
+
+                                    // 清除上一次選重的單字
+                                    viewModel.noCurrentWord()
+
                                     // 1.檢測是否選取單字
 //                                    val contentText = paragraphContent.getSelectedText().text
                                     annotationState = if (contentText.isNotBlank()) {
+
+//                                        viewModel.curr
 
                                         viewModel.addWordListTable(contentText, paragraphIndex)
 
@@ -331,6 +389,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                             viewModel.currentContent[paragraphIndex].copy(
                                                 selection = TextRange.Zero
                                             )
+
+//                                        wordTranslate(context, contentText)
+
 
                                         // 2.translate並且開啟annotation欄位
 
@@ -389,6 +450,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         color.animateTo(Color.Yellow)
                                     }
                                 }
+
+
                                 AnnotationState.WORDS -> {
 
                                     val list = remember {
@@ -483,6 +546,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                                        )
 //                                                    )
 //                                                }
+                                                viewModel = viewModel
                                             )
                                         }
                                     }
