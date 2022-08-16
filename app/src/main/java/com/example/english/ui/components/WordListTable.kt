@@ -277,21 +277,9 @@ fun WordComponent(
 //    if ((viewModel.currentWord == word.value.english)) AppToast.show(context, "${word.value.english}!!")
     LaunchedEffect(key1 = Unit) {
         coroutineScope.launch {
-
             if (viewModel.currentWord == word.value.english && word.value.chinese.isBlank()) {
-//            if (viewModel.currentWord == word.value.english ) {
-//                if (word.value.chinese.isBlank()) {
                     swipeableState.animateTo("translate")
-//                }
-
-                Log.d("!!", "WordComponent: if ${viewModel.currentWord == word.value.english && word.value.chinese.isBlank()}")
             }
-
-            Log.d("!!", "WordComponent: $word")
-
-//            swipeableState.animateTo("translate")
-
-            Log.d("!!", "WordComponent: viewModel.currentWord == word.value.english:${viewModel.currentWord == word.value.english}\nword.value.chinese.isBlank() : ${word.value.chinese.isBlank()}")
             viewModel.noCurrentWord()
         }
     }

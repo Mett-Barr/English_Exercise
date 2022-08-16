@@ -67,7 +67,7 @@ class MainViewModel @Inject constructor(
     var wordListTable: SnapshotStateList<SnapshotStateList<Int>> =
         mutableStateListOf(emptyList<Int>().toMutableStateList())
 
-    var currentWord by mutableStateOf("")
+    var currentWord by mutableStateOf<String?>(null)
 
     private fun wordExistCheck(word: String, index: Int) {
         viewModelScope.launch {
@@ -77,7 +77,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun noCurrentWord() {
-        currentWord = ""
+        currentWord = null
     }
 
     val testList =
