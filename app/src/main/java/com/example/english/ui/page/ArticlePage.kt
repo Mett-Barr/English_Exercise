@@ -41,13 +41,14 @@ import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordComponent
 import com.example.english.ui.theme.ColorDone
+import com.example.english.ui.theme.TextBackgroundAlphaLight
 
 
 enum class AnnotationState {
     TRANSLATION, WORDS, CLOSE
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class, )
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 //    val activity = LocalContext.current as Activity
@@ -113,8 +114,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     }
 
 
-    val brush = Brush.verticalGradient(listOf(Color(0f, 0f, 0f, 0f),
-        MaterialTheme.colors.surface.copy(alpha = 1f)))
+    val brush = Brush.verticalGradient(
+        listOf(
+            Color(0f, 0f, 0f, 0f),
+            MaterialTheme.colors.surface.copy(alpha = 1f)
+        )
+    )
 
 
 
@@ -209,8 +214,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
                         .fillMaxWidth()
-                        .wrapContentHeight()
-                        .clip(RoundedCornerShape(16.dp))
+                        .wrapContentHeight(),
+//                        .clip(RoundedCornerShape(16.dp)),
+                    backgroundColor = MaterialTheme.colors.surface,
+//                    elevation = 4.dp,
+                    shape = RoundedCornerShape(16.dp)
 //                        .background(MaterialTheme.colors.background)
 //                        .animateItemPlacement(TweenSpec())
 //                        .then(hideKeyboardModifier)
@@ -219,8 +227,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                         FlatTextField(
                             value = if (paragraphContent.text.first() == '^') {
-                                paragraphContent.copy(text = paragraphContent.text.removeRange(0,
-                                    1))
+                                paragraphContent.copy(
+                                    text = paragraphContent.text.removeRange(
+                                        0,
+                                        1
+                                    )
+                                )
                             } else paragraphContent,
                             onValueChange = { viewModel.currentContent[paragraphIndex] = it },
                             modifier = Modifier.fillMaxWidth(),
@@ -260,17 +272,21 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 if (it) LocalContentAlpha.current else 0.80f
                             }
 //                            val doneColor by animateColorAsState(targetValue = if (isDone()) ColorDone else LocalContentColor.current)
-                            ClickableIcon(painter = painterResource(id = R.drawable.done_broad),
+                            ClickableIcon(
+                                painter = painterResource(id = R.drawable.done_broad),
                                 onClick = {
 //                                    currentParagraphIndex = paragraphIndex
 //                                    curr；entParagraphContent = paragraphContent.text
 //                                    deleteParagraphDialog = true
                                     viewModel.changeDoneState(paragraphIndex)
-                                    Log.d("!!",
-                                        "NewsArticlePage: \n${paragraphContent.text}\n${paragraphContent.text.firstOrNull()}")
+                                    Log.d(
+                                        "!!",
+                                        "NewsArticlePage: \n${paragraphContent.text}\n${paragraphContent.text.firstOrNull()}"
+                                    )
                                 },
                                 modifier = Modifier.alpha(doneAlpha),
-                                tint = doneColor)
+                                tint = doneColor
+                            )
 
                             Spacer(modifier = Modifier
                                 .weight(1F)
@@ -340,11 +356,18 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         AnimatedContent(targetState = annotationState) { it ->
                             when (it) {
                                 AnnotationState.TRANSLATION -> {
-                                    Card(elevation = 4.dp,
+                                    Card(
+                                        elevation = 0.dp,
                                         shape = RoundedCornerShape(12.dp),
                                         modifier = Modifier
                                             .padding(bottom = 8.dp)
-                                            .fillMaxWidth()) {
+                                            .fillMaxWidth(),
+                                        backgroundColor = if (MaterialTheme.colors.isLight)
+                                            MaterialTheme.colors.onSurface.copy(alpha = TextBackgroundAlphaLight)
+                                        else TextFieldDefaults.textFieldColors()
+                                            .backgroundColor(true).value
+
+                                    ) {
                                         Text(
                                             text = viewModel.currentContentTr[paragraphIndex].text,
                                             style = Typography().h6,
@@ -393,65 +416,76 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                        Log.d("!!!", "WordListTable: $index")
 //                                    }
 
-                                    LazyColumn(modifier = Modifier
-                                        .padding(bottom = 8.dp)
-                                        .focusable()
-                                        .animateContentSize()
-                                        .heightIn(max = 300.dp)) {
-
-//                                        items(wordList, key = { it -> it }) { word ->
+//                                    LazyColumn(
+//                                        modifier = Modifier
+//                                            .padding(bottom = 8.dp)
+//                                            .focusable()
+//                                            .animateContentSize()
+//                                            .heightIn(max = 300.dp)
+//                                    ) {
+//
+////                                        items(wordList, key = { it -> it }) { word ->
+////                                            WordComponent(word = word,
+////                                                onValueChange = {
+////                                                    wordList[index].value =
+////                                                        word.value.copy(chinese = it)
+////                                                },
+////                                                remove = {
+////                                                    viewModel.wordListTable[index].remove(word.value.id)
+////                                                },
+////                                                updateWord = { viewModel.updateWord(word.value) },
+////                                                updateChinese = {
+////                                                    viewModel.updateWord(Word(word.value.id,
+////                                                        word.value.english,
+////                                                        it))
+////                                                })
+////                                        }
+//
+//                                        itemsIndexed(wordList) { index, word ->
 //                                            WordComponent(word = word,
 //                                                onValueChange = {
 //                                                    wordList[index].value =
 //                                                        word.value.copy(chinese = it)
 //                                                },
 //                                                remove = {
-//                                                    viewModel.wordListTable[index].remove(word.value.id)
+//                                                    viewModel.wordListTable[paragraphIndex].remove(
+//                                                        word.value.id
+//                                                    )
 //                                                },
-//                                                updateWord = { viewModel.updateWord(word.value) },
-//                                                updateChinese = {
-//                                                    viewModel.updateWord(Word(word.value.id,
-//                                                        word.value.english,
-//                                                        it))
-//                                                })
+//                                                updateWord = { viewModel.updateWord(word.value) })
 //                                        }
+//                                    }
 
-                                        itemsIndexed(wordList) { index, word ->
-                                            WordComponent(word = word,
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(bottom = 6.dp)
+//                                        .animateContentSize()
+                                            .focusable()
+                                    ) {
+
+                                        wordList.forEachIndexed { index, word ->
+                                            WordComponent(
+                                                word = word,
                                                 onValueChange = {
                                                     wordList[index].value =
                                                         word.value.copy(chinese = it)
                                                 },
                                                 remove = {
-                                                    viewModel.wordListTable[paragraphIndex].remove(
-                                                        word.value.id)
+                                                    viewModel.wordListTable[index].remove(word.value.id)
                                                 },
-                                                updateWord = { viewModel.updateWord(word.value) })
+                                                updateWord = { viewModel.updateWord(word.value) },
+//                                                updateChinese = {
+//                                                    viewModel.updateWord(
+//                                                        Word(
+//                                                            word.value.id,
+//                                                            word.value.english,
+//                                                            it
+//                                                        )
+//                                                    )
+//                                                }
+                                            )
                                         }
                                     }
-
-//                                    Column(modifier = Modifier
-//                                        .padding(bottom = 8.dp)
-////                                        .animateContentSize()
-//                                        .focusable()) {
-//
-//                                        wordList.forEachIndexed { index, word ->
-//                                            WordComponent(word = word,
-//                                                onValueChange = {
-//                                                    wordList[index].value =
-//                                                        word.value.copy(chinese = it)
-//                                                },
-//                                                remove = {
-//                                                    viewModel.wordListTable[index].remove(word.value.id)
-//                                                },
-//                                                updateWord = { viewModel.updateWord(word.value) },
-//                                                updateChinese = {
-//                                                    viewModel.updateWord(Word(word.value.id,
-//                                                        word.value.english,
-//                                                        it))
-//                                                })
-//                                        }
-//                                    }
 
 //                                    WordListTable(
 //                                        wordList = wordList,

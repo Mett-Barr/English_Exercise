@@ -10,6 +10,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.example.english.ui.theme.TextBackgroundAlphaLight
+
+//const val TEXT_BACKGROUND_ALPHA = 0.058F
 
 @Composable
 fun FlatTextField(
@@ -45,14 +48,19 @@ fun FlatTextField(
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            placeholderColor = placeholderColor
+            placeholderColor = placeholderColor,
+            backgroundColor =
+            if (MaterialTheme.colors.isLight)
+                MaterialTheme.colors.onSurface.copy(alpha = TextBackgroundAlphaLight)
+            else TextFieldDefaults.textFieldColors().backgroundColor(true).value
+//            backgroundColor = TextFieldDefaults.textFieldColors().backgroundColor(enabled = true).value
         ),
         textStyle = Typography().h6,
         maxLines = maxLines,
         shape = RoundedCornerShape(0.dp),
         readOnly = readOnly,
         isError = isError,
-        placeholder = @Composable { Text(text = textLabel) }
+        placeholder = @Composable { Text(text = textLabel) },
     )
 }
 

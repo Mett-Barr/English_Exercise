@@ -14,3 +14,6 @@ val Secondary = Color(0xFFbdc7dc)
 val ColorDone = Color(0xFF89E8FF)
 
 val ColorDone2 = Color(0xFF6CB1C2)
+
+
+const val TextBackgroundAlphaLight = 0.058f

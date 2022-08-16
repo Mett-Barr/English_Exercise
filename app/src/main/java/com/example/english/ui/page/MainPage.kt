@@ -36,10 +36,8 @@ import com.example.english.NewsWebsite
 import com.example.english.R
 import com.example.english.data.image.ImageOperator
 import com.example.english.data.newslist.room.News
-import com.example.english.translation.BUG_URL
 import com.example.english.ui.components.Movement
 import com.example.english.ui.navigation.MainRoute
-import com.example.english.ui.page.Obj.colorBottom
 import com.example.english.ui.page.Obj.colorTop
 import com.example.english.ui.theme.Typography
 import kotlinx.coroutines.coroutineScope
@@ -83,6 +81,9 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
         if (it) 1f else 0f
     }
     /**      FAB animation      */
+
+    // color init
+    Obj.surfaceColor = MaterialTheme.colors.surface
 
     Scaffold(
         floatingActionButton = {
@@ -287,17 +288,31 @@ fun NewsCard(
 
             /**  brush animation  */
 
+            val surfaceColorTransparent = MaterialTheme.colors.surface.copy(alpha = 0f)
+            val surfaceColorNoAlpha = MaterialTheme.colors.surface.copy(alpha = 0.8f)
+
             val color by animateColorAsState(
-                targetValue = if (bitmap == null) colorTop else colorBottom,
-                animationSpec = tween(1500)
+                targetValue = if (bitmap == null) surfaceColorTransparent else surfaceColorNoAlpha,
+//                animationSpec = tween(800)
             )
 
             val brush by remember {
                 derivedStateOf {
-                    Brush.verticalGradient(listOf(colorTop, color))
+                    Brush.verticalGradient(listOf(surfaceColorTransparent, color))
                 }
             }
 
+//            val color by animateColorAsState(
+//                targetValue = if (bitmap == null) colorTop else colorBottom,
+//                animationSpec = tween(1500)
+//            )
+//
+//            val brush by remember {
+//                derivedStateOf {
+//                    Brush.verticalGradient(listOf(colorTop, color))
+//                }
+//            }
+//
             /**  --------------------  */
 
             Box {
@@ -371,4 +386,7 @@ object Obj {
     val colorBottom = Color(30, 30, 30, 200)
 //    val colorBottom = Color(20, 20, 20, 200)
     val brush = Brush.verticalGradient(colors = listOf(colorTop, colorBottom))
+
+    var surfaceColor = colorTop
+    var surfaceNoAlpha = colorTop.copy(alpha = 1f)
 }

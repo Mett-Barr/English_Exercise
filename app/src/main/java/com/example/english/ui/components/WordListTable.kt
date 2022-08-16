@@ -346,13 +346,14 @@ fun WordComponent(
                 }
             })
 
-        Card(elevation = 4.dp,
+        Card(
+            elevation = 3.dp,
             modifier = Modifier
-                .padding(4.dp)
+                .padding(horizontal = 2.dp, vertical = 4.dp)
                 .heightIn(min = 48.dp)
 //                .offset(y = anim)
                 .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
-            shape = RoundedCornerShape(4.dp)
+            shape = RoundedCornerShape(8.dp)
         ) {
             Row(
                 modifier = Modifier
