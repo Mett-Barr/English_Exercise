@@ -27,6 +27,7 @@ import com.example.english.R
 import com.example.english.data.word.word.room.Word
 import com.example.english.tool.AppToast
 import com.example.english.translation.wordTranslate
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -273,22 +274,34 @@ fun WordComponent(
 //        rememberSwipeableState(if (viewModel.currentWord == word.value.english) anchors[swipeRange]!! else anchors[0f]!!)
     val swipeableState = rememberSwipeableState("normal")
 
-
 //    if ((viewModel.currentWord == word.value.english)) AppToast.show(context, "${word.value.english}!!")
-    LaunchedEffect(key1 = Unit) {
-        coroutineScope.launch {
-            Log.d(
-                "!! 1",
-                "\nviewModel.currentWord:${viewModel.currentWord}\nword.value.english${word.value.english}\nword.value.chinese.isBlank()${word.value.chinese.isBlank()}"
-            )
-            if (viewModel.currentWord == word.value.english && word.value.chinese.isBlank()) {
+
+
+    val firstInit by remember {
+        derivedStateOf() {
+            word.value.english.isNotBlank()
+        }
+    }
+
+    Log.d("!! ?", "word.value.english:${word.value.english}")
+
+    if (firstInit) {
+        LaunchedEffect(key1 = Unit) {
+            coroutineScope.launch {
                 Log.d(
-                    "!! 2",
-                    " \nviewModel.currentWord:${viewModel.currentWord}\nword.value.english${word.value.english}\nword.value.chinese.isBlank()${word.value.chinese.isBlank()}"
+                    "!! 1",
+                    "\nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
                 )
-                swipeableState.animateTo("translate")
+                if (viewModel.currentWord == word.value.english && word.value.chinese.isBlank()) {
+                    Log.d(
+                        "!! 2",
+                        " \nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
+                    )
+                    delay(300)
+                    swipeableState.animateTo("translate")
+                }
+                viewModel.noCurrentWord()
             }
-            viewModel.noCurrentWord()
         }
     }
 

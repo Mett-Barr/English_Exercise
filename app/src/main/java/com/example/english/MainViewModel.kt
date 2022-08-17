@@ -282,7 +282,9 @@ class MainViewModel @Inject constructor(
     /** WordList Operation */
     //Insert
     fun addWordListTable(english: String, index: Int) {
-        wordExistCheck(english, index)
+//        wordExistCheck(english, index)
+
+        currentWord = english
 
         viewModelScope.launch {
             addInWordListTable(english, wordRepository, wordListTable[index])
