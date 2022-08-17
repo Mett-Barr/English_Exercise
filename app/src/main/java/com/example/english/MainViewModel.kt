@@ -71,8 +71,19 @@ class MainViewModel @Inject constructor(
 
     private fun wordExistCheck(word: String, index: Int) {
         viewModelScope.launch {
-            currentWord = if (wordListTable[index].contains(wordRepository.getWordIdSuspend(word))) word else ""
+            val wordId = wordRepository.getWordIdSuspend(word)
+            currentWord = if (wordListTable[index].contains(wordId)) {
+                word
+//                if (wordRepository.getWord(wordId))
+
+                // change getWord to suspend fun
+                // getWordId -> check is in list
+                // in list -> Tr -> false  -> currentWord = null
+                // not in list || Non-Tr -> true  -> currentWord = word
+            } else null
 //            currentWord = if (wordRepository.wordIsExist(word)) word else ""
+
+            Log.d("!! 3", "wordExistCheck: $currentWord  word:$word")
         }
     }
 
