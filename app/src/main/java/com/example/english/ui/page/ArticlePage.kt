@@ -81,6 +81,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         }
     }
 
+    fun getColor(): Color = Color.Transparent.copy(alpha = statusBarAlpha)
 //    val
 
 //    SideEffect {
@@ -93,7 +94,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         )
         setStatusBarColor(
 //                color = Color.Transparent,
-            color = Color.Transparent.copy(alpha = statusBarAlpha),
+            color = getColor(),
+//            color = Color.Transparent.copy(alpha = statusBarAlpha),
             darkIcons = useDarkIcons
         )
     }

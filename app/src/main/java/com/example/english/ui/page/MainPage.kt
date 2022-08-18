@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -117,6 +118,36 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                         .calculateBottomPadding()
                 )
                 .width(IntrinsicSize.Max)) {
+
+
+                // Insert
+                Row(modifier = Modifier
+                    .alpha(fabAlphaAnimation)
+                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = fabPaddingAdd + 56.dp + 16.dp)) {
+//                    .padding(bottom = 144.dp)) {
+                    Text(text = "測試", modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .align(Alignment.CenterVertically), textAlign = TextAlign.Left)
+//                    Spacer(modifier = Modifier.weight(1f))
+                    FloatingActionButton(
+                        modifier = Modifier.scale(fabScaleAnimation),
+//                            .align(Alignment.BottomEnd),
+                        onClick = {
+//                            navController.navigate(MainRoute.Insert.route)
+//                    viewModel.addBBCNews(BUG_URL, context)
+
+                            viewModel.draftTitle = TextFieldValue("Title")
+                            viewModel.draftContent = TextFieldValue("This is a test content. zqwe asd zxc")
+                            viewModel.addNews(context)
+
+                            fabIsOpening = !fabIsOpening
+                        }) {
+                        Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
+                    }
+                }
 
 
                 // Insert
