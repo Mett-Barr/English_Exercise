@@ -285,25 +285,54 @@ fun WordComponent(
 
     Log.d("!! ?", "word.value.english:${word.value.english}")
 
-    if (firstInit) {
-        LaunchedEffect(key1 = Unit) {
-            coroutineScope.launch {
+    fun swipeToTr() {
+        coroutineScope.launch {
+            Log.d(
+                "!! 1",
+                "\nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
+            )
+            if (viewModel.currentWord == word.value.english && word.value.chinese.isBlank()) {
                 Log.d(
-                    "!! 1",
-                    "\nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
+                    "!! 2",
+                    " \nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
                 )
-                if (viewModel.currentWord == word.value.english && word.value.chinese.isBlank()) {
-                    Log.d(
-                        "!! 2",
-                        " \nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
-                    )
-                    delay(300)
-                    swipeableState.animateTo("translate")
-                }
-                viewModel.noCurrentWord()
+                delay(150)
+                swipeableState.animateTo("translate")
             }
+            viewModel.noCurrentWord()
         }
     }
+
+//    swipeToTr()
+
+    val openState by remember { derivedStateOf { word.value.english == viewModel.currentWord } }
+
+    if (openState) {
+        swipeToTr()
+    }
+
+//    if (firstInit) {
+//
+//        swipeToTr()
+//
+////        LaunchedEffect(key1 = Unit) {
+////            coroutineScope.launch {
+////                Log.d(
+////                    "!! 1",
+////                    "\nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
+////                )
+////                if (viewModel.currentWord == word.value.english && word.value.chinese.isBlank()) {
+////                    Log.d(
+////                        "!! 2",
+////                        " \nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
+////                    )
+////                    delay(300)
+////                    swipeableState.animateTo("translate")
+////                }
+////                viewModel.noCurrentWord()
+////            }
+////        }
+//    }
 
 //    val sizeDp by remember {
 //        derivedStateOf { with(LocalDensity.current) { sizePx.toDp() } }

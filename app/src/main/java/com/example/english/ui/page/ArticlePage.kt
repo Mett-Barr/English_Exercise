@@ -530,11 +530,16 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                             WordComponent(
                                                 word = word,
                                                 onValueChange = {
-                                                    wordList[index].value =
+                                                    wordList[paragraphIndex].value =
+//                                                    wordList[index].value =
                                                         word.value.copy(chinese = it)
                                                 },
                                                 remove = {
-                                                    viewModel.wordListTable[index].remove(word.value.id)
+                                                    Log.d("!!", viewModel.wordListTable[paragraphIndex].toList().toString() + index.toString())
+//                                                    Log.d("!!", viewModel.wordListTable[index].toList().toString())
+                                                    viewModel.wordListTable[paragraphIndex].remove(word.value.id)
+//                                                    viewModel.wordListTable[index].remove(word.value.id)
+                                                    Log.d("!!", viewModel.wordListTable[paragraphIndex].toList().toString())
                                                 },
                                                 updateWord = { viewModel.updateWord(word.value) },
 //                                                updateChinese = {
