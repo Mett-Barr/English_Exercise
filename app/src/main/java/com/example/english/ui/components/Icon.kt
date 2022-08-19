@@ -47,10 +47,12 @@ fun ClickableIcon(
     painter: Painter,
     contentDescription: String? = null,
     enabled: Boolean = true,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+    tint: Color = LocalContentColor.current.copy(alpha = ContentAlpha.high),
+//    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
     onClick: () -> Unit = {},
 ) {
-    val contentAlpha by animateFloatAsState(if (enabled) LocalContentAlpha.current else ContentAlpha.disabled)
+    val contentAlpha by animateFloatAsState(if (enabled) ContentAlpha.high else ContentAlpha.disabled)
+//    val contentAlpha by animateFloatAsState(if (enabled) LocalContentAlpha.current else ContentAlpha.disabled)
 
 //    val color = remember {
 //        Animatable(Color.Black)

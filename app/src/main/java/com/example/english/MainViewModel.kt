@@ -19,6 +19,7 @@ import com.example.english.network.JsoupNews
 import com.example.english.network.imageStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -136,6 +137,9 @@ class MainViewModel @Inject constructor(
         // Room
         val caption = draftContent.text.split("\n")[0]
         val newsId = repository.addNews(News(0, draftTitle.text, caption))
+
+        // downloading state
+        isDownloading.add(newsId.toInt())
 
         // add file
         addNewFile(newsId, context)
