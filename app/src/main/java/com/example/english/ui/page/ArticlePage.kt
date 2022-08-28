@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -19,10 +20,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -39,30 +37,39 @@ import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
-import com.example.english.translation.translateApp
-import com.example.english.translation.wordTranslate
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordComponent
-import com.example.english.ui.page.test.BrushCanvas
-import com.example.english.ui.page.test.BrushTest
+import com.example.english.ui.components.animateHorizontalAlignmentAsState
 import com.example.english.ui.theme.ColorDone
+import com.example.english.ui.theme.PrimaryVariant
 import com.example.english.ui.theme.TextBackgroundAlphaLight
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 enum class AnnotationState {
     TRANSLATION, WORDS, CLOSE
 }
 
+enum class ReadMode(val position: Float) {
+    CARD_VIEW(-1F), ARTICLE_VIEW(1F)
+}
+
+const val ratio = 12f
+
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 //    val activity = LocalContext.current as Activity
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val density = LocalDensity.current
 
     // system bar
+
+    val naviBarPadding = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
 
     val lazyListState = rememberLazyListState()
 
@@ -90,19 +97,24 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     // Update all of the system bar colors to be transparent, and use
     // dark icons if we're in light theme
 
+    var boolean by remember { mutableStateOf(false) }
 
-//    systemUiController.apply {
-//        setNavigationBarColor(
-//            color = Color.Transparent,
+//    val animatedStatusBarColor by animateColorAsState(targetValue = if (boolean) Color.Transparent else Color.Transparent.copy(0.5f))
+
+//    boolean = true
+    systemUiController.apply {
+        setNavigationBarColor(
+            color = Color.Transparent,
 //            darkIcons = useDarkIcons
-//        )
-//        setStatusBarColor(
-////                color = Color.Transparent,
+        )
+        setStatusBarColor(
+//            color = animatedStatusBarColor,
+            color = Color.Transparent,
 //            color = getColor(),
-////            color = Color.Transparent.copy(alpha = statusBarAlpha),
+//            color = Color.Transparent.copy(alpha = statusBarAlpha),
 //            darkIcons = useDarkIcons
-//        )
-//    }
+        )
+    }
 
 
     // setStatusBarsColor() and setNavigationBarsColor() also exist
@@ -185,14 +197,23 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         offset.toDp()
     }
 
+    LaunchedEffect(key1 = Unit) {
+        scope.launch {
+            while (true) {
+                delay(1000)
+                Log.d("!!", "NewsArticlePage: $naviBarPadding")
+            }
+        }
+    }
+
     Scaffold(
         bottomBar = {
-            BottomAppBar {
-                Row(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .height(64.dp)
-                        .align(Alignment.CenterVertically)
+            BottomAppBar(contentPadding = WindowInsets.navigationBars.asPaddingValues()) {
+                Row(modifier = Modifier
+//                    .wrapContentHeight()
+//                    .height(64.dp + naviBarPadding)
+//                    .padding(bottom = naviBarPadding)
+                    .align(Alignment.CenterVertically)
                 ) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                         ClickableIcon(painter = painterResource(R.drawable.back)) {
@@ -209,7 +230,58 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     }
 
                     // change to info icon
-                    ClickableIcon(painter = painterResource(R.drawable.lable), enabled = false)
+//                    ClickableIcon(painter = painterResource(R.drawable.lable), enabled = false)
+
+                    // SegmentedControls
+                    var horizontalBias by remember { mutableStateOf(ReadMode.CARD_VIEW) }
+
+                    val transition = updateTransition(targetState = horizontalBias, label = "Segmented Controls")
+
+                    val alignment by animateHorizontalAlignmentAsState(horizontalBias.position)
+
+                    val cardViewTint by transition.animateColor(label = "cardView tint") {
+                        when(it) {
+                            ReadMode.CARD_VIEW -> PrimaryVariant
+                            ReadMode.ARTICLE_VIEW -> Color.White
+                        }
+                    }
+
+                    val articleView by transition.animateColor(label = "cardView tint") {
+                        when(it) {
+                            ReadMode.CARD_VIEW -> Color.White
+                            ReadMode.ARTICLE_VIEW -> PrimaryVariant
+                        }
+                    }
+
+//                    Surface(elevation = 8.dp) {
+//
+//                    }
+
+                    val color = LocalElevationOverlay.current!!.apply(MaterialTheme.colors.surface,LocalAbsoluteElevation.current + 50.dp)
+
+                    Box(modifier = Modifier
+//                        .clickable { horizontalBias *= -1 }
+                        .clip(CircleShape)
+//                        .background(Color.DarkGray)
+                        .background(color)
+                        .wrapContentSize()
+                        .height(intrinsicSize = IntrinsicSize.Min)) {
+                        Spacer(modifier = Modifier
+                            .padding(6.dp)
+                            .clip(CircleShape)
+                            .size(36.dp)
+                            .background(Color.White)
+                            .align(alignment))
+                        Row {
+                            ClickableIcon(painter = painterResource(id = R.drawable.card_view), tint = cardViewTint) {
+                                horizontalBias = ReadMode.CARD_VIEW
+                            }
+                            ClickableIcon(painter = painterResource(id = R.drawable.article), tint = articleView) {
+                                horizontalBias = ReadMode.ARTICLE_VIEW
+                            }
+                        }
+                    }
+
                     ClickableIcon(painter = painterResource(R.drawable.done_broad), enabled = false)
                 }
             }
@@ -223,13 +295,13 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
         val screenHeight = configuration.screenHeightDp.dp
         val screenWidth = configuration.screenWidthDp.dp
-        val imageHeight = screenWidth / 16 * 13
-        val range = screenWidth / 4
+        val imageHeight = screenWidth / 16 * ratio
+        val range = screenWidth / 16 * (ratio - 9)
 
         val imageRatio by remember {
             derivedStateOf {
                 if (lazyListState.firstVisibleItemIndex == 0 && dp(lazyListState.firstVisibleItemScrollOffset) < range) {
-                    screenWidth / (screenWidth / 16 * 13 - dp(lazyListState.firstVisibleItemScrollOffset))
+                    screenWidth / (screenWidth / 16 * ratio - dp(lazyListState.firstVisibleItemScrollOffset))
                 } else 16f / 9f
 //                if (ratio < 16f / 9f && ratio >= 0f) ratio else 16f / 9f
             }
@@ -282,7 +354,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
-                    .aspectRatio(16f / 13f)
+                    .aspectRatio(16f / ratio)
             ) {
                 Crossfade(
                     targetState = viewModel.currentImage,
@@ -317,29 +389,30 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         } else 500.dp
                     }
                 }
-                Spacer(
-                    modifier = Modifier
-//                    .background(imageBrush)
-//                    .drawBehind { BrushTest() }
-                        .align(Alignment.BottomCenter)
-                        .background(Color.Black)
-                        .fillMaxWidth()
-                        .height(spacerHeight)
-                )
+
+
+                // 遮罩
+//                Spacer(
+//                    modifier = Modifier
+////                    .background(imageBrush)
+////                    .drawBehind { BrushTest() }
+//                        .align(Alignment.BottomCenter)
+//                        .background(Color.Black)
+//                        .fillMaxWidth()
+//                        .height(spacerHeight)
+//                )
 
 //                BrushCanvas(imageBrushCenter, imageBrushBottom)
             }
 
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-//            contentPadding = PaddingValues.,
-//            contentPadding = paddingValues,
+//                verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(
 //                top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding() + 8.dp,
                     bottom = WindowInsets.systemBars.asPaddingValues()
                         .calculateBottomPadding() + 8.dp,
                 ),
-                modifier = Modifier.padding(paddingValues),
+//                modifier = Modifier.padding(paddingValues),
 //                .padding(horizontal = 8.dp),
                 state = lazyListState
             ) {
@@ -348,7 +421,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(16f / 13f)
+                            .aspectRatio(16f / ratio)
                     ) {
 //                    Crossfade(targetState = viewModel.currentImage) {
 //                        if (it != null) {
@@ -380,6 +453,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 .padding(top = 32.dp)
                                 .padding(vertical = 8.dp, horizontal = 16.dp)
                                 .align(Alignment.BottomCenter)
+                                .padding(bottom = 8.dp)
                         )
                     }
                 }
@@ -396,7 +470,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                     Card(
                         modifier = Modifier
-                            .padding(horizontal = 8.dp)
+                            .background(MaterialTheme.colors.background)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
                             .fillMaxWidth()
                             .wrapContentHeight(),
 //                        .clip(RoundedCornerShape(16.dp)),
@@ -731,6 +806,16 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     }
                 }
             }
+
+            // StatusBar 遮罩
+            Spacer(modifier = Modifier
+                .drawBehind { drawRect(getColor()) }
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .height(WindowInsets.statusBars
+                    .asPaddingValues()
+                    .calculateTopPadding())
+            )
         }
 
     }

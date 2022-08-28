@@ -15,6 +15,7 @@ import androidx.core.view.WindowCompat
 import com.example.english.translation.BUG_URL
 import com.example.english.ui.components.Loader
 import com.example.english.ui.components.Movement
+import com.example.english.ui.components.SegmentedControls
 import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.theme.EnglishTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainNavigation(viewModel)
 
+//                    SegmentedControls()
 //                    Loader()
 //                    Movement()
 

@@ -62,12 +62,12 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
         systemUiController.apply {
             setNavigationBarColor(
                 color = Color.Transparent,
-                darkIcons = useDarkIcons
+//                darkIcons = useDarkIcons
             )
             setStatusBarColor(
 //                color = Color.Transparent,
                 color = Color.Transparent.copy(alpha = 0.5F),
-                darkIcons = useDarkIcons
+//                darkIcons = useDarkIcons
             )
         }
         // setStatusBarsColor() and setNavigationBarsColor() also exist
