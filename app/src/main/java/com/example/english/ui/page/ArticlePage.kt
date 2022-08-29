@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
@@ -23,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -32,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.unit.Dp
@@ -61,9 +65,9 @@ enum class AnnotationState {
     TRANSLATION, WORDS, CLOSE
 }
 
-enum class ReadMode(val position: Float) {
-    CARD_VIEW(-1F), ARTICLE_VIEW(1F)
-}
+//enum class ReadMode(val position: Float) {
+//    CARD_VIEW(-1F), ARTICLE_VIEW(1F)
+//}
 
 const val ratio = 12f
 
@@ -77,6 +81,16 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
+
+    val configuration = LocalConfiguration.current
+
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
+    val screenWidthPx = with(LocalDensity.current){ screenWidth.toPx() }
+//    val imageHeight = 16f / ratio * screenWidth.value
+    val imageHeight = screenWidth / 16 * ratio
+    val imageHeightPx = with(LocalDensity.current){ (screenWidth / 16 * ratio).toPx() }
+    val range = screenWidth / 16 * (ratio - 9)
 
     // system bar
 
@@ -92,6 +106,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     val statusBarHeight = with(LocalDensity.current) {
         WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx() * 2
     }
+
+    val scrollOffset by remember { derivedStateOf { if (lazyListState.firstVisibleItemIndex == 0) imageHeightPx - lazyListState.firstVisibleItemScrollOffset.toFloat() else 0f } }
 
     val statusBarAlpha by remember {
         derivedStateOf {
@@ -217,9 +233,20 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         }
     }
 
+    /** SegmentedControls */
+//    val width = 96.dp
+    val swipeableState = rememberSwipeableState(0)
+    val sizePx = with(LocalDensity.current) { 48.dp.toPx() }
+    val anchors = mapOf(0f to 0, sizePx to 1)
+
+    val readMode by remember { derivedStateOf { swipeableState.targetValue } }
+
+
+
     Scaffold(
         bottomBar = {
-            BottomAppBar(contentPadding = WindowInsets.navigationBars.asPaddingValues(), backgroundColor = MaterialTheme.colors.surface) {
+            BottomAppBar(contentPadding = WindowInsets.navigationBars.asPaddingValues(),
+                backgroundColor = MaterialTheme.colors.surface) {
                 Row(
                     modifier = Modifier
 //                    .wrapContentHeight()
@@ -246,66 +273,20 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
 
                     /** SegmentedControls */
-                    val width = 96.dp
-                    val swipeableState = rememberSwipeableState(0)
-                    val sizePx = with(LocalDensity.current) { 48.dp.toPx() }
-                    val anchors = mapOf(0f to 0, sizePx to 1)
+                    val contentColor =
+                        MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface)
 
-//                    var horizontalBias by remember { mutableStateOf(ReadMode.CARD_VIEW) }
-
-                    val transition =
-                        updateTransition(
-                            targetState = swipeableState.offset.value,
-                            label = "Segmented Controls"
-                        )
-
-//                    val transition =
-//                        updateTransition(targetState = horizontalBias, label = "Segmented Controls")
-//
-//                    val alignment by animateHorizontalAlignmentAsState(horizontalBias.position)
-
-                    val contentColor = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface)
                     fun gestureColor(state: Float): Color {
                         val rangeState = if (state > 1f) 1f else if (state < 0) 0f else state
                         return Color(
-//                            red = 255f,
-//                            green = 255f,
-//                            blue = 255f
-//                            red = 0.2784314f,
-//                            green = 0.5294118f,
-//                            blue = 0f
                             red = PrimaryVariant.red * rangeState + (1 - rangeState) * contentColor.red,
                             green = PrimaryVariant.green * rangeState + (1 - rangeState) * contentColor.green,
                             blue = PrimaryVariant.blue * rangeState + (1 - rangeState) * contentColor.blue
                         )
                     }
 
-                    val cardViewTint by remember {
-                        derivedStateOf {
-                            val state = 1 - swipeableState.offset.value / sizePx
-                            gestureColor(state)
-                        }
-                    }
-//                    val cardViewTint by transition.animateColor(label = "cardView tint") {
-////                        when (it) {
-////                            ReadMode.CARD_VIEW -> PrimaryVariant
-////                            ReadMode.ARTICLE_VIEW -> Color.White
-////                        }
-//                        if (it == 0f) PrimaryVariant else Color.White
-//                    }
-
+                    val cardViewTint by remember { derivedStateOf { gestureColor(1 - swipeableState.offset.value / sizePx) } }
                     val articleView by remember { derivedStateOf { gestureColor(swipeableState.offset.value / sizePx) } }
-//                    val articleView by transition.animateColor(label = "cardView tint") {
-////                        when (it) {
-////                            ReadMode.CARD_VIEW -> Color.White
-////                            ReadMode.ARTICLE_VIEW -> PrimaryVariant
-////                        }
-//                        if (it == 0f) Color.White else PrimaryVariant
-//                    }
-
-//                    Surface(elevation = 8.dp) {
-//
-//                    }
 
                     val color = LocalElevationOverlay.current!!.apply(
                         MaterialTheme.colors.surface,
@@ -398,12 +379,6 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
     ) { paddingValues ->
 
-        val configuration = LocalConfiguration.current
-
-        val screenHeight = configuration.screenHeightDp.dp
-        val screenWidth = configuration.screenWidthDp.dp
-        val imageHeight = screenWidth / 16 * ratio
-        val range = screenWidth / 16 * (ratio - 9)
 
         val imageRatio by remember {
             derivedStateOf {
@@ -499,15 +474,22 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
 
                 // 遮罩
-//                Spacer(
-//                    modifier = Modifier
-////                    .background(imageBrush)
-////                    .drawBehind { BrushTest() }
-//                        .align(Alignment.BottomCenter)
+                val surfaceColor = MaterialTheme.colors.surface
+                Spacer(
+                    modifier = Modifier
+//                    .background(imageBrush)
+//                    .drawBehind { BrushTest() }
+                        .align(Alignment.BottomCenter)
 //                        .background(Color.Black)
+                        .fillMaxSize()
 //                        .fillMaxWidth()
 //                        .height(spacerHeight)
-//                )
+                        .drawBehind {
+                            drawRect(surfaceColor,
+                                topLeft = Offset(x = 0f, y = scrollOffset),
+                                size = Size(width = screenWidth.toPx(), height = imageHeight.toPx()))
+                        }
+                )
 
 //                BrushCanvas(imageBrushCenter, imageBrushBottom)
             }
@@ -521,7 +503,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 ),
 //                modifier = Modifier.padding(paddingValues),
 //                .padding(horizontal = 8.dp),
-                state = lazyListState
+                state = lazyListState,
+                modifier = Modifier.animateContentSize()
             ) {
 
                 item {
@@ -567,194 +550,207 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                 itemsIndexed(viewModel.currentContent) { paragraphIndex, paragraphContent ->
 
-                    var openState by remember {
-                        mutableStateOf(false)
-                    }
+                    Box(modifier = Modifier.animateContentSize()
+                    ) {
+                        if (readMode == 1) {
+                            Text(text = paragraphContent.text,
+                                style = Typography().body1,
+                                modifier = Modifier.padding(vertical = 10.dp, horizontal = 16.dp))
+                        } else {
+                            var openState by remember {
+                                mutableStateOf(false)
+                            }
 
-                    var annotationState by remember {
-                        mutableStateOf(AnnotationState.CLOSE)
-                    }
+                            var annotationState by remember {
+                                mutableStateOf(AnnotationState.CLOSE)
+                            }
 
-                    Card(
-                        modifier = Modifier
-                            .background(MaterialTheme.colors.background)
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
+                            Card(
+                                modifier = Modifier
+                                    .background(MaterialTheme.colors.background)
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
 //                        .clip(RoundedCornerShape(16.dp)),
-                        backgroundColor = MaterialTheme.colors.surface,
+                                backgroundColor = MaterialTheme.colors.surface,
 //                    elevation = 4.dp,
-                        shape = RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(16.dp)
 //                        .background(MaterialTheme.colors.background)
 //                        .animateItemPlacement(TweenSpec())
 //                        .then(hideKeyboardModifier)
-                    ) {
-                        Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)) {
+                            ) {
+                                Column(modifier = Modifier.padding(top = 8.dp,
+                                    start = 8.dp,
+                                    end = 8.dp)) {
 
-                            FlatTextField(
-                                value = if (paragraphContent.text.first() == '^') {
-                                    paragraphContent.copy(
-                                        text = paragraphContent.text.removeRange(
-                                            0,
-                                            1
-                                        )
+                                    FlatTextField(
+                                        value = if (paragraphContent.text.first() == '^') {
+                                            paragraphContent.copy(
+                                                text = paragraphContent.text.removeRange(
+                                                    0,
+                                                    1
+                                                )
+                                            )
+                                        } else paragraphContent,
+                                        onValueChange = {
+                                            viewModel.currentContent[paragraphIndex] = it
+                                        },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        readOnly = true
                                     )
-                                } else paragraphContent,
-                                onValueChange = { viewModel.currentContent[paragraphIndex] = it },
-                                modifier = Modifier.fillMaxWidth(),
-                                readOnly = true
-                            )
 
 //                        Spacer(modifier = Modifier.height(8.dp))
 
-                            // chinese
-                            AnimatedVisibility(visible = openState) {
-                                FlatTextField(
-                                    value = viewModel.currentContentCn[paragraphIndex],
-                                    onValueChange = {
-                                        viewModel.currentContentCn[paragraphIndex] = it
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp)
-                                )
-                            }
+                                    // chinese
+                                    AnimatedVisibility(visible = openState) {
+                                        FlatTextField(
+                                            value = viewModel.currentContentCn[paragraphIndex],
+                                            onValueChange = {
+                                                viewModel.currentContentCn[paragraphIndex] = it
+                                            },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(top = 8.dp)
+                                        )
+                                    }
 
 
-                            // button row
-                            Row(modifier = Modifier.fillMaxWidth()) {
+                                    // button row
+                                    Row(modifier = Modifier.fillMaxWidth()) {
 
-                                fun isDone(): Boolean {
-                                    return if (paragraphContent.text.isNotEmpty()) {
-                                        paragraphContent.text.first() == '^'
-                                    } else false
-                                }
+                                        fun isDone(): Boolean {
+                                            return if (paragraphContent.text.isNotEmpty()) {
+                                                paragraphContent.text.first() == '^'
+                                            } else false
+                                        }
 
-                                val transition =
-                                    updateTransition(targetState = isDone(), label = "transition")
+                                        val transition =
+                                            updateTransition(targetState = isDone(),
+                                                label = "transition")
 
-                                val doneColor by transition.animateColor(label = "") {
-                                    if (it) ColorDone else LocalContentColor.current
-                                }
-                                val doneAlpha by transition.animateFloat(label = "") {
-                                    if (it) LocalContentAlpha.current else 0.80f
-                                }
+                                        val doneColor by transition.animateColor(label = "") {
+                                            if (it) ColorDone else LocalContentColor.current
+                                        }
+                                        val doneAlpha by transition.animateFloat(label = "") {
+                                            if (it) LocalContentAlpha.current else 0.80f
+                                        }
 //                            val doneColor by animateColorAsState(targetValue = if (isDone()) ColorDone else LocalContentColor.current)
-                                ClickableIcon(
-                                    painter = painterResource(id = R.drawable.done_broad),
-                                    onClick = {
+                                        ClickableIcon(
+                                            painter = painterResource(id = R.drawable.done_broad),
+                                            onClick = {
 //                                    currentParagraphIndex = paragraphIndex
 //                                    curr；entParagraphContent = paragraphContent.text
 //                                    deleteParagraphDialog = true
-                                        viewModel.changeDoneState(paragraphIndex)
-                                        Log.d(
-                                            "!!",
-                                            "NewsArticlePage: \n${paragraphContent.text}\n${paragraphContent.text.firstOrNull()}"
+                                                viewModel.changeDoneState(paragraphIndex)
+                                                Log.d(
+                                                    "!!",
+                                                    "NewsArticlePage: \n${paragraphContent.text}\n${paragraphContent.text.firstOrNull()}"
+                                                )
+                                            },
+                                            modifier = Modifier.alpha(doneAlpha),
+                                            tint = doneColor
                                         )
-                                    },
-                                    modifier = Modifier.alpha(doneAlpha),
-                                    tint = doneColor
-                                )
 
-                                Spacer(modifier = Modifier
-                                    .weight(1F)
-                                    .focusable()
-                                    .clickable { })
+                                        Spacer(modifier = Modifier
+                                            .weight(1F)
+                                            .focusable()
+                                            .clickable { })
 
-                                ClickableIcon(
-                                    painter = painterResource(id = R.drawable.translation)
-                                )
+                                        ClickableIcon(
+                                            painter = painterResource(id = R.drawable.translation)
+                                        )
 //                                tint = color.value,
-                                {
-                                    annotationState =
-                                        if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
-                                        else AnnotationState.TRANSLATION
+                                        {
+                                            annotationState =
+                                                if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
+                                                else AnnotationState.TRANSLATION
 
 //                                    viewModel.translation(paragraph.text)
 //                                    viewModel.translateTest(context, paragraph.text)
 //                                    translate(context)
-                                }
+                                        }
 
-                                // do not work
+                                        // do not work
 //                            val contentText by remember {
 //                                derivedStateOf { paragraphContent.getSelectedText().text }
 //                            }
-                                val contentText by remember {
-                                    derivedStateOf { viewModel.currentContent[paragraphIndex].getSelectedText().text }
-                                }
+                                        val contentText by remember {
+                                            derivedStateOf { viewModel.currentContent[paragraphIndex].getSelectedText().text }
+                                        }
 
 
-                                val wordIconState by remember {
-                                    derivedStateOf { contentText.isNotBlank() || viewModel.wordListTable[paragraphIndex].isNotEmpty() }
-                                }
-                                ClickableIcon(
-                                    painter = painterResource(id = R.drawable.word),
-                                    enabled = wordIconState,
-                                    modifier = Modifier.focusable()
-                                ) {
+                                        val wordIconState by remember {
+                                            derivedStateOf { contentText.isNotBlank() || viewModel.wordListTable[paragraphIndex].isNotEmpty() }
+                                        }
+                                        ClickableIcon(
+                                            painter = painterResource(id = R.drawable.word),
+                                            enabled = wordIconState,
+                                            modifier = Modifier.focusable()
+                                        ) {
 
-                                    // 清除上一次選重的單字
-                                    viewModel.noCurrentWord()
+                                            // 清除上一次選重的單字
+                                            viewModel.noCurrentWord()
 
-                                    // 1.檢測是否選取單字
+                                            // 1.檢測是否選取單字
 //                                    val contentText = paragraphContent.getSelectedText().text
-                                    annotationState = if (contentText.isNotBlank()) {
+                                            annotationState = if (contentText.isNotBlank()) {
 
 //                                        viewModel.curr
 
-                                        viewModel.addWordListTable(contentText, paragraphIndex)
+                                                viewModel.addWordListTable(contentText,
+                                                    paragraphIndex)
 
-                                        viewModel.currentContent[paragraphIndex] =
-                                            viewModel.currentContent[paragraphIndex].copy(
-                                                selection = TextRange.Zero
-                                            )
+                                                viewModel.currentContent[paragraphIndex] =
+                                                    viewModel.currentContent[paragraphIndex].copy(
+                                                        selection = TextRange.Zero
+                                                    )
 
 //                                        wordTranslate(context, contentText)
 
 
-                                        // 2.translate並且開啟annotation欄位
+                                                // 2.translate並且開啟annotation欄位
 
-                                        AnnotationState.WORDS
-                                    } else {
-                                        // 3.檢測開啟狀態，決定開關annotation欄位
-                                        if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
-                                        else AnnotationState.WORDS
-                                    }
-                                }
-                                AnimatedContent(targetState = openState) {
-                                    ClickableIcon(
-                                        painter = painterResource(id = getRid(it))
-                                    ) {
-                                        openState = !openState
-                                    }
-                                }
-                            }
-
-                            val color = remember {
-                                Animatable(Color.White)
-                            }
-
-                            AnimatedContent(targetState = annotationState) { it ->
-                                when (it) {
-                                    AnnotationState.TRANSLATION -> {
-                                        Card(
-                                            elevation = 0.dp,
-                                            shape = RoundedCornerShape(12.dp),
-                                            modifier = Modifier
-                                                .padding(bottom = 8.dp)
-                                                .fillMaxWidth(),
-                                            backgroundColor = if (MaterialTheme.colors.isLight)
-                                                MaterialTheme.colors.onSurface.copy(alpha = TextBackgroundAlphaLight)
-                                            else TextFieldDefaults.textFieldColors()
-                                                .backgroundColor(true).value
-
-                                        ) {
-                                            Text(
-                                                text = viewModel.currentContentTr[paragraphIndex].text,
-                                                style = Typography().h6,
-                                                modifier = Modifier.padding(16.dp)
-                                            )
+                                                AnnotationState.WORDS
+                                            } else {
+                                                // 3.檢測開啟狀態，決定開關annotation欄位
+                                                if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
+                                                else AnnotationState.WORDS
+                                            }
                                         }
+                                        AnimatedContent(targetState = openState) {
+                                            ClickableIcon(
+                                                painter = painterResource(id = getRid(it))
+                                            ) {
+                                                openState = !openState
+                                            }
+                                        }
+                                    }
+
+                                    val color = remember {
+                                        Animatable(Color.White)
+                                    }
+
+                                    AnimatedContent(targetState = annotationState) { it ->
+                                        when (it) {
+                                            AnnotationState.TRANSLATION -> {
+                                                Card(
+                                                    elevation = 0.dp,
+                                                    shape = RoundedCornerShape(12.dp),
+                                                    modifier = Modifier
+                                                        .padding(bottom = 8.dp)
+                                                        .fillMaxWidth(),
+                                                    backgroundColor = if (MaterialTheme.colors.isLight)
+                                                        MaterialTheme.colors.onSurface.copy(alpha = TextBackgroundAlphaLight)
+                                                    else TextFieldDefaults.textFieldColors()
+                                                        .backgroundColor(true).value
+
+                                                ) {
+                                                    Text(
+                                                        text = viewModel.currentContentTr[paragraphIndex].text,
+                                                        style = Typography().h6,
+                                                        modifier = Modifier.padding(16.dp)
+                                                    )
+                                                }
 //                                    FlatTextField(
 //                                        value = viewModel.currentContentTr[paragraphIndex],
 //                                        onValueChange = {
@@ -766,25 +762,25 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 ////                                            .padding(top = 8.dp)
 //                                    )
 
-                                        LaunchedEffect(key1 = 1) {
-                                            color.animateTo(Color.Yellow)
-                                        }
-                                    }
+                                                LaunchedEffect(key1 = 1) {
+                                                    color.animateTo(Color.Yellow)
+                                                }
+                                            }
 
 
-                                    AnnotationState.WORDS -> {
+                                            AnnotationState.WORDS -> {
 
-                                        val list = remember {
-                                            viewModel.wordListTable[paragraphIndex]
-                                        }
+                                                val list = remember {
+                                                    viewModel.wordListTable[paragraphIndex]
+                                                }
 
 
-                                        // 測試中
-                                        val wordList: SnapshotStateList<MutableState<Word>> =
-                                            list.map {
-                                                viewModel.getWordById(it)
-                                                    .collectAsState(initial = EmptyWord.word) as MutableState<Word>
-                                            }.toMutableStateList()
+                                                // 測試中
+                                                val wordList: SnapshotStateList<MutableState<Word>> =
+                                                    list.map {
+                                                        viewModel.getWordById(it)
+                                                            .collectAsState(initial = EmptyWord.word) as MutableState<Word>
+                                                    }.toMutableStateList()
 //                                        emptyList<MutableState<Word>>().toMutableStateList()
 
 //                                    wordList = list
@@ -839,39 +835,39 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                        }
 //                                    }
 
-                                        Column(
-                                            modifier = Modifier
-                                                .padding(bottom = 6.dp)
+                                                Column(
+                                                    modifier = Modifier
+                                                        .padding(bottom = 6.dp)
 //                                        .animateContentSize()
-                                                .focusable()
-                                        ) {
+                                                        .focusable()
+                                                ) {
 
-                                            wordList.forEachIndexed { index, word ->
-                                                WordComponent(
-                                                    word = word,
-                                                    onValueChange = {
-                                                        wordList[paragraphIndex].value =
+                                                    wordList.forEachIndexed { index, word ->
+                                                        WordComponent(
+                                                            word = word,
+                                                            onValueChange = {
+                                                                wordList[paragraphIndex].value =
 //                                                    wordList[index].value =
-                                                            word.value.copy(chinese = it)
-                                                    },
-                                                    remove = {
-                                                        Log.d(
-                                                            "!!",
-                                                            viewModel.wordListTable[paragraphIndex].toList()
-                                                                .toString() + index.toString()
-                                                        )
+                                                                    word.value.copy(chinese = it)
+                                                            },
+                                                            remove = {
+                                                                Log.d(
+                                                                    "!!",
+                                                                    viewModel.wordListTable[paragraphIndex].toList()
+                                                                        .toString() + index.toString()
+                                                                )
 //                                                    Log.d("!!", viewModel.wordListTable[index].toList().toString())
-                                                        viewModel.wordListTable[paragraphIndex].remove(
-                                                            word.value.id
-                                                        )
+                                                                viewModel.wordListTable[paragraphIndex].remove(
+                                                                    word.value.id
+                                                                )
 //                                                    viewModel.wordListTable[index].remove(word.value.id)
-                                                        Log.d(
-                                                            "!!",
-                                                            viewModel.wordListTable[paragraphIndex].toList()
-                                                                .toString()
-                                                        )
-                                                    },
-                                                    updateWord = { viewModel.updateWord(word.value) },
+                                                                Log.d(
+                                                                    "!!",
+                                                                    viewModel.wordListTable[paragraphIndex].toList()
+                                                                        .toString()
+                                                                )
+                                                            },
+                                                            updateWord = { viewModel.updateWord(word.value) },
 //                                                updateChinese = {
 //                                                    viewModel.updateWord(
 //                                                        Word(
@@ -881,10 +877,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                                        )
 //                                                    )
 //                                                }
-                                                    viewModel = viewModel
-                                                )
-                                            }
-                                        }
+                                                            viewModel = viewModel
+                                                        )
+                                                    }
+                                                }
 
 //                                    WordListTable(
 //                                        wordList = wordList,
@@ -895,26 +891,29 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                                        viewModel
 //                                    )
 
-                                        LaunchedEffect(key1 = 1) {
-                                            color.animateTo(Color.White)
-                                        }
+                                                LaunchedEffect(key1 = 1) {
+                                                    color.animateTo(Color.White)
+                                                }
 
 
 //                                    viewModel.currentContentWordList.toList()
 //                                        .forEachIndexed { index, snapshotStateList ->
 ////                                        Log.d("!!! forEach", "$index：${snapshotStateList.toList()}")
 //                                        }
-                                    }
-                                    AnnotationState.CLOSE -> {
-                                        LaunchedEffect(key1 = 1) {
-                                            color.animateTo(Color.White)
+                                            }
+                                            AnnotationState.CLOSE -> {
+                                                LaunchedEffect(key1 = 1) {
+                                                    color.animateTo(Color.White)
+                                                }
+                                            }
                                         }
                                     }
+//                        Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
-//                        Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
+
                 }
             }
 
