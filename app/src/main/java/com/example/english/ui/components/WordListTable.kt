@@ -1,7 +1,6 @@
 package com.example.english.ui.components
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.data.word.word.room.Word
-import com.example.english.tool.AppToast
 import com.example.english.translation.wordTranslate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -406,30 +404,31 @@ fun WordComponent(
             modifier = Modifier
                 .scale(deleteIconScale)
                 .align(Alignment.CenterEnd),
-            onClick = {
+            tint = MaterialTheme.colors.error
+        ) {
 
 //                visible = false
 
-                remove()
+            remove()
 
-                coroutineScope.launch {
-                    swipeableState.snapTo("normal")
-                }
-            })
+            coroutineScope.launch {
+                swipeableState.snapTo("normal")
+            }
+        }
 
 
         ClickableIcon(
             painter = painterResource(id = R.drawable.translation),
             modifier = Modifier
                 .scale(translateIconScale)
-                .align(Alignment.CenterStart),
-            onClick = {
-                coroutineScope.launch {
-                    swipeableState.animateTo("normal")
-                }
+                .align(Alignment.CenterStart)
+        ) {
+            coroutineScope.launch {
+                swipeableState.animateTo("normal")
+            }
 
-                wordTranslate(context, word.value.english)
-            })
+            wordTranslate(context, word.value.english)
+        }
 
 
         Card(

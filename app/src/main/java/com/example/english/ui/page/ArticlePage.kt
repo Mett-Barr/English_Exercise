@@ -7,6 +7,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -24,6 +26,8 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.painterResource
@@ -31,12 +35,14 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
+import com.example.english.tool.AppToast
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.WordComponent
@@ -45,8 +51,10 @@ import com.example.english.ui.theme.ColorDone
 import com.example.english.ui.theme.PrimaryVariant
 import com.example.english.ui.theme.TextBackgroundAlphaLight
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
 enum class AnnotationState {
@@ -59,7 +67,10 @@ enum class ReadMode(val position: Float) {
 
 const val ratio = 12f
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(
+    ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 //    val activity = LocalContext.current as Activity
@@ -208,12 +219,13 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
     Scaffold(
         bottomBar = {
-            BottomAppBar(contentPadding = WindowInsets.navigationBars.asPaddingValues()) {
-                Row(modifier = Modifier
+            BottomAppBar(contentPadding = WindowInsets.navigationBars.asPaddingValues(), backgroundColor = MaterialTheme.colors.surface) {
+                Row(
+                    modifier = Modifier
 //                    .wrapContentHeight()
 //                    .height(64.dp + naviBarPadding)
 //                    .padding(bottom = naviBarPadding)
-                    .align(Alignment.CenterVertically)
+                        .align(Alignment.CenterVertically)
                 ) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                         ClickableIcon(painter = painterResource(R.drawable.back)) {
@@ -232,53 +244,148 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                     // change to info icon
 //                    ClickableIcon(painter = painterResource(R.drawable.lable), enabled = false)
 
-                    // SegmentedControls
-                    var horizontalBias by remember { mutableStateOf(ReadMode.CARD_VIEW) }
 
-                    val transition = updateTransition(targetState = horizontalBias, label = "Segmented Controls")
+                    /** SegmentedControls */
+                    val width = 96.dp
+                    val swipeableState = rememberSwipeableState(0)
+                    val sizePx = with(LocalDensity.current) { 48.dp.toPx() }
+                    val anchors = mapOf(0f to 0, sizePx to 1)
 
-                    val alignment by animateHorizontalAlignmentAsState(horizontalBias.position)
+//                    var horizontalBias by remember { mutableStateOf(ReadMode.CARD_VIEW) }
 
-                    val cardViewTint by transition.animateColor(label = "cardView tint") {
-                        when(it) {
-                            ReadMode.CARD_VIEW -> PrimaryVariant
-                            ReadMode.ARTICLE_VIEW -> Color.White
-                        }
+                    val transition =
+                        updateTransition(
+                            targetState = swipeableState.offset.value,
+                            label = "Segmented Controls"
+                        )
+
+//                    val transition =
+//                        updateTransition(targetState = horizontalBias, label = "Segmented Controls")
+//
+//                    val alignment by animateHorizontalAlignmentAsState(horizontalBias.position)
+
+                    val contentColor = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface)
+                    fun gestureColor(state: Float): Color {
+                        val rangeState = if (state > 1f) 1f else if (state < 0) 0f else state
+                        return Color(
+//                            red = 255f,
+//                            green = 255f,
+//                            blue = 255f
+//                            red = 0.2784314f,
+//                            green = 0.5294118f,
+//                            blue = 0f
+                            red = PrimaryVariant.red * rangeState + (1 - rangeState) * contentColor.red,
+                            green = PrimaryVariant.green * rangeState + (1 - rangeState) * contentColor.green,
+                            blue = PrimaryVariant.blue * rangeState + (1 - rangeState) * contentColor.blue
+                        )
                     }
 
-                    val articleView by transition.animateColor(label = "cardView tint") {
-                        when(it) {
-                            ReadMode.CARD_VIEW -> Color.White
-                            ReadMode.ARTICLE_VIEW -> PrimaryVariant
+                    val cardViewTint by remember {
+                        derivedStateOf {
+                            val state = 1 - swipeableState.offset.value / sizePx
+                            gestureColor(state)
                         }
                     }
+//                    val cardViewTint by transition.animateColor(label = "cardView tint") {
+////                        when (it) {
+////                            ReadMode.CARD_VIEW -> PrimaryVariant
+////                            ReadMode.ARTICLE_VIEW -> Color.White
+////                        }
+//                        if (it == 0f) PrimaryVariant else Color.White
+//                    }
+
+                    val articleView by remember { derivedStateOf { gestureColor(swipeableState.offset.value / sizePx) } }
+//                    val articleView by transition.animateColor(label = "cardView tint") {
+////                        when (it) {
+////                            ReadMode.CARD_VIEW -> Color.White
+////                            ReadMode.ARTICLE_VIEW -> PrimaryVariant
+////                        }
+//                        if (it == 0f) Color.White else PrimaryVariant
+//                    }
 
 //                    Surface(elevation = 8.dp) {
 //
 //                    }
 
-                    val color = LocalElevationOverlay.current!!.apply(MaterialTheme.colors.surface,LocalAbsoluteElevation.current + 50.dp)
+                    val color = LocalElevationOverlay.current!!.apply(
+                        MaterialTheme.colors.surface,
+                        LocalAbsoluteElevation.current + 50.dp
+                    )
 
-                    Box(modifier = Modifier
+
+                    Box(
+                        modifier = Modifier
 //                        .clickable { horizontalBias *= -1 }
-                        .clip(CircleShape)
-//                        .background(Color.DarkGray)
-                        .background(color)
-                        .wrapContentSize()
-                        .height(intrinsicSize = IntrinsicSize.Min)) {
-                        Spacer(modifier = Modifier
-                            .padding(6.dp)
                             .clip(CircleShape)
-                            .size(36.dp)
-                            .background(Color.White)
-                            .align(alignment))
+//                        .background(Color.DarkGray)
+                            .background(color)
+                            .wrapContentSize()
+                            .height(intrinsicSize = IntrinsicSize.Min)
+                            .swipeable(
+                                state = swipeableState,
+                                anchors = anchors,
+                                thresholds = { _, _ -> FractionalThreshold(0.3f) },
+                                orientation = Orientation.Horizontal
+                            )
+                    ) {
+
+                        fun swipeAnimate(position: Int) {
+//                            scope.cancel()
+                            scope.launch { swipeableState.animateTo(position) }
+//                            swipeableState.
+                        }
                         Row {
-                            ClickableIcon(painter = painterResource(id = R.drawable.card_view), tint = cardViewTint) {
-                                horizontalBias = ReadMode.CARD_VIEW
-                            }
-                            ClickableIcon(painter = painterResource(id = R.drawable.article), tint = articleView) {
-                                horizontalBias = ReadMode.ARTICLE_VIEW
-                            }
+                            Spacer(modifier = Modifier
+                                .size(48.dp)
+                                .clickable(
+//                                    indication = null,
+//                                    interactionSource = remember { MutableInteractionSource() }
+                                ) { swipeAnimate(0) })
+                            Spacer(modifier = Modifier
+                                .size(48.dp)
+                                .clickable(
+                                    indication = rememberRipple(radius = 48.dp),
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) { swipeAnimate(1) })
+//                           Spacer(modifier = Modifier.size(48.dp).clickable { horizontalBias = ReadMode.CARD_VIEW })
+//                           Spacer(modifier = Modifier.size(48.dp).clickable { horizontalBias = ReadMode.ARTICLE_VIEW })
+                        }
+
+                        Spacer(
+                            modifier = Modifier
+                                .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                                .padding(6.dp)
+                                .clip(CircleShape)
+                                .size(36.dp)
+                                .background(Color.White)
+//                                .align(alignment)
+
+                        )
+                        Row {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.card_view),
+//                                contentDescription = null
+//                            )
+//                            Icon(
+//                                painterResource(id = R.drawable.article),
+//                                contentDescription = null
+//                            )
+                            ClickableIcon(
+                                painter = painterResource(id = R.drawable.card_view),
+                                tint = cardViewTint,
+//                                enabled = false
+                            )
+//                            {
+//                                horizontalBias = ReadMode.CARD_VIEW
+//                            }
+                            ClickableIcon(
+                                painter = painterResource(id = R.drawable.article),
+                                tint = articleView,
+//                                enabled = false
+                            )
+//                            {
+//                                horizontalBias = ReadMode.ARTICLE_VIEW
+//                            }
                         }
                     }
 
@@ -554,17 +661,19 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     .focusable()
                                     .clickable { })
 
-                                ClickableIcon(painter = painterResource(id = R.drawable.translation),
+                                ClickableIcon(
+                                    painter = painterResource(id = R.drawable.translation)
+                                )
 //                                tint = color.value,
-                                    onClick = {
-                                        annotationState =
-                                            if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
-                                            else AnnotationState.TRANSLATION
+                                {
+                                    annotationState =
+                                        if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
+                                        else AnnotationState.TRANSLATION
 
 //                                    viewModel.translation(paragraph.text)
 //                                    viewModel.translateTest(context, paragraph.text)
 //                                    translate(context)
-                                    })
+                                }
 
                                 // do not work
 //                            val contentText by remember {
@@ -578,44 +687,46 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 val wordIconState by remember {
                                     derivedStateOf { contentText.isNotBlank() || viewModel.wordListTable[paragraphIndex].isNotEmpty() }
                                 }
-                                ClickableIcon(painter = painterResource(id = R.drawable.word),
+                                ClickableIcon(
+                                    painter = painterResource(id = R.drawable.word),
                                     enabled = wordIconState,
-                                    modifier = Modifier.focusable(),
-                                    onClick = {
+                                    modifier = Modifier.focusable()
+                                ) {
 
-                                        // 清除上一次選重的單字
-                                        viewModel.noCurrentWord()
+                                    // 清除上一次選重的單字
+                                    viewModel.noCurrentWord()
 
-                                        // 1.檢測是否選取單字
+                                    // 1.檢測是否選取單字
 //                                    val contentText = paragraphContent.getSelectedText().text
-                                        annotationState = if (contentText.isNotBlank()) {
+                                    annotationState = if (contentText.isNotBlank()) {
 
 //                                        viewModel.curr
 
-                                            viewModel.addWordListTable(contentText, paragraphIndex)
+                                        viewModel.addWordListTable(contentText, paragraphIndex)
 
-                                            viewModel.currentContent[paragraphIndex] =
-                                                viewModel.currentContent[paragraphIndex].copy(
-                                                    selection = TextRange.Zero
-                                                )
+                                        viewModel.currentContent[paragraphIndex] =
+                                            viewModel.currentContent[paragraphIndex].copy(
+                                                selection = TextRange.Zero
+                                            )
 
 //                                        wordTranslate(context, contentText)
 
 
-                                            // 2.translate並且開啟annotation欄位
+                                        // 2.translate並且開啟annotation欄位
 
-                                            AnnotationState.WORDS
-                                        } else {
-                                            // 3.檢測開啟狀態，決定開關annotation欄位
-                                            if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
-                                            else AnnotationState.WORDS
-                                        }
-                                    })
+                                        AnnotationState.WORDS
+                                    } else {
+                                        // 3.檢測開啟狀態，決定開關annotation欄位
+                                        if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
+                                        else AnnotationState.WORDS
+                                    }
+                                }
                                 AnimatedContent(targetState = openState) {
-                                    ClickableIcon(painter = painterResource(id = getRid(it)),
-                                        onClick = {
-                                            openState = !openState
-                                        })
+                                    ClickableIcon(
+                                        painter = painterResource(id = getRid(it))
+                                    ) {
+                                        openState = !openState
+                                    }
                                 }
                             }
 
@@ -812,9 +923,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 .drawBehind { drawRect(getColor()) }
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .height(WindowInsets.statusBars
-                    .asPaddingValues()
-                    .calculateTopPadding())
+                .height(
+                    WindowInsets.statusBars
+                        .asPaddingValues()
+                        .calculateTopPadding()
+                )
             )
         }
 
