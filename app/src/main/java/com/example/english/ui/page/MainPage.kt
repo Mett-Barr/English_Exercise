@@ -40,6 +40,7 @@ import com.example.english.data.newslist.room.News
 import com.example.english.ui.components.Movement
 import com.example.english.ui.navigation.MainRoute
 import com.example.english.ui.page.Obj.colorTop
+import com.example.english.ui.theme.CardContainerDark
 import com.example.english.ui.theme.Typography
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.coroutineScope
@@ -140,7 +141,8 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 //                    viewModel.addBBCNews(BUG_URL, context)
 
                             viewModel.draftTitle = TextFieldValue("Title")
-                            viewModel.draftContent = TextFieldValue("This is a test content. zqwe asd zxc")
+                            viewModel.draftContent =
+                                TextFieldValue("This is a test content. zqwe asd zxc")
                             viewModel.addNews(context)
 
                             fabIsOpening = !fabIsOpening
@@ -323,38 +325,46 @@ fun NewsCard(
         bitmap = ImageOperator().getImage(news.id.toString(), context)
     }
 
-    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
+//    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
 
-        Card(
-            modifier = Modifier
-                .alpha(alpha)
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .clip(RoundedCornerShape(16.dp))
-                .clickable(!isDownloading) {
-                    viewModel.currentNews(news, context)
-                    viewModel.currentImage = bitmap
-                    navigation.invoke()
-                }
+    val elevationOverlay = LocalElevationOverlay.current
+    val absoluteElevation = LocalAbsoluteElevation.current + 24.dp
+    val background = elevationOverlay!!.apply(MaterialTheme.colors.surface, absoluteElevation)
+
+    Card(
+        elevation = absoluteElevation,
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+//            .aspectRatio(4f / 3f)
+//            .clickable(!isDownloading) {
+//                viewModel.currentNews(news, context)
+//                viewModel.currentImage = bitmap
+//                navigation.invoke()
+//            },
+//            .alpha(alpha),
 //            .background(MaterialTheme.colors.background)
-        ) {
+
+        shape = RoundedCornerShape(16.dp),
+    ) {
 
 
-            /**  brush animation  */
+        /**  brush animation  */
 
-            val surfaceColorTransparent = MaterialTheme.colors.surface.copy(alpha = 0f)
-            val surfaceColorNoAlpha = MaterialTheme.colors.surface.copy(alpha = 0.8f)
+        val surfaceColorTransparent = MaterialTheme.colors.surface.copy(alpha = 0f)
+        val surfaceColorNoAlpha = MaterialTheme.colors.surface.copy(alpha = 0.8f)
 
-            val color by animateColorAsState(
-                targetValue = if (bitmap == null) surfaceColorTransparent else surfaceColorNoAlpha,
+        val color by animateColorAsState(
+            targetValue = if (bitmap == null) surfaceColorTransparent else surfaceColorNoAlpha,
 //                animationSpec = tween(800)
-            )
+        )
 
-            val brush by remember {
-                derivedStateOf {
-                    Brush.verticalGradient(listOf(surfaceColorTransparent, color))
-                }
+        val brush by remember {
+            derivedStateOf {
+                Brush.verticalGradient(listOf(surfaceColorTransparent, color))
             }
+        }
 
 //            val color by animateColorAsState(
 //                targetValue = if (bitmap == null) colorTop else colorBottom,
@@ -367,72 +377,115 @@ fun NewsCard(
 //                }
 //            }
 //
-            /**  --------------------  */
+        /**  --------------------  */
 
-            Box {
-                Crossfade(targetState = bitmap) {
-                    if (it != null) {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .aspectRatio(16f / 9f)
-                                .fillMaxWidth()
-                        )
-                    } else {
-                        Spacer(
-                            modifier = Modifier
-                                .aspectRatio(16f / 9f)
-                                .fillMaxWidth()
-                                .background(Color.DarkGray)
-                        )
-                    }
-                }
+        Box(modifier = Modifier.clickable(!isDownloading) {
+            viewModel.currentNews(news, context)
+            viewModel.currentImage = bitmap
+            navigation.invoke()
+        }) {
+//            Crossfade(targetState = bitmap) {
+//                if (it != null) {
+//                    Image(
+//                        bitmap = it.asImageBitmap(),
+//                        contentDescription = null,
+//                        modifier = Modifier
+//                            .aspectRatio(16f / 9f)
+//                            .fillMaxWidth()
+//                    )
+//                } else {
+//                    Spacer(
+//                        modifier = Modifier
+//                            .aspectRatio(16f / 9f)
+//                            .fillMaxWidth()
+//                            .background(MaterialTheme.colors.surface)
+//                    )
+//                }
+//            }
 
-                if (news.progress < 100) {
-                    Text(text = news.progress.toString() + "%",
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp))
-                } else {
-                    Icon(painter = painterResource(id = R.drawable.done_broad),
-                        contentDescription = "done",
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                            .size(24.dp))
-                }
+//            if (news.progress < 100) {
+//                Text(text = news.progress.toString() + "%",
+//                    modifier = Modifier
+//                        .align(Alignment.TopEnd)
+//                        .padding(8.dp))
+//            } else {
+//                Icon(painter = painterResource(id = R.drawable.done_broad),
+//                    contentDescription = "done",
+//                    modifier = Modifier
+//                        .align(Alignment.TopEnd)
+//                        .padding(8.dp)
+//                        .size(24.dp))
+//            }
 
-                Column(
-                    modifier = Modifier
-                        .drawBehind { drawRect(brush) }
+            Column(
+                modifier = Modifier
+                    .drawBehind { drawRect(brush) }
 //                        .background(brush = brush)
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .align(Alignment.BottomCenter)
-                ) {
-                    Text(
-                        text = news.title,
-//                        text = "${news.id}  $isDownloading",
-                        maxLines = 2,
-                        style = Typography.h5,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
-//                Text(text = news.caption, maxLines = 2, style = Typography.caption)
+                    .fillMaxWidth()
+//                    .padding(8.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+
+                Box {
+                    Crossfade(targetState = bitmap) {
+                        if (it != null) {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .aspectRatio(16f / 9f)
+                                    .fillMaxWidth()
+                            )
+                        } else {
+                            Spacer(
+                                modifier = Modifier
+                                    .aspectRatio(16f / 9f)
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colors.surface)
+                            )
+                        }
+                    }
+
+//                    Spacer(modifier = Modifier
+//                        .align(Alignment.BottomCenter)
+//                        .background(Brush.verticalGradient(listOf(Color.Transparent,
+//                            MaterialTheme.colors.surface)))
+//                        .fillMaxWidth()
+//                        .height(36.dp))
                 }
+
+                Text(
+                    text = news.title,
+//                        text = "${news.id}  $isDownloading",
+                    maxLines = 2,
+                    style = Typography.h5,
+                    modifier = Modifier
+//                        .padding(horizontal = 12.dp)
+//                        .padding(bottom = 12.dp)
+                        .background(background)
+//                        .background(MaterialTheme.colors.surface)
+//                        .background(CardContainerDark)
+                        .padding(12.dp)
+                        .fillMaxWidth()
+                )
+//                Text(text = news.caption, maxLines = 2, style = Typography.caption)
+            }
+
+            Crossfade(targetState = isDownloading) {
+                if (it) {
+//                    Movement()
+                } else {
+                    LaunchedEffect(key1 = Unit) {
+                        bitmap = ImageOperator().getImage(news.id.toString(), context)
+                    }
+//                    Movement()
+                }
+
             }
         }
 
-        Crossfade(targetState = isDownloading) {
-            if (it) {
-                Movement()
-            } else {
-                LaunchedEffect(key1 = Unit) {
-                    bitmap = ImageOperator().getImage(news.id.toString(), context)
-                }
-            }
-        }
     }
+//    }
 }
 
 object Obj {

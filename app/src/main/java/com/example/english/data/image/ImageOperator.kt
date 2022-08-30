@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.example.english.R
+import com.example.english.data.image.ImageObj.getDefaultImage
 
 const val IMAGE_NAME = "Image_"
 
@@ -34,9 +35,8 @@ class ImageOperator {
             BitmapFactory.decodeStream(fis)
         } catch (e: Exception) {
             Log.d("image file not found", "getImage: $newsId")
-            BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
-//            ImageObj.context = context
-//            ImageObj.defaultImage
+//            BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
+            getDefaultImage(context)
         }
 //        val path = context.getFileStreamPath(fileName)
     }
@@ -52,6 +52,11 @@ class ImageOperator {
 }
 
 object ImageObj {
-//    lateinit var context: Context
+    var image: Bitmap? = null
+    fun getDefaultImage(context: Context): Bitmap {
+        if (image == null) image = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
+        return image!!
+    }
+
 //    val defaultImage: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
 }

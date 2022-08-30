@@ -17,3 +17,7 @@ val ColorDone2 = Color(0xFF6CB1C2)
 
 
 const val TextBackgroundAlphaLight = 0.058f
+
+
+val CardContainerDark = Color(0xFF2A2B30)
+//val CardContainerDark = Color(0xFF2A2B30)
