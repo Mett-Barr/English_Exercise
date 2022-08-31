@@ -2,6 +2,7 @@ package com.example.english.ui.page
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
@@ -327,12 +328,17 @@ fun NewsCard(
 
 //    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
 
-    val elevationOverlay = LocalElevationOverlay.current
-    val absoluteElevation = LocalAbsoluteElevation.current + 24.dp
-    val background = elevationOverlay!!.apply(MaterialTheme.colors.surface, absoluteElevation)
+//    val elevationOverlay = LocalElevationOverlay.current
+//    Log.d("!! LocalElevationOverlay", LocalElevationOverlay.current.toString())
+
+//    val absoluteElevation = LocalAbsoluteElevation.current + 24.dp
+//    val background = { elevationOverlay!!.apply(MaterialTheme.colors.surface, absoluteElevation) }
+//    val background = elevationOverlay!!.apply(MaterialTheme.colors.surface, absoluteElevation)
 
     Card(
-        elevation = absoluteElevation,
+        elevation = 24.dp,
+//        elevation = absoluteElevation,
+//        backgroundColor = background,
 
         modifier = Modifier
             .fillMaxWidth()
@@ -419,7 +425,7 @@ fun NewsCard(
 
             Column(
                 modifier = Modifier
-                    .drawBehind { drawRect(brush) }
+//                    .drawBehind { drawRect(brush) }
 //                        .background(brush = brush)
                     .fillMaxWidth()
 //                    .padding(8.dp)
@@ -427,24 +433,33 @@ fun NewsCard(
             ) {
 
                 Box {
-                    Crossfade(targetState = bitmap) {
-                        if (it != null) {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .aspectRatio(16f / 9f)
-                                    .fillMaxWidth()
-                            )
-                        } else {
-                            Spacer(
-                                modifier = Modifier
-                                    .aspectRatio(16f / 9f)
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colors.surface)
-                            )
-                        }
+                    bitmap?.let {
+                        Image(
+                            bitmap = it.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .aspectRatio(16f / 9f)
+                                .fillMaxWidth()
+                        )
                     }
+//                    Crossfade(targetState = bitmap) {
+//                        if (it != null) {
+//                            Image(
+//                                bitmap = it.asImageBitmap(),
+//                                contentDescription = null,
+//                                modifier = Modifier
+//                                    .aspectRatio(16f / 9f)
+//                                    .fillMaxWidth()
+//                            )
+//                        } else {
+//                            Spacer(
+//                                modifier = Modifier
+//                                    .aspectRatio(16f / 9f)
+//                                    .fillMaxWidth()
+//                                    .background(MaterialTheme.colors.surface)
+//                            )
+//                        }
+//                    }
 
 //                    Spacer(modifier = Modifier
 //                        .align(Alignment.BottomCenter)
@@ -462,7 +477,9 @@ fun NewsCard(
                     modifier = Modifier
 //                        .padding(horizontal = 12.dp)
 //                        .padding(bottom = 12.dp)
-                        .background(background)
+
+//                        .background(background)
+
 //                        .background(MaterialTheme.colors.surface)
 //                        .background(CardContainerDark)
                         .padding(12.dp)
@@ -473,12 +490,11 @@ fun NewsCard(
 
             Crossfade(targetState = isDownloading) {
                 if (it) {
-//                    Movement()
+                    Movement()
                 } else {
                     LaunchedEffect(key1 = Unit) {
                         bitmap = ImageOperator().getImage(news.id.toString(), context)
                     }
-//                    Movement()
                 }
 
             }

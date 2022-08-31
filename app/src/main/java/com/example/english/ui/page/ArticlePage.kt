@@ -237,7 +237,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     val sizePx = with(LocalDensity.current) { 48.dp.toPx() }
     val anchors = mapOf(0f to 0, sizePx to 1)
 
-    val readMode by remember { derivedStateOf { swipeableState.targetValue } }
+    val readMode by remember { derivedStateOf { swipeableState.currentValue } }
     val animateModifier by remember { derivedStateOf { if (readMode == 0) Modifier else Modifier.animateContentSize() } }
 //    val transition = updateTransition(targetState = readMode, label = "readMode content alpha animation")
     val alphaAnimation by animateFloatAsState(targetValue = if (readMode == 0) 2f else 0f)

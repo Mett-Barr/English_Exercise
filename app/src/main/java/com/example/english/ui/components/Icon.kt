@@ -67,6 +67,7 @@ fun ClickableIcon(
     val clickModifier = if (onClick != null) {
         modifier
             .clickable(
+                enabled = enabled,
                 indication = rememberRipple(
                     bounded = false,
                     radius = 20.dp
