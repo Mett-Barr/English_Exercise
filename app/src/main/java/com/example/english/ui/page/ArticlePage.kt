@@ -276,6 +276,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             .fillMaxWidth()
                             .weight(1F)
                     )
+                    ClickableIcon(painter = painterResource(R.drawable.more_vert), enabled = true) {
+                        deleteArticleDialog = true
+                    }
+
                     ClickableIcon(painter = painterResource(R.drawable.delete), enabled = true) {
                         deleteArticleDialog = true
                     }
@@ -443,7 +447,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //            )
 
 
+        /** Scaffold content */
         Box {
+
+            /** image cover */
             Box(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -972,6 +979,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
             )
         }
 
+        
+        /** Popup info */
+        Column() {
+            
+        }
     }
 
     if (deleteParagraphDialog) {

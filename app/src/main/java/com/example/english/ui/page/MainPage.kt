@@ -67,8 +67,8 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 //                darkIcons = useDarkIcons
             )
             setStatusBarColor(
-//                color = Color.Transparent,
-                color = Color.Transparent.copy(alpha = 0.5F),
+                color = Color.Transparent,
+//                color = Color.Transparent.copy(alpha = 0.5F),
 //                darkIcons = useDarkIcons
             )
         }
