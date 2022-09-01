@@ -22,26 +22,26 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 
-@Composable
-fun ClickableIcon(
-    modifier: Modifier,
-    imageVector: ImageVector,
-    contentDescription: String? = null,
-    clickable: Boolean = true,
-    onClick: () -> Unit = {},
-) {
-    Icon(
-        imageVector = imageVector,
-        contentDescription = contentDescription,
-        modifier = Modifier
-            .padding(4.dp)
-            .clip(RoundedCornerShape(50))
-            .clickable(clickable) { onClick.invoke() }
-            .padding(8.dp)
-            .size(24.dp)
-            .then(modifier)
-    )
-}
+//@Composable
+//fun ClickableIcon(
+//    modifier: Modifier,
+//    imageVector: ImageVector,
+//    contentDescription: String? = null,
+//    clickable: Boolean = true,
+//    onClick: () -> Unit = {},
+//) {
+//    Icon(
+//        imageVector = imageVector,
+//        contentDescription = contentDescription,
+//        modifier = Modifier
+//            .padding(4.dp)
+//            .clip(RoundedCornerShape(50))
+//            .clickable(clickable) { onClick.invoke() }
+//            .padding(8.dp)
+//            .size(24.dp)
+//            .then(modifier)
+//    )
+//}
 
 @Composable
 fun ClickableIcon(
