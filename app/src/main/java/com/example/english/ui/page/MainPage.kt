@@ -2,7 +2,6 @@ package com.example.english.ui.page
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
@@ -28,6 +27,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -40,11 +40,8 @@ import com.example.english.data.image.ImageOperator
 import com.example.english.data.newslist.room.News
 import com.example.english.ui.components.Movement
 import com.example.english.ui.navigation.MainRoute
-import com.example.english.ui.page.Obj.colorTop
-import com.example.english.ui.theme.CardContainerDark
 import com.example.english.ui.theme.Typography
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun MainPage(viewModel: MainViewModel, navController: NavController) {
@@ -58,22 +55,22 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = MaterialTheme.colors.isLight
 
-    SideEffect {
-        // Update all of the system bar colors to be transparent, and use
-        // dark icons if we're in light theme
-        systemUiController.apply {
-            setNavigationBarColor(
-                color = Color.Transparent,
-//                darkIcons = useDarkIcons
-            )
-            setStatusBarColor(
-                color = Color.Transparent,
-//                color = Color.Transparent.copy(alpha = 0.5F),
-//                darkIcons = useDarkIcons
-            )
-        }
-        // setStatusBarsColor() and setNavigationBarsColor() also exist
-    }
+//    SideEffect {
+//        // Update all of the system bar colors to be transparent, and use
+//        // dark icons if we're in light theme
+//        systemUiController.apply {
+//            setNavigationBarColor(
+//                color = Color.Transparent,
+////                darkIcons = useDarkIcons
+//            )
+//            setStatusBarColor(
+//                color = Color.Transparent,
+////                color = Color.Transparent.copy(alpha = 0.5F),
+////                darkIcons = useDarkIcons
+//            )
+//        }
+//        // setStatusBarsColor() and setNavigationBarsColor() also exist
+//    }
 
 
     /**     FAB animation      */
@@ -108,31 +105,43 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
     }
     /**      FAB animation      */
 
+    /** FAB mask */
+    val fabMaskAlpha by transition.animateColor(label = "spacerAlphaAnimation") {
+        if (it) MaterialTheme.colors.background.copy(alpha = 0.8f) else Color.Transparent
+    }
+
+
     // color init
     Obj.surfaceColor = MaterialTheme.colors.surface
 
     Scaffold(
         floatingActionButton = {
-            Box(modifier = Modifier
-                .padding(
-                    bottom = WindowInsets.systemBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                )
-                .width(IntrinsicSize.Max)) {
+            Box(
+                modifier = Modifier
+                    .padding(
+                        bottom = WindowInsets.systemBars
+                            .asPaddingValues()
+                            .calculateBottomPadding()
+                    )
+                    .width(IntrinsicSize.Max)
+            ) {
 
 
                 // Insert
-                Row(modifier = Modifier
-                    .alpha(fabAlphaAnimation)
-                    .fillMaxWidth()
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = fabPaddingAdd + 56.dp + 16.dp)) {
+                Row(
+                    modifier = Modifier
+                        .alpha(fabAlphaAnimation)
+                        .fillMaxWidth()
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = fabPaddingAdd + 56.dp + 16.dp)
+                ) {
 //                    .padding(bottom = 144.dp)) {
-                    Text(text = "測試", modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp)
-                        .align(Alignment.CenterVertically), textAlign = TextAlign.Left)
+                    Text(
+                        text = "測試", modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                            .align(Alignment.CenterVertically), textAlign = TextAlign.Left
+                    )
 //                    Spacer(modifier = Modifier.weight(1f))
                     FloatingActionButton(
                         modifier = Modifier.scale(fabScaleAnimation),
@@ -154,16 +163,20 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
 
                 // Insert
-                Row(modifier = Modifier
-                    .alpha(fabAlphaAnimation)
-                    .fillMaxWidth()
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = fabPaddingAdd)) {
+                Row(
+                    modifier = Modifier
+                        .alpha(fabAlphaAnimation)
+                        .fillMaxWidth()
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = fabPaddingAdd)
+                ) {
 //                    .padding(bottom = 144.dp)) {
-                    Text(text = "新增", modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp)
-                        .align(Alignment.CenterVertically), textAlign = TextAlign.Left)
+                    Text(
+                        text = "新增", modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                            .align(Alignment.CenterVertically), textAlign = TextAlign.Left
+                    )
 //                    Spacer(modifier = Modifier.weight(1f))
                     FloatingActionButton(
                         modifier = Modifier.scale(fabScaleAnimation),
@@ -179,16 +192,20 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
 
                 // BBC
-                Row(modifier = Modifier
-                    .alpha(fabAlphaAnimation)
-                    .fillMaxWidth()
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = fabPaddingBBC)) {
+                Row(
+                    modifier = Modifier
+                        .alpha(fabAlphaAnimation)
+                        .fillMaxWidth()
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = fabPaddingBBC)
+                ) {
 //                    .padding(bottom = 72.dp)) {
-                    Text(text = "BBC", modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp)
-                        .align(Alignment.CenterVertically), textAlign = TextAlign.Left)
+                    Text(
+                        text = "BBC", modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                            .align(Alignment.CenterVertically), textAlign = TextAlign.Left
+                    )
 //                    Spacer(modifier = Modifier.weight(1f))
                     FloatingActionButton(
                         modifier = Modifier.scale(fabScaleAnimation), backgroundColor = Color.White,
@@ -199,23 +216,29 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 //                            viewModel.addBBCNews(BUG_URL, context)
 //                            fabIsOpening = !fabIsOpening
                         }) {
-                        Icon(painter = painterResource(id = R.drawable.bbc),
+                        Icon(
+                            painter = painterResource(id = R.drawable.bbc),
                             contentDescription = "add",
 //                        modifier = Modifier.size(24.dp),
-                            tint = Color.Black)
+                            tint = Color.Black
+                        )
                     }
                 }
 
 
 
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomEnd)) {
-                    Text(text = "取消", modifier = Modifier
-                        .alpha(fabAlphaAnimation)
-                        .weight(1f)
-                        .padding(end = 8.dp)
-                        .align(Alignment.CenterVertically), textAlign = TextAlign.Left)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomEnd)
+                ) {
+                    Text(
+                        text = "取消", modifier = Modifier
+                            .alpha(fabAlphaAnimation)
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                            .align(Alignment.CenterVertically), textAlign = TextAlign.Left
+                    )
 //                    Spacer(modifier = Modifier.weight(1f))
                     FloatingActionButton(
                         modifier = Modifier,
@@ -226,10 +249,12 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 //                    viewModel.addBBCNews(BUG_URL, context)
                             fabIsOpening = !fabIsOpening
                         }) {
-                        Icon(imageVector = Icons.Rounded.Add,
+                        Icon(
+                            imageVector = Icons.Rounded.Add,
                             contentDescription = "add",
                             modifier = Modifier.rotate(fabRotateAnimation),
-                            tint = Color.Black)
+                            tint = Color.Black
+                        )
                     }
                 }
             }
@@ -238,6 +263,29 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
     ) {
 
 //        val state = rememberLazyListState()
+
+
+        val lazyListState = rememberLazyListState()
+        val statusBarHeight = with(LocalDensity.current) {
+            WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx() * 2
+        }
+
+        val statusBarAlpha by remember {
+            derivedStateOf {
+                val alpha = if (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset <= statusBarHeight * 2) {
+                    lazyListState.firstVisibleItemScrollOffset / (statusBarHeight * 2) / 5 * 4
+                } else 0.8f
+                if (fabMaskAlpha.alpha > 0) {
+                    if (fabMaskAlpha.alpha > alpha) 0f
+                    else alpha - fabMaskAlpha.alpha
+                } else alpha
+            }
+        }
+
+        val backgroundColor = MaterialTheme.colors.background
+        fun getColor(): Color {
+            return backgroundColor.copy(alpha = statusBarAlpha)
+        }
 
         LazyColumn(
             modifier = Modifier
@@ -252,6 +300,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 //            reverseLayout = true,
 //            state = state,
             verticalArrangement = Arrangement.spacedBy(16.dp),
+            state = lazyListState
         ) {
             items(list) {
                 NewsCard(
@@ -263,19 +312,34 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
             }
         }
 
+        /** StatusBar mask */
+        Spacer(modifier = Modifier
+            .drawBehind { drawRect(getColor()) }
+//            .align(Alignment.TopCenter)
+            .fillMaxWidth()
+            .height(
+                WindowInsets.statusBars
+                    .asPaddingValues()
+                    .calculateTopPadding()
+            ))
+
+
         val modifier = if (fabIsOpening) Modifier.clickable(indication = null,
             interactionSource = remember { MutableInteractionSource() }) {
             fabIsOpening = false
         } else Modifier
 
 
-        val spacerAlphaAnimation by transition.animateColor(label = "spacerAlphaAnimation") {
-            if (it) Color.Black.copy(alpha = ContentAlpha.disabled) else Color.Transparent
-        }
+        /** FAB mask */
+//        val spacerAlphaAnimation by transition.animateColor(label = "spacerAlphaAnimation") {
+//            if (it) MaterialTheme.colors.background.copy(alpha = 0.9f) else Color.Transparent
+//        }
 
-        Spacer(modifier = modifier
-            .fillMaxSize()
-            .background(spacerAlphaAnimation))
+        Spacer(
+            modifier = modifier
+                .fillMaxSize()
+                .background(fabMaskAlpha)
+        )
 //            .background(if (fabIsOpening) Color.Black.copy(alpha = ContentAlpha.disabled) else Color.Transparent))
 
 

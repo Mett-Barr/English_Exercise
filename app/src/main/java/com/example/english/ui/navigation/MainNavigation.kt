@@ -33,25 +33,25 @@ fun MainNavigation(viewModel: MainViewModel) {
 
     val navController = rememberNavController()
 
-//    val systemUiController = rememberSystemUiController()
-//    val useDarkIcons = MaterialTheme.colors.isLight
-//
-//    SideEffect {
-//        // Update all of the system bar colors to be transparent, and use
-//        // dark icons if we're in light theme
-//        systemUiController.apply {
-//            setNavigationBarColor(
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
+
+    SideEffect {
+        // Update all of the system bar colors to be transparent, and use
+        // dark icons if we're in light theme
+        systemUiController.apply {
+            setNavigationBarColor(
+                color = Color.Transparent,
+//                darkIcons = useDarkIcons
+            )
+            setStatusBarColor(
 //                color = Color.Transparent,
-//                darkIcons = useDarkIcons
-//            )
-//            setStatusBarColor(
-////                color = Color.Transparent,
-//                color = Color.Transparent.copy(alpha = 0.5F),
-//                darkIcons = useDarkIcons
-//            )
-//        }
-//        // setStatusBarsColor() and setNavigationBarsColor() also exist
-//    }
+                color = Color.Transparent,
+                darkIcons = useDarkIcons
+            )
+        }
+        // setStatusBarsColor() and setNavigationBarsColor() also exist
+    }
 
     NavHost(
         navController = navController,

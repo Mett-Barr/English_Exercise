@@ -88,8 +88,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
     // Popup Info
     var infoCardIsOpening by remember { mutableStateOf(false) }
-    val maskColor by animateColorAsState(targetValue = if (infoCardIsOpening) Color.Black.copy(
-        alpha = 0.5f) else Color.Transparent)
+    val maskColor by animateColorAsState(targetValue = if (infoCardIsOpening) MaterialTheme.colors.background.copy(
+        alpha = 0.8f) else Color.Transparent)
 
 
     // system bar
@@ -98,10 +98,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
     val lazyListState = rememberLazyListState()
 
-    val systemUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colors.isLight
+//    val systemUiController = rememberSystemUiController()
+//    val useDarkIcons = MaterialTheme.colors.isLight
 
-    systemUiController.setStatusBarColor(color = Color.Transparent)
+//    systemUiController.setStatusBarColor(color = Color.Transparent)
 
     val statusBarHeight = with(LocalDensity.current) {
         WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx() * 2
@@ -111,9 +111,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
     val statusBarAlpha by remember {
         derivedStateOf {
-            val alpha = if (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset <= statusBarHeight) {
-                lazyListState.firstVisibleItemScrollOffset / statusBarHeight / 2
-            } else 0.5f
+            val alpha = if (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset <= statusBarHeight * 2) {
+                lazyListState.firstVisibleItemScrollOffset / (statusBarHeight * 2) / 5 * 4
+            } else 0.8f
             if (maskColor.alpha > 0) {
                 if (maskColor.alpha > alpha) 0f
                 else alpha - maskColor.alpha
@@ -126,8 +126,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         }
     }
 
+    val backgroundColor = MaterialTheme.colors.background
     fun getColor(): Color {
-        return Color.Transparent.copy(alpha = statusBarAlpha)
+        return backgroundColor.copy(alpha = statusBarAlpha)
     }
 
     val color = remember { Animatable(getColor()) }
@@ -150,19 +151,19 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //    val animatedStatusBarColor by animateColorAsState(targetValue = if (boolean) Color.Transparent else Color.Transparent.copy(0.5f))
 
 //    boolean = true
-    systemUiController.apply {
-        setNavigationBarColor(
-            color = Color.Transparent,
-//            darkIcons = useDarkIcons
-        )
-        setStatusBarColor(
-//            color = animatedStatusBarColor,
-            color = Color.Transparent,
-//            color = getColor(),
-//            color = Color.Transparent.copy(alpha = statusBarAlpha),
-//            darkIcons = useDarkIcons
-        )
-    }
+//    systemUiController.apply {
+//        setNavigationBarColor(
+//            color = Color.Transparent,
+////            darkIcons = useDarkIcons
+//        )
+//        setStatusBarColor(
+////            color = animatedStatusBarColor,
+//            color = Color.Transparent,
+////            color = getColor(),
+////            color = Color.Transparent.copy(alpha = statusBarAlpha),
+////            darkIcons = useDarkIcons
+//        )
+//    }
 
 
     // setStatusBarsColor() and setNavigationBarsColor() also exist
@@ -291,7 +292,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 ) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                         ClickableIcon(painter = painterResource(R.drawable.back)) {
-                            dispatcher.onBackPressed()
+//                            dispatcher.onBackPressed()
+                            popBack()
                         }
                     }
                     Spacer(
@@ -504,7 +506,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 LazyColumn(
                     contentPadding = PaddingValues(bottom =
 //                    WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() +
-                    paddingValues.calculateBottomPadding()
+                    paddingValues.calculateBottomPadding() + 4.dp
 //                                    - 8.dp,
                     ),
                     state = lazyListState,
@@ -965,15 +967,14 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 .drawBehind { drawRect(getColor()) }
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .height(
-                    WindowInsets.statusBars
-                        .asPaddingValues()
-                        .calculateTopPadding()
-                ))
+                .height(WindowInsets.statusBars.asPaddingValues().calculateTopPadding()))
 
 
             /** Popup info */
-            AnimatedVisibility(visible = infoCardIsOpening,
+            AnimatedVisibility(
+                visible = infoCardIsOpening,
+                enter = scaleIn() + fadeIn() + slideIn { fullSize -> IntOffset(0, fullSize.height / 5 * 2) },
+                exit = scaleOut() + fadeOut() + slideOut { fullSize -> IntOffset(0, fullSize.height / 5 * 2) },
                 modifier = Modifier
                     .padding(bottom = paddingValues.calculateBottomPadding())
                     .align(Alignment.BottomCenter)) {
