@@ -12,6 +12,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.english.network.JsoupNews
 import com.example.english.translation.BUG_URL
 import com.example.english.ui.components.Loader
 import com.example.english.ui.components.Movement
@@ -19,6 +21,8 @@ import com.example.english.ui.components.SegmentedControls
 import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.theme.EnglishTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -55,6 +59,13 @@ class MainActivity : ComponentActivity() {
 //                    WebViewTest()
                 }
             }
+        }
+
+        // getTime Test
+        lifecycleScope.launch(Dispatchers.IO) {
+            val jsoupNews = JsoupNews("https://www.bbc.com/news/uk-62766917")
+            val str = jsoupNews.getTime()
+            Log.d("!!! get time", str)
         }
 
         // add news by url

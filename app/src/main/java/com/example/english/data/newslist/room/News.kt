@@ -12,8 +12,11 @@ data class News(
     @ColumnInfo(name = "news_title")
     var title: String = "No Title",
 
-    @ColumnInfo(name = "news_caption")
-    var caption: String = "No caption",
+//    @ColumnInfo(name = "news_caption")
+//    var caption: String = "No caption",
+
+    @ColumnInfo(name = "source")
+    var source: String = "",
 
     @ColumnInfo(name = "tag")
     var tag: String = "",
@@ -33,8 +36,8 @@ data class News(
 
 
     // date
-//@ColumInfo(name = "start")
-//val start: String
+    @ColumnInfo(name = "date")
+    val date: String = "",
 
 //@ColumnInfo(name = "end")
 //var end = ""

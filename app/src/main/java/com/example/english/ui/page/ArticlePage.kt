@@ -978,7 +978,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 modifier = Modifier
                     .padding(bottom = paddingValues.calculateBottomPadding())
                     .align(Alignment.BottomCenter)) {
-                PopupInfo()
+                PopupInfo(viewModel.currentNews)
 //                PopupInfo(modifier = Modifier
 //                    .padding(bottom = paddingValues.calculateBottomPadding())
 //                    .align(Alignment.BottomCenter))

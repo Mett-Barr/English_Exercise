@@ -54,7 +54,7 @@ class MainViewModel @Inject constructor(
 
 
     /** current news */
-    private var currentNews by mutableStateOf(News())
+    var currentNews by mutableStateOf(News())
     private var currentNewsId by mutableStateOf("0")
     private var currentNewsSize by mutableStateOf(0)
 
@@ -135,8 +135,8 @@ class MainViewModel @Inject constructor(
     private suspend fun suspendAddNews(context: Context) {
 
         // Room
-        val caption = draftContent.text.split("\n")[0]
-        val newsId = repository.addNews(News(0, draftTitle.text, caption))
+//        val caption = draftContent.text.split("\n")[0]
+        val newsId = repository.addNews(News(title = draftTitle.text, ))
 
         // downloading state
         isDownloading.add(newsId.toInt())
@@ -335,8 +335,11 @@ class MainViewModel @Inject constructor(
             val title = jsoupNews.getTitle()
             val content = jsoupNews.getContent()
 
+            // date
+            val date = jsoupNews.getTime()
+
             val caption = content.split("\n")[0]
-            val newsId = addUrlNews(context, title, content)
+            val newsId = addUrlNews(context, title, content, date = date)
 //            isDownloading.add(newsId.toInt())
 
             // get Image
@@ -351,11 +354,12 @@ class MainViewModel @Inject constructor(
         title: String,
 //        caption: String,
         content: String,
+        date: String
     ): String {
 
 //         Room
 //        val caption = draftContent.text.split("\n")[0]
-        val newsId = repository.addNews(News(title = title))
+        val newsId = repository.addNews(News(title = title, date = date, source = "BBC News"))
         isDownloading.add(newsId.toInt())
 
         // add file

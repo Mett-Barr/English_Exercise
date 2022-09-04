@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.english.MainViewModel
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 
 const val BBC_TITLE = "main-heading"
 const val BBC_PARAGRAPH = ""
@@ -12,10 +14,20 @@ const val BBC_COVER = "div.ssrcss-vk3nhx-ComponentWrapper ep2nwvo1"
 
 class JsoupNews(url: String) {
 
+//    private val html: Document
+//    init {
+//        html = Jsoup.connect(url).get()
+//    }
+
     private val html = Jsoup.connect(url).get()
+
+
 
     //    fun getTitle(): String = html.getElementById("main-heading")?.text() ?: ""
     fun getTitle(): String = html.getElementById(BBC_TITLE)?.text() ?: ""
+
+    fun getTime(): String = html.select("[data-testid='timestamp']").attr("datetime")
+//        .toString()
 
     fun getContent(): String {
         var content = ""

@@ -16,11 +16,12 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.english.R
+import com.example.english.data.newslist.room.News
 import com.example.english.ui.components.ClickableIcon
 
 //@Preview
 @Composable
-fun PopupInfo() {
+fun PopupInfo(news: News) {
     Card(
         elevation = 8.dp,
         shape = RoundedCornerShape(16.dp),
@@ -34,15 +35,19 @@ fun PopupInfo() {
                 Column(modifier = Modifier.padding(8.dp).width(intrinsicSize = IntrinsicSize.Max)) {
 
                     Column {
-                        InfoRow(tag = "   source", description = "BBC News")
+                        if (news.source.isNotBlank()) {
+                            InfoRow(tag = "   source", description = news.source)
+                            Divider(modifier = Modifier.padding(vertical = 4.dp))
+                        }
+                        InfoRow(tag = "   date", description = news.date)
                         Divider(modifier = Modifier.padding(vertical = 4.dp))
-                        InfoRow(tag = "   date", description = "2022/10/10")
-                        Divider(modifier = Modifier.padding(vertical = 4.dp))
-                        InfoRow(tag = "   tag", description = "Tech")
-                        Divider(modifier = Modifier.padding(vertical = 4.dp))
-                        InfoRow(tag = "   start", description = "2022/10/11")
-                        Divider(modifier = Modifier.padding(vertical = 4.dp))
-                        InfoRow(tag = "   progress", description = "50%")
+                        if (news.tag.isNotBlank()) {
+                            InfoRow(tag = "   tag", description = news.tag)
+                            Divider(modifier = Modifier.padding(vertical = 4.dp))
+                        }
+//                        InfoRow(tag = "   start", description = "2022/10/11")
+//                        Divider(modifier = Modifier.padding(vertical = 4.dp))
+                        InfoRow(tag = "   progress", description = "${news.progress}%")
                     }
 
 //                    Row {
