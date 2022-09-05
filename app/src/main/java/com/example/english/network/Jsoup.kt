@@ -7,6 +7,8 @@ import com.example.english.MainViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.text.SimpleDateFormat
+import java.util.*
 
 const val BBC_TITLE = "main-heading"
 const val BBC_PARAGRAPH = ""
@@ -22,11 +24,20 @@ class JsoupNews(url: String) {
     private val html = Jsoup.connect(url).get()
 
 
-
     //    fun getTitle(): String = html.getElementById("main-heading")?.text() ?: ""
     fun getTitle(): String = html.getElementById(BBC_TITLE)?.text() ?: ""
 
-    fun getTime(): String = html.select("[data-testid='timestamp']").attr("datetime")
+    fun getTime(): String {
+        val utc = html.select("[data-testid='timestamp']").attr("datetime")
+        val utcFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
+        val simpleDateFormat = SimpleDateFormat("yyyy/MM/dd",
+            Locale.getDefault())
+//            .apply { timeZone = TimeZone.getTimeZone("UTC") }
+        val date = utcFormat.parse(utc)?.let { simpleDateFormat.format(it) }
+        return date ?: ""
+    }
 //        .toString()
 
     fun getContent(): String {

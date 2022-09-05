@@ -1,5 +1,6 @@
 package com.example.english.ui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
@@ -44,13 +45,52 @@ import androidx.compose.ui.unit.dp
 //}
 
 @Composable
+fun SelectableIcon(
+    modifier: Modifier = Modifier,
+    painter: Painter,
+    contentDescription: String? = null,
+    enabled: Boolean = true,
+    isSelected: Boolean = true,
+    normalColor: Color = LocalContentColor.current.copy(alpha = ContentAlpha.high),
+    selectedColor: Color = LocalContentColor.current.copy(alpha = ContentAlpha.high),
+//    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+    onClick: (() -> Unit)? = null,
+) {
+    val contentAlpha by animateFloatAsState(if (enabled) ContentAlpha.high else ContentAlpha.disabled)
+
+    val tint by animateColorAsState(targetValue = if (enabled && isSelected) selectedColor else normalColor)
+
+    val clickModifier = if (onClick != null) {
+        modifier
+            .clickable(
+                enabled = enabled,
+                indication = rememberRipple(
+                    bounded = false,
+                    radius = 20.dp
+                ),
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick.invoke() }
+    } else modifier
+
+    Icon(
+        painter = painter,
+        contentDescription = contentDescription,
+        modifier = clickModifier
+            .alpha(contentAlpha)
+
+            .padding(12.dp)
+            .size(24.dp),
+        tint = tint
+    )
+}
+
+@Composable
 fun ClickableIcon(
     modifier: Modifier = Modifier,
     painter: Painter,
     contentDescription: String? = null,
     enabled: Boolean = true,
     tint: Color = LocalContentColor.current.copy(alpha = ContentAlpha.high),
-//    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
     onClick: (() -> Unit)? = null,
 ) {
     val contentAlpha by animateFloatAsState(if (enabled) ContentAlpha.high else ContentAlpha.disabled)
@@ -94,21 +134,3 @@ fun ClickableIcon(
     )
 }
 
-@Composable
-fun CustomIconButton(
-    modifier: Modifier = Modifier,
-    painter: Painter,
-    contentDescription: String? = null,
-    enabled: Boolean = true,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
-    onClick: () -> Unit = {},
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = modifier,
-        enabled = enabled,
-
-        ) {
-
-    }
-}

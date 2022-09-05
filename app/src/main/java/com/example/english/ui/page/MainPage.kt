@@ -2,6 +2,7 @@ package com.example.english.ui.page
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -40,6 +42,7 @@ import com.example.english.data.image.ImageOperator
 import com.example.english.data.newslist.room.News
 import com.example.english.ui.components.Movement
 import com.example.english.ui.navigation.MainRoute
+import com.example.english.ui.theme.ColorDone
 import com.example.english.ui.theme.Typography
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -416,7 +419,7 @@ fun NewsCard(
 //            .alpha(alpha),
 //            .background(MaterialTheme.colors.background)
 
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(24.dp),
     ) {
 
 
@@ -479,13 +482,8 @@ fun NewsCard(
 //                        .align(Alignment.TopEnd)
 //                        .padding(8.dp))
 //            } else {
-//                Icon(painter = painterResource(id = R.drawable.done_broad),
-//                    contentDescription = "done",
-//                    modifier = Modifier
-//                        .align(Alignment.TopEnd)
-//                        .padding(8.dp)
-//                        .size(24.dp))
-//            }
+
+            Log.d("!!!", (news.progress == 100).toString())
 
             Column(
                 modifier = Modifier
@@ -533,6 +531,24 @@ fun NewsCard(
 //                        .height(36.dp))
                 }
 
+                Spacer(modifier = Modifier.height(6.dp))
+
+                val caption =
+                    if (news.date.isNotBlank() && news.tag.isNotBlank()) news.date + " • " + news.tag
+                    else if (news.date.isNotBlank()) news.date
+                    else if (news.tag.isNotBlank()) news.tag
+                    else ""
+
+                if (caption.isNotBlank()) {
+                    Text(text = news.date + " • " + news.tag,
+                        style = Typography.body2,
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp)
+                            .padding(bottom = 6.dp)
+                            .fillMaxWidth()
+                    )
+                }
+
                 Text(
                     text = news.title,
 //                        text = "${news.id}  $isDownloading",
@@ -546,11 +562,26 @@ fun NewsCard(
 
 //                        .background(MaterialTheme.colors.surface)
 //                        .background(CardContainerDark)
-                        .padding(12.dp)
+                        .padding(horizontal = 12.dp)
+                        .padding(bottom = 12.dp)
                         .fillMaxWidth()
                 )
 //                Text(text = news.caption, maxLines = 2, style = Typography.caption)
             }
+
+            if (news.progress == 100) {
+                Icon(painter = painterResource(id = R.drawable.done_broad),
+                    contentDescription = "done",
+                    tint = ColorDone,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(10.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colors.surface.copy(alpha = 0.5f))
+                        .padding(6.dp)
+                        .size(24.dp))
+            }
+
 
             Crossfade(targetState = isDownloading) {
                 if (it) {

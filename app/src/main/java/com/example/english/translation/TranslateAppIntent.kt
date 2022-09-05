@@ -44,9 +44,10 @@ fun wordTranslate(context: Context, text: String) {
         val intent = Intent()
         intent.action = Intent.ACTION_SEND
 //        intent.action = Intent.ACTION_SEND
-        intent.putExtra(Intent.EXTRA_TEXT, "hello")
-        intent.putExtra("key_text_input", text)
-        intent.putExtra("key_text_output", "")
+        intent.putExtra(Intent.EXTRA_TEXT, text)
+//        intent.putExtra(Intent.EXTRA_TEXT, "hello")
+//        intent.putExtra("key_text_input", text)
+//        intent.putExtra("key_text_output", "")
 //        intent.putExtra("key_language_from", "en")
 //        intent.putExtra("key_language_to", "mal")
 //        intent.putExtra("key_suggest_translation", "")

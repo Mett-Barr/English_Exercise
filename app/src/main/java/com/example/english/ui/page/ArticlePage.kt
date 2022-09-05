@@ -43,6 +43,7 @@ import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
+import com.example.english.ui.components.SelectableIcon
 import com.example.english.ui.components.WordComponent
 import com.example.english.ui.components.test.PopupInfo
 import com.example.english.ui.theme.ColorDone
@@ -140,39 +141,20 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
         }
     }
 
-//    val
-
-//    SideEffect {
-    // Update all of the system bar colors to be transparent, and use
-    // dark icons if we're in light theme
-
-    var boolean by remember { mutableStateOf(false) }
-
-//    val animatedStatusBarColor by animateColorAsState(targetValue = if (boolean) Color.Transparent else Color.Transparent.copy(0.5f))
-
-//    boolean = true
-//    systemUiController.apply {
-//        setNavigationBarColor(
-//            color = Color.Transparent,
-////            darkIcons = useDarkIcons
-//        )
-//        setStatusBarColor(
-////            color = animatedStatusBarColor,
-//            color = Color.Transparent,
-////            color = getColor(),
-////            color = Color.Transparent.copy(alpha = statusBarAlpha),
-////            darkIcons = useDarkIcons
-//        )
-//    }
 
 
-    // setStatusBarsColor() and setNavigationBarsColor() also exist
-//    }
+    // data
+    val progress by remember {
+        derivedStateOf {
+            var done = 0
+            viewModel.currentContent.forEach { if (it.text.first() == '^') done++ }
 
-//    LaunchedEffect(key1 = Unit) {
-//        systemUiController.setStatusBarColor(color = Color.Transparent.copy(alpha = statusBarAlpha),
-//            darkIcons = useDarkIcons)
-//    }
+            val progress = (done * 100 / viewModel.currentContent.size)
+
+            progress
+        }
+    }
+
 
 
 //    val focusRequester = remember { FocusRequester() }
@@ -301,7 +283,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             .fillMaxWidth()
                             .weight(1F)
                     )
-                    ClickableIcon(painter = painterResource(R.drawable.delete), enabled = true) {
+                    ClickableIcon(painter = painterResource(R.drawable.delete), enabled = true,
+                        tint = MaterialTheme.colors.error) {
                         deleteArticleDialog = true
                     }
 
@@ -663,7 +646,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         if (it) ColorDone else LocalContentColor.current
                                     }
                                     val doneAlpha by transition.animateFloat(label = "") {
-                                        if (it) LocalContentAlpha.current else 0.80f
+                                        if (it) 1f else 0.80f
                                     }
 //                            val doneColor by animateColorAsState(targetValue = if (isDone()) ColorDone else LocalContentColor.current)
                                     ClickableIcon(
@@ -687,8 +670,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         .focusable()
                                         .clickable { })
 
-                                    ClickableIcon(
-                                        painter = painterResource(id = R.drawable.translation)
+                                    SelectableIcon(
+                                        painter = painterResource(id = R.drawable.translation),
+                                        isSelected = annotationState == AnnotationState.TRANSLATION,
+                                        selectedColor = ColorDone,
+                                        normalColor = Color.White
                                     )
 //                                tint = color.value,
                                     {
@@ -713,9 +699,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                     val wordIconState by remember {
                                         derivedStateOf { contentText.isNotBlank() || viewModel.wordListTable[paragraphIndex].isNotEmpty() }
                                     }
-                                    ClickableIcon(
+                                    SelectableIcon(
                                         painter = painterResource(id = R.drawable.word),
                                         enabled = wordIconState,
+                                        isSelected = annotationState == AnnotationState.WORDS,
+                                        selectedColor = ColorDone,
                                         modifier = Modifier.focusable()
                                     ) {
 
@@ -967,7 +955,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 .drawBehind { drawRect(getColor()) }
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .height(WindowInsets.statusBars.asPaddingValues().calculateTopPadding()))
+                .height(WindowInsets.statusBars
+                    .asPaddingValues()
+                    .calculateTopPadding()))
 
 
             /** Popup info */
@@ -978,7 +968,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 modifier = Modifier
                     .padding(bottom = paddingValues.calculateBottomPadding())
                     .align(Alignment.BottomCenter)) {
-                PopupInfo(viewModel.currentNews)
+                PopupInfo(viewModel.currentNews, progress) { deleteArticleDialog = true }
 //                PopupInfo(modifier = Modifier
 //                    .padding(bottom = paddingValues.calculateBottomPadding())
 //                    .align(Alignment.BottomCenter))
