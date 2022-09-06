@@ -33,7 +33,7 @@ fun PopupInfo(news: News, progress: Int, delete: () -> Unit) {
 
 //            Box(modifier = Modifier.padding(8.dp)) {
             Column(modifier = Modifier
-                .padding(8.dp)
+                .padding(horizontal = 8.dp).padding(top = 8.dp)
                 .width(intrinsicSize = IntrinsicSize.Max)) {
 
 //                Column {
@@ -70,31 +70,30 @@ fun PopupInfo(news: News, progress: Int, delete: () -> Unit) {
                         }
                         Text("   progress    ")
                         ClickableIcon(painter = painterResource(R.drawable.delete),
-                            tint = MaterialTheme.colors.error)
+                            tint = MaterialTheme.colors.error) { delete() }
 
                     }
                     Column(modifier = Modifier.width(intrinsicSize = IntrinsicSize.Max)) {
 //                    Column(modifier = Modifier.weight(2f)) {
                         if (news.source.isNotBlank()) {
-                            Text(news.source)
+                            Text(news.source + "   ")
                             Divider(modifier = Modifier.padding(vertical = 4.dp))
                         }
-                        Text(news.date)
+                        Text(news.date + "   ")
                         Divider(modifier = Modifier.padding(vertical = 4.dp))
 
                         if (news.tag.isNotBlank()) {
-                            Text("Tech")
+                            Text("Tech   ")
                             Divider(modifier = Modifier.padding(vertical = 4.dp))
                         }
-                        Text("${progress}%")
+                        Text("${progress}%   ")
                         if (news.source.isNotBlank()) {
-                            Row {
-                                ClickableIcon(painter = painterResource(R.drawable.link))
-                                ClickableIcon(painter = painterResource(R.drawable.share))
-                                ClickableIcon(painter = painterResource(R.drawable.website))
+                            Row(modifier = Modifier.align(Alignment.End)) {
+                                ClickableIcon(painter = painterResource(R.drawable.website), enabled = false)
+                                ClickableIcon(painter = painterResource(R.drawable.share), enabled = false)
+                                ClickableIcon(painter = painterResource(R.drawable.link), enabled = false)
                             }
                         }
-
                     }
                 }
 //        Text("2022/10/10  Tech")

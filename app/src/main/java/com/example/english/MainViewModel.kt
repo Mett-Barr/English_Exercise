@@ -58,8 +58,6 @@ class MainViewModel @Inject constructor(
     private var currentNewsId by mutableStateOf("0")
     private var currentNewsSize by mutableStateOf(0)
 
-//    var currentProgress by mutableStateOf(0)
-
     var currentImage by mutableStateOf<Bitmap?>(null)
     var currentTitle by mutableStateOf("Title")
 
@@ -71,6 +69,35 @@ class MainViewModel @Inject constructor(
         mutableStateListOf(emptyList<Int>().toMutableStateList())
 
     var currentWord by mutableStateOf<String?>(null)
+
+    //    var currentProgress by mutableStateOf(0)
+    val allDoneList = mutableStateListOf<Int>()
+
+    fun allDone() {
+        viewModelScope.launch {
+            currentContent.forEachIndexed { index, textFieldValue ->
+                if (textFieldValue.text.first() != '^') {
+                    allDoneList.add(index)
+                }
+            }
+            allDoneList.forEach {
+                changeDoneState(it)
+            }
+        }
+    }
+
+    fun undoAllDone() {
+        viewModelScope.launch {
+            allDoneList.forEach {
+                if (currentContent[it].text.isDone()) {
+                    changeDoneState(it)
+                }
+            }
+            allDoneList.clear()
+        }
+    }
+
+
 
     private fun wordExistCheck(word: String, index: Int) {
         viewModelScope.launch {
@@ -382,4 +409,9 @@ class MainViewModel @Inject constructor(
 
 enum class NewsWebsite(val url: String) {
     BBC("https://www.bbc.com/news")
+}
+
+// Tool
+fun String.isDone(): Boolean {
+    return this.first() == '^'
 }

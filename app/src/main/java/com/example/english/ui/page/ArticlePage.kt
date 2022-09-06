@@ -41,6 +41,7 @@ import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
+import com.example.english.isDone
 import com.example.english.ui.components.ClickableIcon
 import com.example.english.ui.components.FlatTextField
 import com.example.english.ui.components.SelectableIcon
@@ -90,7 +91,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
     // Popup Info
     var infoCardIsOpening by remember { mutableStateOf(false) }
     val maskColor by animateColorAsState(targetValue = if (infoCardIsOpening) MaterialTheme.colors.background.copy(
-        alpha = 0.8f) else Color.Transparent)
+        alpha = 0.8f) else Color.Transparent, animationSpec = tween(300))
 
 
     // system bar
@@ -144,10 +145,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
 
     // data
-    val progress by remember {
+    val progress by remember(viewModel.currentContent) {
         derivedStateOf {
             var done = 0
-            viewModel.currentContent.forEach { if (it.text.first() == '^') done++ }
+            viewModel.currentContent.forEach { if (it.text.isDone()) done++ }
 
             val progress = (done * 100 / viewModel.currentContent.size)
 
@@ -270,6 +271,8 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 //                    .wrapContentHeight()
 //                    .height(64.dp + naviBarPadding)
 //                    .padding(bottom = naviBarPadding)
+                        .padding(4.dp)
+//                        .padding(horizontal = 4.dp)
                         .align(Alignment.CenterVertically)
                 ) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
@@ -283,10 +286,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             .fillMaxWidth()
                             .weight(1F)
                     )
-                    ClickableIcon(painter = painterResource(R.drawable.delete), enabled = true,
-                        tint = MaterialTheme.colors.error) {
-                        deleteArticleDialog = true
-                    }
+//                    ClickableIcon(painter = painterResource(R.drawable.delete), enabled = true,
+//                        tint = MaterialTheme.colors.error) {
+//                        deleteArticleDialog = true
+//                    }
 
                     ClickableIcon(painter = painterResource(R.drawable.info), enabled = true) {
 //                        deleteArticleDialog = true
@@ -395,7 +398,12 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                         }
                     }
 
-                    ClickableIcon(painter = painterResource(R.drawable.done_broad), enabled = false)
+                    ClickableIcon(painter = painterResource(R.drawable.done_broad)) {
+                        viewModel.apply {
+                            if (allDoneList.isEmpty()) allDone()
+                            else undoAllDone()
+                        }
+                    }
                 }
             }
         },
@@ -596,7 +604,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                             ) {
 
                                 FlatTextField(
-                                    value = if (paragraphContent.text.first() == '^') {
+                                    value = if (paragraphContent.text.isDone()) {
                                         paragraphContent.copy(
                                             text = paragraphContent.text.removeRange(
                                                 0,
@@ -632,7 +640,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
 
                                     fun isDone(): Boolean {
                                         return if (paragraphContent.text.isNotEmpty()) {
-                                            paragraphContent.text.first() == '^'
+                                            paragraphContent.text.isDone()
                                         } else false
                                     }
 
@@ -867,26 +875,24 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                                     WordComponent(
                                                         word = word,
                                                         onValueChange = {
-                                                            wordList[paragraphIndex].value =
-//                                                    wordList[index].value =
-                                                                word.value.copy(chinese = it)
+                                                            wordList[index].value = word.value.copy(chinese = it)
                                                         },
                                                         remove = {
                                                             Log.d(
                                                                 "!!",
-                                                                viewModel.wordListTable[paragraphIndex].toList()
+                                                                viewModel.wordListTable[index].toList()
                                                                     .toString() + index.toString()
                                                             )
 //                                                    Log.d("!!", viewModel.wordListTable[index].toList().toString())
-                                                            viewModel.wordListTable[paragraphIndex].remove(
+                                                            viewModel.wordListTable[index].remove(
                                                                 word.value.id
                                                             )
 //                                                    viewModel.wordListTable[index].remove(word.value.id)
-                                                            Log.d(
-                                                                "!!",
-                                                                viewModel.wordListTable[paragraphIndex].toList()
-                                                                    .toString()
-                                                            )
+//                                                            Log.d(
+//                                                                "!!",
+//                                                                viewModel.wordListTable[index].toList()
+//                                                                    .toString()
+//                                                            )
                                                         },
                                                         updateWord = { viewModel.updateWord(word.value) },
 //                                                updateChinese = {
@@ -947,7 +953,9 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 val maskModifier by remember { derivedStateOf { if (infoCardIsOpening) clickableModifier else Modifier } }
                 Spacer(modifier = maskModifier
                     .fillMaxSize()
-                    .background(maskColor))
+                    .drawBehind { drawRect(maskColor) }
+//                    .background(maskColor)
+                )
             }
 
             /** StatusBar mask */

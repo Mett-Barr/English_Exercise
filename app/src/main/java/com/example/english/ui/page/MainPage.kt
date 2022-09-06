@@ -533,14 +533,13 @@ fun NewsCard(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                val caption =
-                    if (news.date.isNotBlank() && news.tag.isNotBlank()) news.date + " • " + news.tag
-                    else if (news.date.isNotBlank()) news.date
-                    else if (news.tag.isNotBlank()) news.tag
-                    else ""
+
+                val dot = if (news.date.isNotBlank() && news.tag.isNotBlank()) " • " else ""
+
+                val caption = news.date + dot + news.tag
 
                 if (caption.isNotBlank()) {
-                    Text(text = news.date + " • " + news.tag,
+                    Text(text = caption,
                         style = Typography.body2,
                         modifier = Modifier
                             .padding(horizontal = 12.dp)
