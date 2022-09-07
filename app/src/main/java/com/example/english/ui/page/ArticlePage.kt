@@ -485,8 +485,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                 drawRect(
                                     surfaceColor,
                                     topLeft = Offset(x = 0f, y = scrollOffset),
-                                    size = Size(width = screenWidth.toPx(),
-                                        height = imageHeight.toPx())
+                                    size = Size(
+                                        width = screenWidth.toPx(),
+                                        height = imageHeight.toPx()
+                                    )
                                 )
                             }
                     )
@@ -804,6 +806,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                             }
 
 
+//                                            Log.d("!!!", "AnnotationState.WORDS: $paragraphIndex")
                                             // 測試中
                                             val wordList: SnapshotStateList<MutableState<Word>> =
                                                 list.map {
@@ -884,10 +887,10 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                                                     .toString() + index.toString()
                                                             )
 //                                                    Log.d("!!", viewModel.wordListTable[index].toList().toString())
-                                                            viewModel.wordListTable[index].remove(
-                                                                word.value.id
-                                                            )
-//                                                    viewModel.wordListTable[index].remove(word.value.id)
+//                                                            viewModel.wordListTable[index].remove(
+//                                                                word.value.id
+//                                                            )
+                                                    viewModel.wordListTable[paragraphIndex].remove(word.value.id)
 //                                                            Log.d(
 //                                                                "!!",
 //                                                                viewModel.wordListTable[index].toList()
@@ -963,9 +966,11 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                 .drawBehind { drawRect(getColor()) }
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .height(WindowInsets.statusBars
-                    .asPaddingValues()
-                    .calculateTopPadding()))
+                .height(
+                    WindowInsets.statusBars
+                        .asPaddingValues()
+                        .calculateTopPadding()
+                ))
 
 
             /** Popup info */
