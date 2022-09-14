@@ -2,6 +2,7 @@ package com.example.english.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -58,7 +59,17 @@ fun SelectableIcon(
 ) {
     val contentAlpha by animateFloatAsState(if (enabled) ContentAlpha.high else ContentAlpha.disabled)
 
-    val tint by animateColorAsState(targetValue = if (enabled && isSelected) selectedColor else normalColor)
+
+    val backgroundColor by animateColorAsState(targetValue = if (enabled && isSelected) selectedColor else Color.Transparent)
+
+//    val tint by animateColorAsState(
+//        targetValue = MaterialTheme.colors.contentColorFor(
+//            backgroundColor
+//        )
+//    )
+    val tint by animateColorAsState(targetValue = if (enabled && isSelected) Color.DarkGray else Color.White)
+//    val tint by animateColorAsState(targetValue = if (enabled && isSelected) selectedColor else normalColor)
+
 
     val clickModifier = if (onClick != null) {
         modifier
@@ -78,7 +89,11 @@ fun SelectableIcon(
         modifier = clickModifier
             .alpha(contentAlpha)
 
-            .padding(12.dp)
+            .padding(8.dp)
+            .clip(CircleShape)
+            .background(backgroundColor)
+            .padding(4.dp)
+//            .padding(12.dp)
             .size(24.dp),
         tint = tint
     )

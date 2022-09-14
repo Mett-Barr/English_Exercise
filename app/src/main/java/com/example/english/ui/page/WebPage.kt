@@ -119,14 +119,14 @@ fun WebPage(viewModel: MainViewModel, navController: NavController) {
 
 
     Scaffold(
-//        modifier = Modifier.padding(WindowInsets.systemBars.asPaddingValues()),
+        modifier = Modifier.padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()),
         bottomBar = {
             Row(
                 modifier = Modifier
                     .padding(WindowInsets.navigationBars.asPaddingValues())
                     .padding(8.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colors.surface.copy(alpha = 0.8f))
+                    .background(Color.Black.copy(alpha = 0.8f))
                     .padding(8.dp)
                     .height(IntrinsicSize.Min)
             ) {

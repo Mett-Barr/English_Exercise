@@ -1,22 +1,16 @@
 package com.example.english.ui.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.english.MainViewModel
 import com.example.english.ui.page.InsertPage
 import com.example.english.ui.page.MainPage
-import com.example.english.ui.page.NewsArticlePage
+import com.example.english.ui.page.ArticlePage
 import com.example.english.ui.page.WebPage
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -68,7 +62,7 @@ fun MainNavigation(viewModel: MainViewModel) {
 //            WebPage(viewModel)
         }
         composable(MainRoute.News.route) {
-            NewsArticlePage(
+            ArticlePage(
                 viewModel = viewModel,
                 viewModel.currentTitle,
                 navController = navController

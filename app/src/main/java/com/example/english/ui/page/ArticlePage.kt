@@ -71,7 +71,7 @@ const val ratio = 12f
     ExperimentalMaterialApi::class
 )
 @Composable
-fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
+fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
 //    val activity = LocalContext.current as Activity
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -659,7 +659,7 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                         if (it) 1f else 0.80f
                                     }
 //                            val doneColor by animateColorAsState(targetValue = if (isDone()) ColorDone else LocalContentColor.current)
-                                    ClickableIcon(
+                                    SelectableIcon(
                                         painter = painterResource(id = R.drawable.done_broad),
                                         onClick = {
 //                                    currentParagraphIndex = paragraphIndex
@@ -671,9 +671,26 @@ fun NewsArticlePage(viewModel: MainViewModel, title: String, navController: NavC
                                                 "NewsArticlePage: \n${paragraphContent.text}\n${paragraphContent.text.firstOrNull()}"
                                             )
                                         },
-                                        modifier = Modifier.alpha(doneAlpha),
-                                        tint = doneColor
+//                                        modifier = Modifier.alpha(doneAlpha),
+                                        selectedColor = ColorDone,
+//                                        selectedColor = doneColor,
+                                        isSelected = isDone()
                                     )
+//                                    ClickableIcon(
+//                                        painter = painterResource(id = R.drawable.done_broad),
+//                                        onClick = {
+////                                    currentParagraphIndex = paragraphIndex
+////                                    curr；entParagraphContent = paragraphContent.text
+////                                    deleteParagraphDialog = true
+//                                            viewModel.changeDoneState(paragraphIndex)
+//                                            Log.d(
+//                                                "!!",
+//                                                "NewsArticlePage: \n${paragraphContent.text}\n${paragraphContent.text.firstOrNull()}"
+//                                            )
+//                                        },
+//                                        modifier = Modifier.alpha(doneAlpha),
+//                                        tint = doneColor
+//                                    )
 
                                     Spacer(modifier = Modifier
                                         .weight(1F)
