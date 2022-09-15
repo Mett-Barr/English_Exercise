@@ -672,7 +672,7 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                             )
                                         },
 //                                        modifier = Modifier.alpha(doneAlpha),
-                                        selectedColor = ColorDone,
+//                                        selectedColor = ColorDone,
 //                                        selectedColor = doneColor,
                                         isSelected = isDone()
                                     )
@@ -700,7 +700,7 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                     SelectableIcon(
                                         painter = painterResource(id = R.drawable.translation),
                                         isSelected = annotationState == AnnotationState.TRANSLATION,
-                                        selectedColor = ColorDone,
+//                                        selectedColor = ColorDone,
                                         normalColor = Color.White
                                     )
 //                                tint = color.value,
@@ -730,7 +730,7 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                         painter = painterResource(id = R.drawable.word),
                                         enabled = wordIconState,
                                         isSelected = annotationState == AnnotationState.WORDS,
-                                        selectedColor = ColorDone,
+//                                        selectedColor = ColorDone,
                                         modifier = Modifier.focusable()
                                     ) {
 
