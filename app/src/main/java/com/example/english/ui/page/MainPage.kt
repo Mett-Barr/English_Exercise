@@ -155,7 +155,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
                             viewModel.draftTitle = TextFieldValue("Title")
                             viewModel.draftContent =
-                                TextFieldValue("This is a test content. zqwe asd zxc")
+                                TextFieldValue("This is a test content. zqwe asd zxc\nqwe asd zxc\n wer sdf xcv")
                             viewModel.addNews(context)
 
                             fabIsOpening = !fabIsOpening
@@ -275,9 +275,10 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
         val statusBarAlpha by remember {
             derivedStateOf {
-                val alpha = if (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset <= statusBarHeight * 2) {
-                    lazyListState.firstVisibleItemScrollOffset / (statusBarHeight * 2) / 5 * 4
-                } else 0.8f
+                val alpha =
+                    if (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset <= statusBarHeight * 2) {
+                        lazyListState.firstVisibleItemScrollOffset / (statusBarHeight * 2) / 5 * 4
+                    } else 0.8f
                 if (fabMaskAlpha.alpha > 0) {
                     if (fabMaskAlpha.alpha > alpha) 0f
                     else alpha - fabMaskAlpha.alpha
