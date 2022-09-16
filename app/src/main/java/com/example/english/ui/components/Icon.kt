@@ -53,7 +53,8 @@ fun SelectableIcon(
     enabled: Boolean = true,
     isSelected: Boolean = true,
     normalColor: Color = LocalContentColor.current.copy(alpha = ContentAlpha.high),
-    selectedColor: Color = LocalContentColor.current.copy(alpha = ContentAlpha.high),
+    selectedColor: Color = MaterialTheme.colors.primary,
+//    selectedColor: Color = LocalContentColor.current.copy(alpha = ContentAlpha.high),
 //    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
     onClick: (() -> Unit)? = null,
 ) {
@@ -67,7 +68,7 @@ fun SelectableIcon(
 //            backgroundColor
 //        )
 //    )
-    val tint by animateColorAsState(targetValue = if (enabled && isSelected) Color.DarkGray else Color.White)
+    val tint by animateColorAsState(targetValue = if (enabled && isSelected) MaterialTheme.colors.background else MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background))
 //    val tint by animateColorAsState(targetValue = if (enabled && isSelected) selectedColor else normalColor)
 
 

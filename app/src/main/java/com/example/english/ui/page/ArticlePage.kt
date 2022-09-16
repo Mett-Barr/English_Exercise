@@ -304,22 +304,32 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                     val contentColor =
                         MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface)
 
+                    val colorTint = MaterialTheme.colors.primaryVariant
+                    val gray = if (MaterialTheme.colors.isLight) Color.Gray else contentColor
                     fun gestureColor(state: Float): Color {
                         val rangeState = if (state > 1f) 1f else if (state < 0) 0f else state
                         return Color(
-                            red = PrimaryVariant.red * rangeState + (1 - rangeState) * contentColor.red,
-                            green = PrimaryVariant.green * rangeState + (1 - rangeState) * contentColor.green,
-                            blue = PrimaryVariant.blue * rangeState + (1 - rangeState) * contentColor.blue
+                            red = colorTint.red * rangeState + (1 - rangeState) * contentColor.red,
+                            green = colorTint.green * rangeState + (1 - rangeState) * contentColor.green,
+                            blue = colorTint.blue * rangeState + (1 - rangeState) * contentColor.blue
+//                            red = PrimaryVariant.red * rangeState + (1 - rangeState) * contentColor.red,
+//                            green = PrimaryVariant.green * rangeState + (1 - rangeState) * contentColor.green,
+//                            blue = PrimaryVariant.blue * rangeState + (1 - rangeState) * contentColor.blue
                         )
                     }
 
                     val cardViewTint by remember { derivedStateOf { gestureColor(1 - swipeableState.offset.value / sizePx) } }
                     val articleView by remember { derivedStateOf { gestureColor(swipeableState.offset.value / sizePx) } }
 
-                    val color = LocalElevationOverlay.current!!.apply(
-                        MaterialTheme.colors.surface,
-                        LocalAbsoluteElevation.current + 50.dp
-                    )
+//                    val color = MaterialTheme.colors.onSurface.copy(0.1f)
+                    val color = if (!MaterialTheme.colors.isLight){
+                        LocalElevationOverlay.current!!.apply(
+                            MaterialTheme.colors.surface,
+                            LocalAbsoluteElevation.current + 50.dp
+                        )
+                    } else {
+                        MaterialTheme.colors.onSurface.copy(0.08f)
+                    }
 
 
                     Box(
@@ -366,7 +376,8 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                 .padding(6.dp)
                                 .clip(CircleShape)
                                 .size(36.dp)
-                                .background(Color.White)
+                                .background(if (MaterialTheme.colors.isLight) Color(0xFF777777) else Color.White)
+//                                .background(Color.White)
 //                                .align(alignment)
 
                         )
@@ -379,21 +390,25 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 //                                painterResource(id = R.drawable.article),
 //                                contentDescription = null
 //                            )
-                            ClickableIcon(
-                                painter = painterResource(id = R.drawable.card_view),
-                                tint = cardViewTint,
+//                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+
+                                ClickableIcon(
+                                    painter = painterResource(id = R.drawable.card_view),
+                                    tint = cardViewTint,
 //                                enabled = false
-                            )
+                                )
 //                            {
 //                                horizontalBias = ReadMode.CARD_VIEW
 //                            }
-                            ClickableIcon(
-                                painter = painterResource(id = R.drawable.article),
-                                tint = articleView,
+                                ClickableIcon(
+                                    painter = painterResource(id = R.drawable.article),
+                                    tint = articleView,
 //                                enabled = false
-                            )
+                                )
 //                            {
 //                                horizontalBias = ReadMode.ARTICLE_VIEW
+//                            }
+
 //                            }
                         }
                     }
@@ -672,7 +687,7 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                             )
                                         },
 //                                        modifier = Modifier.alpha(doneAlpha),
-                                        selectedColor = ColorDone,
+//                                        selectedColor = ColorDone,
 //                                        selectedColor = doneColor,
                                         isSelected = isDone()
                                     )
@@ -700,7 +715,7 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                     SelectableIcon(
                                         painter = painterResource(id = R.drawable.translation),
                                         isSelected = annotationState == AnnotationState.TRANSLATION,
-                                        selectedColor = ColorDone,
+//                                        selectedColor = ColorDone,
                                         normalColor = Color.White
                                     )
 //                                tint = color.value,
@@ -730,7 +745,7 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                         painter = painterResource(id = R.drawable.word),
                                         enabled = wordIconState,
                                         isSelected = annotationState == AnnotationState.WORDS,
-                                        selectedColor = ColorDone,
+//                                        selectedColor = ColorDone,
                                         modifier = Modifier.focusable()
                                     ) {
 

@@ -41,6 +41,7 @@ import com.example.english.R
 import com.example.english.data.image.ImageOperator
 import com.example.english.data.newslist.room.News
 import com.example.english.ui.components.Movement
+import com.example.english.ui.components.test.BookMark
 import com.example.english.ui.navigation.MainRoute
 import com.example.english.ui.theme.ColorDone
 import com.example.english.ui.theme.Typography
@@ -160,7 +161,8 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 
                             fabIsOpening = !fabIsOpening
                         }) {
-                        Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
+                        Icon(imageVector = Icons.Rounded.Add, contentDescription = "add",
+                            tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background))
                     }
                 }
 
@@ -189,7 +191,8 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 //                    viewModel.addBBCNews(BUG_URL, context)
                             fabIsOpening = !fabIsOpening
                         }) {
-                        Icon(imageVector = Icons.Rounded.Edit, contentDescription = "add")
+                        Icon(imageVector = Icons.Rounded.Edit, contentDescription = "add",
+                        tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background))
                     }
                 }
 
@@ -252,11 +255,16 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
 //                    viewModel.addBBCNews(BUG_URL, context)
                             fabIsOpening = !fabIsOpening
                         }) {
+
+                        val tint by animateColorAsState(targetValue = if (fabIsOpening) MaterialTheme.colors.background else MaterialTheme.colors.onBackground)
                         Icon(
                             imageVector = Icons.Rounded.Add,
                             contentDescription = "add",
                             modifier = Modifier.rotate(fabRotateAnimation),
-                            tint = Color.Black
+                            tint = tint
+//                            tint = Color.Black
+//                            tint = MaterialTheme.colors.contentColorFor(fabColorAnimation)
+//                            tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background)
                         )
                     }
                 }
@@ -420,7 +428,7 @@ fun NewsCard(
 //            .alpha(alpha),
 //            .background(MaterialTheme.colors.background)
 
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(16.dp),
     ) {
 
 
@@ -570,16 +578,18 @@ fun NewsCard(
             }
 
             if (news.progress == 100) {
-                Icon(painter = painterResource(id = R.drawable.done_broad),
-                    contentDescription = "done",
-                    tint = ColorDone,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(10.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colors.surface.copy(alpha = 0.5f))
-                        .padding(6.dp)
-                        .size(24.dp))
+//                Icon(painter = painterResource(id = R.drawable.done_broad),
+//                    contentDescription = "done",
+//                    tint = ColorDone,
+//                    modifier = Modifier
+//                        .align(Alignment.TopEnd)
+//                        .padding(10.dp)
+//                        .clip(CircleShape)
+//                        .background(MaterialTheme.colors.surface.copy(alpha = 0.5f))
+//                        .padding(6.dp)
+//                        .size(24.dp))
+
+                BookMark(modifier = Modifier.align(Alignment.TopEnd).padding(end = 24.dp))
             }
 
 

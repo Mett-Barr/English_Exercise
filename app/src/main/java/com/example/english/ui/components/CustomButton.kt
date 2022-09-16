@@ -3,10 +3,7 @@ package com.example.english.ui.components
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun CustomButton(modifier: Modifier, text: String, color: Color, onClick: () -> Unit) {
+fun CustomButton(modifier: Modifier, text: String, color: Color, textColor: Color = Color.Unspecified, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(color),
@@ -32,6 +29,7 @@ fun CustomButton(modifier: Modifier, text: String, color: Color, onClick: () -> 
             text = text,
             Modifier.padding(vertical = 1.dp, horizontal = 8.dp),
             style = TextStyle(
+                color = textColor,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
                 letterSpacing = 0.15.sp,
