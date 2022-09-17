@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,11 +27,13 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
@@ -43,16 +44,17 @@ import com.example.english.data.newslist.room.News
 import com.example.english.ui.components.Movement
 import com.example.english.ui.components.test.BookMark
 import com.example.english.ui.navigation.MainRoute
-import com.example.english.ui.theme.ColorDone
 import com.example.english.ui.theme.Typography
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun MainPage(viewModel: MainViewModel, navController: NavController) {
+fun MainPage(viewModel: MainViewModel, navController: NavController, navigateToWebPage: (String) -> Unit) {
 
     val context = LocalContext.current
 
     val list by viewModel.list.collectAsState(initial = emptyList())
+
+    var navigatable by remember { mutableStateOf(true) }
 
 
     // system bar
@@ -192,7 +194,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                             fabIsOpening = !fabIsOpening
                         }) {
                         Icon(imageVector = Icons.Rounded.Edit, contentDescription = "add",
-                        tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background))
+                            tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background))
                     }
                 }
 
@@ -217,8 +219,11 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
                         modifier = Modifier.scale(fabScaleAnimation), backgroundColor = Color.White,
 //                            .align(Alignment.BottomEnd),
                         onClick = {
-                            viewModel.currentWebsite = NewsWebsite.BBC
-                            navController.navigate(MainRoute.Website.route)
+                            navigateToWebPage(NewsWebsite.BBC.url)
+
+//                            viewModel.currentWebsite = NewsWebsite.BBC
+//                            navController.navigate(MainRoute.Website.route)
+
 //                            viewModel.addBBCNews(BUG_URL, context)
 //                            fabIsOpening = !fabIsOpening
                         }) {
@@ -314,11 +319,20 @@ fun MainPage(viewModel: MainViewModel, navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             state = lazyListState
         ) {
+
             items(list) {
                 NewsCard(
                     it,
                     viewModel,
-                    { navController.navigate(MainRoute.News.route) },
+                    {
+                        Log.d("!!!", "NewsCard onClick navigatable = $navigatable")
+                        navigatable = false
+                        navController.navigate(MainRoute.News.route)
+                    },
+                    {
+                        Log.d("!!!", "navigatable = $navigatable")
+                        navigatable
+                    },
                     context
                 )
             }
@@ -383,6 +397,7 @@ fun NewsCard(
     news: News,
     viewModel: MainViewModel,
     navigation: () -> Unit,
+    navigatable: () -> Boolean = { true },
     context: Context,
 ) {
 
@@ -398,99 +413,33 @@ fun NewsCard(
         mutableStateOf<Bitmap?>(null)
     }
 
+    val isLight = MaterialTheme.colors.isLight
     LaunchedEffect(key1 = Unit) {
-        bitmap = ImageOperator().getImage(news.id.toString(), context)
+        bitmap = ImageOperator().getImage(news.id.toString(), context, isLight)
     }
 
-//    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
-
-//    val elevationOverlay = LocalElevationOverlay.current
-//    Log.d("!! LocalElevationOverlay", LocalElevationOverlay.current.toString())
-
-//    val absoluteElevation = LocalAbsoluteElevation.current + 24.dp
-//    val background = { elevationOverlay!!.apply(MaterialTheme.colors.surface, absoluteElevation) }
-//    val background = elevationOverlay!!.apply(MaterialTheme.colors.surface, absoluteElevation)
-
     Card(
-        elevation = 24.dp,
+        elevation = 16.dp,
 //        elevation = absoluteElevation,
 //        backgroundColor = background,
 
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
-//            .aspectRatio(4f / 3f)
-//            .clickable(!isDownloading) {
-//                viewModel.currentNews(news, context)
-//                viewModel.currentImage = bitmap
-//                navigation.invoke()
-//            },
-//            .alpha(alpha),
-//            .background(MaterialTheme.colors.background)
-
         shape = RoundedCornerShape(16.dp),
     ) {
 
 
-        /**  brush animation  */
+        Box(modifier = Modifier.clickable(!isDownloading && navigatable()) {
 
-        val surfaceColorTransparent = MaterialTheme.colors.surface.copy(alpha = 0f)
-        val surfaceColorNoAlpha = MaterialTheme.colors.surface.copy(alpha = 0.8f)
-
-        val color by animateColorAsState(
-            targetValue = if (bitmap == null) surfaceColorTransparent else surfaceColorNoAlpha,
-//                animationSpec = tween(800)
-        )
-
-        val brush by remember {
-            derivedStateOf {
-                Brush.verticalGradient(listOf(surfaceColorTransparent, color))
+            // 放在clickable在連續點擊兩個目標時會多次導航
+            // 有可能是State變化趕不是點擊事件
+            if (navigatable()) {
+                viewModel.currentNews(news, context)
+                viewModel.currentImage = bitmap
+                navigation()
             }
-        }
-
-//            val color by animateColorAsState(
-//                targetValue = if (bitmap == null) colorTop else colorBottom,
-//                animationSpec = tween(1500)
-//            )
-//
-//            val brush by remember {
-//                derivedStateOf {
-//                    Brush.verticalGradient(listOf(colorTop, color))
-//                }
-//            }
-//
-        /**  --------------------  */
-
-        Box(modifier = Modifier.clickable(!isDownloading) {
-            viewModel.currentNews(news, context)
-            viewModel.currentImage = bitmap
-            navigation.invoke()
         }) {
-//            Crossfade(targetState = bitmap) {
-//                if (it != null) {
-//                    Image(
-//                        bitmap = it.asImageBitmap(),
-//                        contentDescription = null,
-//                        modifier = Modifier
-//                            .aspectRatio(16f / 9f)
-//                            .fillMaxWidth()
-//                    )
-//                } else {
-//                    Spacer(
-//                        modifier = Modifier
-//                            .aspectRatio(16f / 9f)
-//                            .fillMaxWidth()
-//                            .background(MaterialTheme.colors.surface)
-//                    )
-//                }
-//            }
-
-//            if (news.progress < 100) {
-//                Text(text = news.progress.toString() + "%",
-//                    modifier = Modifier
-//                        .align(Alignment.TopEnd)
-//                        .padding(8.dp))
-//            } else {
 
             Log.d("!!!", (news.progress == 100).toString())
 
@@ -540,22 +489,7 @@ fun NewsCard(
 //                        .height(36.dp))
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
-
-
-                val dot = if (news.date.isNotBlank() && news.tag.isNotBlank()) " • " else ""
-
-                val caption = news.date + dot + news.tag
-
-                if (caption.isNotBlank()) {
-                    Text(text = caption,
-                        style = Typography.body2,
-                        modifier = Modifier
-                            .padding(horizontal = 12.dp)
-                            .padding(bottom = 6.dp)
-                            .fillMaxWidth()
-                    )
-                }
+//                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = news.title,
@@ -571,9 +505,61 @@ fun NewsCard(
 //                        .background(MaterialTheme.colors.surface)
 //                        .background(CardContainerDark)
                         .padding(horizontal = 12.dp)
-                        .padding(bottom = 12.dp)
+                        .padding(vertical = 6.dp)
+//                        .padding(bottom = 12.dp)
                         .fillMaxWidth()
                 )
+
+                Row(modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .padding(bottom = 12.dp)
+                    .height(IntrinsicSize.Min)) {
+
+                    val sourceIcon = when (news.source) {
+                        NewsWebsite.BBC.sourceName -> R.drawable.bbc
+                        else -> null
+                    }
+                    Log.d("!!!", "NewsCard: $sourceIcon")
+                    if (sourceIcon != null) {
+                        Icon(painter = painterResource(id = R.drawable.bbc),
+                            contentDescription = "bbc news",
+//                            modifier = Modifier
+//                                .aspectRatio(1f)
+//                                .fillMaxSize()
+////                                .wrapContentSize()
+//                                .padding(end = 4.dp))
+                            modifier = Modifier
+                                .layout { measurable, constraints ->
+                                    if (constraints.maxHeight == Constraints.Infinity) {
+                                        layout(0, 0) {}
+                                    } else {
+                                        val placeable = measurable.measure(constraints)
+                                        layout(placeable.width, placeable.height) {
+                                            placeable.place(0, 0)
+                                        }
+                                    }
+                                }
+                                .padding(end = 6.dp).clip(RoundedCornerShape(2.dp))
+                        )
+                    }
+
+                    val dot = if (news.date.isNotBlank() && news.tag.isNotBlank()) " • " else ""
+                    val caption = news.date + dot + news.tag
+//                    if (caption.isNotBlank()) {
+                        Text(text = if (caption.isNotBlank()) caption else "",
+                            style = Typography.body2,
+//                            modifier = Modifier
+//                                .padding(horizontal = 12.dp)
+//                                .padding(bottom = 12.dp)
+//                                .fillMaxWidth()
+//                                .weight(1f)
+//                                .wrapContentSize()
+//                                .wrapContentHeight()
+                        )
+//                    }
+                }
+
+
 //                Text(text = news.caption, maxLines = 2, style = Typography.caption)
             }
 
@@ -589,7 +575,9 @@ fun NewsCard(
 //                        .padding(6.dp)
 //                        .size(24.dp))
 
-                BookMark(modifier = Modifier.align(Alignment.TopEnd).padding(end = 24.dp))
+                BookMark(modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 24.dp))
             }
 
 
@@ -597,8 +585,9 @@ fun NewsCard(
                 if (it) {
                     Movement()
                 } else {
+//                    val isLight = MaterialTheme.colors.isLight
                     LaunchedEffect(key1 = Unit) {
-                        bitmap = ImageOperator().getImage(news.id.toString(), context)
+                        bitmap = ImageOperator().getImage(news.id.toString(), context, isLight)
                     }
                 }
 

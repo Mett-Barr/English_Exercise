@@ -17,6 +17,7 @@ import com.example.english.data.word.word.WordRepository
 import com.example.english.data.word.word.room.Word
 import com.example.english.network.JsoupNews
 import com.example.english.network.imageStore
+import com.example.english.tool.getDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -86,6 +87,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun allUndone() {
+        viewModelScope.launch {
+            val doneList = mutableListOf<Int>()
+            currentContent.forEachIndexed { index, textFieldValue ->
+                if (textFieldValue.text.isDone()) {
+                    doneList.add(index)
+                }
+            }
+            doneList.forEach {
+                currentContent[it] = currentContent[it].copy(text = currentContent[it].text.content())
+            }
+        }
+    }
+
     fun undoAllDone() {
         viewModelScope.launch {
             allDoneList.forEach {
@@ -99,23 +114,23 @@ class MainViewModel @Inject constructor(
 
 
 
-    private fun wordExistCheck(word: String, index: Int) {
-        viewModelScope.launch {
-            val wordId = wordRepository.getWordIdSuspend(word)
-            currentWord = if (wordListTable[index].contains(wordId)) {
-                word
-//                if (wordRepository.getWord(wordId))
-
-                // change getWord to suspend fun
-                // getWordId -> check is in list
-                // in list -> Tr -> false  -> currentWord = null
-                // not in list || Non-Tr -> true  -> currentWord = word
-            } else null
-//            currentWord = if (wordRepository.wordIsExist(word)) word else ""
-
-            Log.d("!! 3", "wordExistCheck: $currentWord  word:$word")
-        }
-    }
+//    private fun wordExistCheck(word: String, index: Int) {
+//        viewModelScope.launch {
+//            val wordId = wordRepository.getWordIdSuspend(word)
+//            currentWord = if (wordListTable[index].contains(wordId)) {
+//                word
+////                if (wordRepository.getWord(wordId))
+//
+//                // change getWord to suspend fun
+//                // getWordId -> check is in list
+//                // in list -> Tr -> false  -> currentWord = null
+//                // not in list || Non-Tr -> true  -> currentWord = word
+//            } else null
+////            currentWord = if (wordRepository.wordIsExist(word)) word else ""
+//
+//            Log.d("!! 3", "wordExistCheck: $currentWord  word:$word")
+//        }
+//    }
 
     fun noCurrentWord() {
         currentWord = null
@@ -156,16 +171,16 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch { suspendAddNews(context) }
     }
 
-    fun addNewsByUrl(context: Context, url: String) {
-        viewModelScope.launch { suspendAddNews(context) }
-    }
+//    fun addNewsByUrl(context: Context, url: String) {
+//        viewModelScope.launch { suspendAddNews(context) }
+//    }
 
 
     private suspend fun suspendAddNews(context: Context) {
 
         // Room
 //        val caption = draftContent.text.split("\n")[0]
-        val newsId = repository.addNews(News(title = draftTitle.text))
+        val newsId = repository.addNews(News(title = draftTitle.text, date = getDate()))
 
         // downloading state
         isDownloading.add(newsId.toInt())
@@ -280,6 +295,10 @@ class MainViewModel @Inject constructor(
         return wordRepository.getWord(id)
     }
 
+    suspend fun getWordId(english: String): Int? {
+        return wordRepository.getWordIdSuspend(english)
+    }
+
     fun getWordList(list: List<Int>): List<Flow<Word>> {
         val wordList: MutableList<Flow<Word>> = emptyList<Flow<Word>>().toMutableList()
 
@@ -333,16 +352,16 @@ class MainViewModel @Inject constructor(
 
 
     /**  Jsoup  */
-    fun addNewsByJsoup(url: String, context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val jsoupNews = JsoupNews(url)
-
-            draftTitle = TextFieldValue(jsoupNews.getTitle())
-            draftContent = TextFieldValue(jsoupNews.getContent())
-
-//            suspendAddNews(context)
-        }
-    }
+//    fun addNewsByJsoup(url: String, context: Context) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val jsoupNews = JsoupNews(url)
+//
+//            draftTitle = TextFieldValue(jsoupNews.getTitle())
+//            draftContent = TextFieldValue(jsoupNews.getContent())
+//
+////            suspendAddNews(context)
+//        }
+//    }
 
     fun addImage(bitmap: Bitmap, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -364,6 +383,9 @@ class MainViewModel @Inject constructor(
             val title = jsoupNews.getTitle()
             val content = jsoupNews.getContent()
 
+            // tag
+            val tag = jsoupNews.getTag()
+
             // date
             val date = jsoupNews.getTime()
 
@@ -371,8 +393,11 @@ class MainViewModel @Inject constructor(
             val newsId = addUrlNews(context,
                 title = title,
                 content = content,
+                tag = tag,
                 date = date,
-                source = "BBC News")
+                source = "BBC News",
+                url = url
+            )
 //            isDownloading.add(newsId.toInt())
 
             // get Image
@@ -385,16 +410,19 @@ class MainViewModel @Inject constructor(
     private suspend fun addUrlNews(
         context: Context,
         title: String,
-//        caption: String,
         content: String,
+        tag: String = "",
         source: String = "",
+        url: String,
         date: String,
     ): String {
 
 //         Room
 //        val caption = draftContent.text.split("\n")[0]
-        val newsId = repository.addNews(News(title = title, date = date, source = source))
+        val newsId = repository.addNews(News(title = title, tag = tag, date = date, source = source, url = url))
         isDownloading.add(newsId.toInt())
+
+        delay(5000)
 
         // add file
         addUrlFile(newsId, content, context)
@@ -405,13 +433,38 @@ class MainViewModel @Inject constructor(
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /** WebPage State  */
+    var webPageUrl by mutableStateOf("")
 }
 
-enum class NewsWebsite(val url: String) {
-    BBC("https://www.bbc.com/news")
+enum class NewsWebsite(val url: String, val sourceName: String) {
+    BBC("https://www.bbc.com/news", "BBC News")
 }
 
 // Tool
 fun String.isDone(): Boolean {
     return this.first() == '^'
+}
+
+fun String.content(): String {
+    return if (this.isDone()) this.removeRange(0, 1)
+    else this
 }

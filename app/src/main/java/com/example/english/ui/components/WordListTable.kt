@@ -285,15 +285,15 @@ fun WordComponent(
 
     fun swipeToTr() {
         coroutineScope.launch {
-            Log.d(
-                "!! 1",
-                "\nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
-            )
+//            Log.d(
+//                "!! 1",
+//                "\nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
+//            )
             if (viewModel.currentWord == word.value.english && word.value.chinese.isBlank()) {
-                Log.d(
-                    "!! 2",
-                    " \nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
-                )
+//                Log.d(
+//                    "!! 2",
+//                    " \nviewModel.currentWord:${viewModel.currentWord}\nword.value.english:${word.value.english}\nword.value.chinese.isBlank():${word.value.chinese.isBlank()}"
+//                )
                 delay(150)
                 swipeableState.animateTo("translate")
             }

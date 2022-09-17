@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
+import com.example.english.content
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.isDone
@@ -48,9 +49,8 @@ import com.example.english.ui.components.SelectableIcon
 import com.example.english.ui.components.WordComponent
 import com.example.english.ui.components.test.PopupInfo
 import com.example.english.ui.theme.ColorDone
-import com.example.english.ui.theme.PrimaryVariant
 import com.example.english.ui.theme.TextBackgroundAlphaLight
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -71,7 +71,12 @@ const val ratio = 12f
     ExperimentalMaterialApi::class
 )
 @Composable
-fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavController) {
+fun ArticlePage(
+    viewModel: MainViewModel,
+    title: String,
+    navController: NavController,
+    navigateToWebPage: (String) -> Unit,
+) {
 //    val activity = LocalContext.current as Activity
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -113,9 +118,10 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 
     val statusBarAlpha by remember {
         derivedStateOf {
-            val alpha = if (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset <= statusBarHeight * 2) {
-                lazyListState.firstVisibleItemScrollOffset / (statusBarHeight * 2) / 5 * 4
-            } else 0.8f
+            val alpha =
+                if (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset <= statusBarHeight * 2) {
+                    lazyListState.firstVisibleItemScrollOffset / (statusBarHeight * 2) / 5 * 4
+                } else 0.8f
             if (maskColor.alpha > 0) {
                 if (maskColor.alpha > alpha) 0f
                 else alpha - maskColor.alpha
@@ -143,7 +149,6 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
     }
 
 
-
     // data
     val progress by remember(viewModel.currentContent) {
         derivedStateOf {
@@ -155,7 +160,6 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
             progress
         }
     }
-
 
 
 //    val focusRequester = remember { FocusRequester() }
@@ -322,7 +326,7 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                     val articleView by remember { derivedStateOf { gestureColor(swipeableState.offset.value / sizePx) } }
 
 //                    val color = MaterialTheme.colors.onSurface.copy(0.1f)
-                    val color = if (!MaterialTheme.colors.isLight){
+                    val color = if (!MaterialTheme.colors.isLight) {
                         LocalElevationOverlay.current!!.apply(
                             MaterialTheme.colors.surface,
                             LocalAbsoluteElevation.current + 50.dp
@@ -370,17 +374,36 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 //                           Spacer(modifier = Modifier.size(48.dp).clickable { horizontalBias = ReadMode.ARTICLE_VIEW })
                         }
 
-                        Spacer(
-                            modifier = Modifier
-                                .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                                .padding(6.dp)
-                                .clip(CircleShape)
-                                .size(36.dp)
-                                .background(if (MaterialTheme.colors.isLight) Color(0xFF777777) else Color.White)
+                        // picker
+                        if (!MaterialTheme.colors.isLight) {
+
+                            Spacer(
+                                modifier = Modifier
+                                    .offset {
+                                        IntOffset(swipeableState.offset.value.roundToInt(),
+                                            0)
+                                    }
+                                    .padding(6.dp)
+                                    .clip(CircleShape)
+                                    .size(36.dp)
+                                    .background(if (MaterialTheme.colors.isLight) Color(0xFF888888) else Color.White)
 //                                .background(Color.White)
 //                                .align(alignment)
-
-                        )
+                            )
+                        } else {
+                            Surface(
+                                elevation = 4.dp,
+                                shape = CircleShape,
+                                color = Color(0xFF777777),
+                                modifier = Modifier
+                                    .offset {
+                                        IntOffset(swipeableState.offset.value.roundToInt(),
+                                            0)
+                                    }
+                                    .padding(6.dp)
+                                    .size(36.dp)
+                            ) {}
+                        }
                         Row {
 //                            Icon(
 //                                painter = painterResource(id = R.drawable.card_view),
@@ -392,19 +415,19 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 //                            )
 //                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
 
-                                ClickableIcon(
-                                    painter = painterResource(id = R.drawable.card_view),
-                                    tint = cardViewTint,
+                            ClickableIcon(
+                                painter = painterResource(id = R.drawable.card_view),
+                                tint = cardViewTint,
 //                                enabled = false
-                                )
+                            )
 //                            {
 //                                horizontalBias = ReadMode.CARD_VIEW
 //                            }
-                                ClickableIcon(
-                                    painter = painterResource(id = R.drawable.article),
-                                    tint = articleView,
+                            ClickableIcon(
+                                painter = painterResource(id = R.drawable.article),
+                                tint = articleView,
 //                                enabled = false
-                                )
+                            )
 //                            {
 //                                horizontalBias = ReadMode.ARTICLE_VIEW
 //                            }
@@ -415,8 +438,10 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 
                     ClickableIcon(painter = painterResource(R.drawable.done_broad)) {
                         viewModel.apply {
-                            if (allDoneList.isEmpty()) allDone()
-                            else undoAllDone()
+                            if (allDoneList.isEmpty()) {
+                                if (progress == 100) allUndone()
+                                else allDone()
+                            } else undoAllDone()
                         }
                     }
                 }
@@ -572,7 +597,7 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 //                        if (readMode == 1) {
 //                        AnimatedVisibility (readMode == 1, enter = scaleIn(tween(3000)), exit = scaleOut(tween(3000))) {
                         Text(
-                            text = paragraphContent.text,
+                            text = paragraphContent.text.content(),
                             style = Typography().body1,
                             modifier = Modifier
 
@@ -591,8 +616,39 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                         var annotationState by remember {
                             mutableStateOf(AnnotationState.CLOSE)
                         }
+//
+//                        val selectedText by remember {
+//                            derivedStateOf {
+//                                paragraphContent.selection
+//                            }
+//                        }
 
-                        val getElevation = if (MaterialTheme.colors.isLight) 24.dp else 1.dp
+                        //!!!!!
+                        val selectedText by remember {
+                            derivedStateOf {
+                                val text =
+                                    viewModel.currentContent[paragraphIndex].getSelectedText().text
+
+//                                if (text.isNotBlank()) {
+//                                    viewModel.getWordId(text)
+////                                    if (viewModel.wordListTable[paragraphIndex].)
+//                                    }
+
+                                text
+                            }
+                        }
+
+                        LaunchedEffect(selectedText.isNotBlank()) {
+//                            scope.launch {
+                            val id = viewModel.getWordId(selectedText)
+                            if(viewModel.wordListTable[paragraphIndex].contains(id)) {
+                                Log.d("!!!", "$selectedText true")
+//
+                            }
+                        }
+
+
+                        val getElevation = if (MaterialTheme.colors.isLight) 8.dp else 1.dp
                         Card(
                             elevation = getElevation,
                             modifier = Modifier
@@ -733,13 +789,10 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 //                            val contentText by remember {
 //                                derivedStateOf { paragraphContent.getSelectedText().text }
 //                            }
-                                    val contentText by remember {
-                                        derivedStateOf { viewModel.currentContent[paragraphIndex].getSelectedText().text }
-                                    }
 
 
                                     val wordIconState by remember {
-                                        derivedStateOf { contentText.isNotBlank() || viewModel.wordListTable[paragraphIndex].isNotEmpty() }
+                                        derivedStateOf { selectedText.isNotBlank() || viewModel.wordListTable[paragraphIndex].isNotEmpty() }
                                     }
                                     SelectableIcon(
                                         painter = painterResource(id = R.drawable.word),
@@ -754,12 +807,11 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 
                                         // 1.檢測是否選取單字
 //                                    val contentText = paragraphContent.getSelectedText().text
-                                        annotationState = if (contentText.isNotBlank()) {
+                                        annotationState = if (selectedText.isNotBlank()) {
 
-//                                        viewModel.curr
 
                                             viewModel.addWordListTable(
-                                                contentText,
+                                                selectedText,
                                                 paragraphIndex
                                             )
 
@@ -767,8 +819,6 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                                 viewModel.currentContent[paragraphIndex].copy(
                                                     selection = TextRange.Zero
                                                 )
-
-//                                        wordTranslate(context, contentText)
 
 
                                             // 2.translate並且開啟annotation欄位
@@ -910,7 +960,8 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
                                                     WordComponent(
                                                         word = word,
                                                         onValueChange = {
-                                                            wordList[index].value = word.value.copy(chinese = it)
+                                                            wordList[index].value =
+                                                                word.value.copy(chinese = it)
                                                         },
                                                         remove = {
                                                             Log.d(
@@ -922,7 +973,8 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
 //                                                            viewModel.wordListTable[index].remove(
 //                                                                word.value.id
 //                                                            )
-                                                    viewModel.wordListTable[paragraphIndex].remove(word.value.id)
+                                                            viewModel.wordListTable[paragraphIndex].remove(
+                                                                word.value.id)
 //                                                            Log.d(
 //                                                                "!!",
 //                                                                viewModel.wordListTable[index].toList()
@@ -1008,12 +1060,20 @@ fun ArticlePage(viewModel: MainViewModel, title: String, navController: NavContr
             /** Popup info */
             AnimatedVisibility(
                 visible = infoCardIsOpening,
-                enter = scaleIn() + fadeIn() + slideIn { fullSize -> IntOffset(0, fullSize.height / 5 * 2) },
-                exit = scaleOut() + fadeOut() + slideOut { fullSize -> IntOffset(0, fullSize.height / 5 * 2) },
+                enter = scaleIn() + fadeIn() + slideIn { fullSize ->
+                    IntOffset(0,
+                        fullSize.height / 5 * 2)
+                },
+                exit = scaleOut() + fadeOut() + slideOut { fullSize ->
+                    IntOffset(0,
+                        fullSize.height / 5 * 2)
+                },
                 modifier = Modifier
                     .padding(bottom = paddingValues.calculateBottomPadding())
                     .align(Alignment.BottomCenter)) {
-                PopupInfo(viewModel.currentNews, progress) { deleteArticleDialog = true }
+                PopupInfo(viewModel.currentNews,
+                    progress,
+                    { deleteArticleDialog = true }) { navigateToWebPage(it) }
 //                PopupInfo(modifier = Modifier
 //                    .padding(bottom = paddingValues.calculateBottomPadding())
 //                    .align(Alignment.BottomCenter))

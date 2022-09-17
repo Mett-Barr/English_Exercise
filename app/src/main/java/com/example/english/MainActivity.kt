@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.english.network.JsoupNews
+import com.example.english.network.jsoupTagTest
 import com.example.english.translation.BUG_URL
 import com.example.english.ui.components.Loader
 import com.example.english.ui.components.Movement
@@ -64,12 +65,19 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // getTime Test
-        lifecycleScope.launch(Dispatchers.IO) {
-            val jsoupNews = JsoupNews("https://www.bbc.com/news/uk-62766917")
-            val str = jsoupNews.getTime()
-            Log.d("!!! get time", str)
-        }
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            jsoupTagTest()
+//            val str = JsoupNews("https://www.bbc.com/news/technology-62833037").getTag()
+//            Log.d("!!!", "onCreate: $str")
+//        }
+
+
+//        // getTime Test
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            val jsoupNews = JsoupNews("https://www.bbc.com/news/uk-62766917")
+//            val str = jsoupNews.getTime()
+//            Log.d("!!! get time", str)
+//        }
 
         // add news by url
 //        viewModel.addBBCNews(BUG_URL, this)
@@ -83,7 +91,6 @@ class MainActivity : ComponentActivity() {
 //            val bitmap = imageStore(imageUrl, this@MainActivity)
 //            ImageOperatorObject.addImage("1", bitmap!!, this@MainActivity)
 //        }
-
 
 
 //        viewModel

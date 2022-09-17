@@ -14,7 +14,7 @@ const val BBC_TITLE = "main-heading"
 const val BBC_PARAGRAPH = ""
 const val BBC_COVER = "div.ssrcss-vk3nhx-ComponentWrapper ep2nwvo1"
 
-class JsoupNews(url: String) {
+class JsoupNews(private val url: String) {
 
 //    private val html: Document
 //    init {
@@ -54,34 +54,44 @@ class JsoupNews(url: String) {
             ?.attr("src") ?: ""
 
 
+    fun getTag(): String =
+        url.split('/').last().split('-').first().replaceFirstChar { it.uppercaseChar() }
+
 }
 
+fun jsoupTagTest() {
+    val html = Jsoup.connect("https://www.bbc.com/news/world-latin-america-62922845").get()
 
-suspend fun jsoupTest(viewModel: MainViewModel, context: Context) {
-
-    val html = Jsoup.connect("https://www.bbc.com/news/uk-politics-62410234").get()
-
-
-    val title = html.getElementById("main-heading")?.text() ?: ""
-    viewModel.draftTitle = TextFieldValue(title)
-
-
-    // get article body
-    var content = ""
-    html.getElementsByClass("ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6")
-        .select("[data-component='text-block']").forEach {
-
-            content += it.text() + "\n\n"
-
-//            Log.d("!!!", it.text())
-//            text.value += it.text() + "\n\n"
-        }
-
-    viewModel.draftContent = TextFieldValue(content)
-
-    viewModel.addNews(context)
-//    StringConverter().stringToListNull(viewModel.draftContent.text)
+    html.getElementsByClass("ssrcss-19k053m-LinkTextContainer eis6szr1").forEach {
+        Log.d("!!!", "jsoupTagTest: $it")
+    }
 }
+
+//suspend fun jsoupTest(viewModel: MainViewModel, context: Context) {
+//
+//    val html = Jsoup.connect("https://www.bbc.com/news/uk-politics-62410234").get()
+//
+//
+//    val title = html.getElementById("main-heading")?.text() ?: ""
+//    viewModel.draftTitle = TextFieldValue(title)
+//
+//
+//    // get article body
+//    var content = ""
+//    html.getElementsByClass("ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6")
+//        .select("[data-component='text-block']").forEach {
+//
+//            content += it.text() + "\n\n"
+//
+////            Log.d("!!!", it.text())
+////            text.value += it.text() + "\n\n"
+//        }
+//
+//    viewModel.draftContent = TextFieldValue(content)
+//
+//    viewModel.addNews(context)
+////    StringConverter().stringToListNull(viewModel.draftContent.text)
+//}
 
 suspend fun jsoupImageTest(): String {
 
@@ -134,3 +144,4 @@ suspend fun jsoupImageTest2() {
     Log.d("!!!  3", testUrl)
 
 }
+

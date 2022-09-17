@@ -47,6 +47,12 @@ fun MainNavigation(viewModel: MainViewModel) {
         // setStatusBarsColor() and setNavigationBarsColor() also exist
     }
 
+    fun navigateToWebPage(url: String) {
+        viewModel.webPageUrl = url
+        navController.navigate(MainRoute.Website.route)
+    }
+
+
     NavHost(
         navController = navController,
 //        startDestination = MainRoute.Website.route,
@@ -54,7 +60,7 @@ fun MainNavigation(viewModel: MainViewModel) {
 //        modifier = Modifier.systemBarsPadding()
     ) {
         composable(MainRoute.Main.route) {
-            MainPage(viewModel = viewModel, navController)
+            MainPage(viewModel = viewModel, navController) { navigateToWebPage(it) }
         }
         composable(MainRoute.Insert.route) {
 //            viewModel.navToInsertPage()
@@ -66,7 +72,9 @@ fun MainNavigation(viewModel: MainViewModel) {
                 viewModel = viewModel,
                 viewModel.currentTitle,
                 navController = navController
-            )
+            ) {
+                navigateToWebPage(it)
+            }
         }
         composable(MainRoute.Dictionary.route) {
 
@@ -75,4 +83,5 @@ fun MainNavigation(viewModel: MainViewModel) {
             WebPage(viewModel = viewModel, navController)
         }
     }
+
 }

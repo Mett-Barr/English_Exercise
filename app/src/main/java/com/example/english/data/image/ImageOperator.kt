@@ -3,6 +3,7 @@ package com.example.english.data.image
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.hardware.lights.Light
 import android.util.Log
 import com.example.english.R
 import com.example.english.data.image.ImageObj.getDefaultImage
@@ -29,14 +30,14 @@ object ImageOperatorObject {
 }
 
 class ImageOperator {
-    suspend fun getImage(newsId: String, context: Context): Bitmap? {
+    suspend fun getImage(newsId: String, context: Context, isLight: Boolean): Bitmap? {
         return try {
             val fis = context.openFileInput(IMAGE_NAME + newsId)
             BitmapFactory.decodeStream(fis)
         } catch (e: Exception) {
             Log.d("image file not found", "getImage: $newsId")
 //            BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
-            getDefaultImage(context)
+            getDefaultImage(context, isLight)
         }
 //        val path = context.getFileStreamPath(fileName)
     }
@@ -52,10 +53,22 @@ class ImageOperator {
 }
 
 object ImageObj {
-    var image: Bitmap? = null
-    fun getDefaultImage(context: Context): Bitmap {
-        if (image == null) image = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
-        return image!!
+    var imageLight: Bitmap? = null
+    var imageDark: Bitmap? = null
+    fun getDefaultImage(context: Context, isLight: Boolean): Bitmap {
+        return if (isLight) {
+            if (imageLight == null) imageLight = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
+            imageLight!!
+        }
+        else {
+            if (imageDark == null) imageDark = BitmapFactory.decodeResource(context.resources, R.drawable.default_image_dark)
+            imageDark!!
+        }
+
+//        if (imageDark == null) imageDark =
+//            BitmapFactory.decodeResource(context.resources, R.drawable.default_image_dark)
+//        return imageDark!!
+
     }
 
 //    val defaultImage: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)

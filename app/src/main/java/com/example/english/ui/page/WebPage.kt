@@ -121,117 +121,121 @@ fun WebPage(viewModel: MainViewModel, navController: NavController) {
     Scaffold(
         modifier = Modifier.padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()),
         bottomBar = {
-            Row(
-                modifier = Modifier
-                    .padding(WindowInsets.navigationBars.asPaddingValues())
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.Black.copy(alpha = 0.8f))
-                    .padding(8.dp)
-                    .height(IntrinsicSize.Min)
-            ) {
-                IconButton(onClick = {
+            CompositionLocalProvider(LocalContentColor provides Color.White) {
+
+                Row(
+                    modifier = Modifier
+                        .padding(WindowInsets.navigationBars.asPaddingValues())
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.Black.copy(alpha = 0.8f))
+                        .padding(8.dp)
+                        .height(IntrinsicSize.Min)
+                ) {
+                    IconButton(onClick = {
 //                    Log.d("!!", "WebPage: ${webView?.canGoBack() ?: false}")
-                    navController.popBackStack()
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.out),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = LocalContentColor.current
-                    )
-                }
-                IconButton(
-                    onClick = { webView?.goBack() },
-                    enabled = webView?.canGoBack() ?: false
-                ) {
-                    val contentAlpha by animateFloatAsState(if (webView?.canGoBack() == true) LocalContentAlpha.current else ContentAlpha.disabled)
-                    Icon(
-                        painter = painterResource(id = R.drawable.back),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .alpha(contentAlpha),
-                        tint = LocalContentColor.current
-                    )
-                }
-                IconButton(
-                    onClick = { webView?.goForward() },
-                    enabled = webView?.canGoForward() ?: false
-                ) {
-                    val contentAlpha by animateFloatAsState(if (webView?.canGoForward() == true) LocalContentAlpha.current else ContentAlpha.disabled)
-                    Icon(
-                        painter = painterResource(id = R.drawable.forward),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .alpha(contentAlpha),
-                        tint = LocalContentColor.current
-                    )
-                }
-                IconButton(onClick = { webView?.reload() }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.refresh),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = LocalContentColor.current
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.out),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = LocalContentColor.current
+                        )
+                    }
+                    IconButton(
+                        onClick = { webView?.goBack() },
+                        enabled = webView?.canGoBack() ?: false
+                    ) {
+                        val contentAlpha by animateFloatAsState(if (webView?.canGoBack() == true) LocalContentAlpha.current else ContentAlpha.disabled)
+                        Icon(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .alpha(contentAlpha),
+                            tint = LocalContentColor.current
+                        )
+                    }
+                    IconButton(
+                        onClick = { webView?.goForward() },
+                        enabled = webView?.canGoForward() ?: false
+                    ) {
+                        val contentAlpha by animateFloatAsState(if (webView?.canGoForward() == true) LocalContentAlpha.current else ContentAlpha.disabled)
+                        Icon(
+                            painter = painterResource(id = R.drawable.forward),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .alpha(contentAlpha),
+                            tint = LocalContentColor.current
+                        )
+                    }
+                    IconButton(onClick = { webView?.reload() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.refresh),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = LocalContentColor.current
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
 
 
 //                IconButton(onClick = { /*TODO*/ }) {
-                Box() {
-                    Box(modifier = Modifier
-                        .scale(alphaAndScale)
-                        .alpha(alphaAndScale)
-                        .padding(4.dp)
-                        .aspectRatio(1f)
-                        .fillMaxSize(),
+                    Box() {
+                        Box(modifier = Modifier
+                            .scale(alphaAndScale)
+                            .alpha(alphaAndScale)
+                            .padding(4.dp)
+                            .aspectRatio(1f)
+                            .fillMaxSize(),
 //                    .clip(CircleShape)
 //                    .padding(1.dp)
 //                    .border(width = 2.dp, color = Color.Green, shape = CircleShape)
 //                    .background(Color.White),
 //                    .border(width = 2.dp, color = Color.Blue),
-                        contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
-                        Text(
-                            "1",
-                            modifier = Modifier,
-                            textAlign = TextAlign.Center,
-                            color = Color(0xFFFFFBFE)
-                        )
+                            contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                            Text(
+                                "1",
+                                modifier = Modifier,
+                                textAlign = TextAlign.Center,
+                                color = Color(0xFFFFFBFE)
+                            )
+                        }
+
+                        IconButton(onClick = { }, enabled = false) {
+//                        val contentAlpha by animateFloatAsState(if (isNewsPage) LocalContentAlpha.current else ContentAlpha.disabled)
+                            Icon(
+                                painter = painterResource(id = R.drawable.done_broad),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .alpha(done)
+                                    .scale(done),
+                                tint = LocalContentColor.current
+                            )
+                        }
                     }
 
-                    IconButton(onClick = { }, enabled = false) {
-//                        val contentAlpha by animateFloatAsState(if (isNewsPage) LocalContentAlpha.current else ContentAlpha.disabled)
+
+                    IconButton(
+                        onClick = { viewModel.addBBCNews(currentUrl, context) },
+                        enabled = isNewsPage
+                    ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.done_broad),
+                            painter = painterResource(id = R.drawable.download),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(24.dp)
-                                .alpha(done)
-                                .scale(done),
+                                .alpha(contentAlpha),
                             tint = LocalContentColor.current
                         )
                     }
                 }
-
-
-                IconButton(
-                    onClick = { viewModel.addBBCNews(currentUrl, context) },
-                    enabled = isNewsPage
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.download),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .alpha(contentAlpha),
-                        tint = LocalContentColor.current
-                    )
-                }
             }
+
         }
     ) {
 
@@ -284,7 +288,8 @@ fun WebPage(viewModel: MainViewModel, navController: NavController) {
                         webViewClient = MyWebViewClient { pageCheck(it) }
 
 //                    loadUrl(viewModel.currentWebsite.url)
-                        loadUrl(NewsWebsite.BBC.url)
+//                        loadUrl(NewsWebsite.BBC.url)
+                        loadUrl(viewModel.webPageUrl)
 
                         this.settings.javaScriptEnabled = true
                         this.settings.domStorageEnabled = true

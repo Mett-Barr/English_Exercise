@@ -1,5 +1,6 @@
 package com.example.english.ui.components.test
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,31 +10,43 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import com.example.english.R
 import com.example.english.data.newslist.room.News
+import com.example.english.tool.AppToast
 import com.example.english.ui.components.ClickableIcon
+
+
+const val blank3 = "   "
+const val blank4 = "    "
 
 //@Preview
 @Composable
-fun PopupInfo(news: News, progress: Int, delete: () -> Unit) {
+fun PopupInfo(news: News, progress: Int, delete: () -> Unit, navigateToWebPage: (String) -> Unit) {
     Card(
         elevation = 8.dp,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.padding(12.dp)
     ) {
+        val context = LocalContext.current
 
         CompositionLocalProvider(LocalTextStyle provides TextStyle(fontSize = 20.sp)) {
 
 
 //            Box(modifier = Modifier.padding(8.dp)) {
             Column(modifier = Modifier
-                .padding(horizontal = 8.dp).padding(top = 8.dp)
+                .padding(horizontal = 8.dp)
+                .padding(top = 8.dp)
                 .width(intrinsicSize = IntrinsicSize.Max)) {
 
 //                Column {
@@ -54,46 +67,98 @@ fun PopupInfo(news: News, progress: Int, delete: () -> Unit) {
 //                    InfoRow(tag = "   progress", description = "${progress}%")
 //                }
 
-                Row {
-                    Column(modifier = Modifier.width(intrinsicSize = IntrinsicSize.Max)) {
+                Column {
+                    Row {
+                        Column(modifier = Modifier.width(intrinsicSize = IntrinsicSize.Max)) {
 //                    Column(modifier = Modifier.weight(1f)) {
-                        if (news.source.isNotBlank()) {
-                            Text("   source    ")
+                            if (news.source.isNotBlank()) {
+                                Text("   source   ")
+                                Divider(modifier = Modifier.padding(vertical = 4.dp))
+                            }
+                            Text("   date   ")
                             Divider(modifier = Modifier.padding(vertical = 4.dp))
-                        }
-                        Text("   date    ")
-                        Divider(modifier = Modifier.padding(vertical = 4.dp))
 
-                        if (news.tag.isNotBlank()) {
-                            Text("   tag    ")
-                            Divider(modifier = Modifier.padding(vertical = 4.dp))
+                            if (news.tag.isNotBlank()) {
+                                Text("   tag   ")
+                                Divider(modifier = Modifier.padding(vertical = 4.dp))
+                            }
+                            Text("   progress   ")
+//                            ClickableIcon(painter = painterResource(R.drawable.delete),
+//                                tint = MaterialTheme.colors.error) { delete() }
+
                         }
-                        Text("   progress    ")
+                        Column(modifier = Modifier.width(intrinsicSize = IntrinsicSize.Max)) {
+//                    Column(modifier = Modifier.weight(2f)) {
+                            if (news.source.isNotBlank()) {
+                                Text(blank3 + news.source + blank3, modifier = Modifier.align(Alignment.End))
+                                Divider(modifier = Modifier.padding(vertical = 4.dp))
+                            }
+                            Text(blank3 + news.date + blank3, modifier = Modifier.align(Alignment.End))
+                            Divider(modifier = Modifier.padding(vertical = 4.dp))
+
+                            if (news.tag.isNotBlank()) {
+                                Text(blank3 + news.tag + blank3, modifier = Modifier.align(Alignment.End))
+                                Divider(modifier = Modifier.padding(vertical = 4.dp))
+                            }
+                            Text("$blank3$progress%$blank3", modifier = Modifier.align(Alignment.End))
+
+//                            if (news.url.isNotBlank()) {
+//                                Row(modifier = Modifier.align(Alignment.End)) {
+//                                    ClickableIcon(painter = painterResource(R.drawable.website)) {
+//
+//                                    }
+//                                    ClickableIcon(painter = painterResource(R.drawable.share)) {
+//                                        val sendIntent: Intent = Intent().apply {
+//                                            action = Intent.ACTION_SEND
+//                                            putExtra(Intent.EXTRA_TEXT, news.url)
+//                                            type = "text/plain"
+//                                        }
+//
+//                                        val shareIntent = Intent.createChooser(sendIntent, null)
+//                                        context.startActivity(shareIntent)
+//                                    }
+//
+//                                    val clipboard = LocalClipboardManager.current
+//                                    ClickableIcon(painter = painterResource(R.drawable.link)) {
+//                                        clipboard.setText(AnnotatedString(news.url))
+//                                        AppToast.show(context, "URL has been copy to clipboard!")
+//                                    }
+//                                }
+//                            }
+                        }
+                    }
+
+                    Row {
                         ClickableIcon(painter = painterResource(R.drawable.delete),
                             tint = MaterialTheme.colors.error) { delete() }
 
-                    }
-                    Column(modifier = Modifier.width(intrinsicSize = IntrinsicSize.Max)) {
-//                    Column(modifier = Modifier.weight(2f)) {
-                        if (news.source.isNotBlank()) {
-                            Text(news.source + "   ")
-                            Divider(modifier = Modifier.padding(vertical = 4.dp))
-                        }
-                        Text(news.date + "   ")
-                        Divider(modifier = Modifier.padding(vertical = 4.dp))
+                        Spacer(modifier = Modifier.weight(1f))
 
-                        if (news.tag.isNotBlank()) {
-                            Text("Tech   ")
-                            Divider(modifier = Modifier.padding(vertical = 4.dp))
-                        }
-                        Text("${progress}%   ")
-                        if (news.source.isNotBlank()) {
-                            Row(modifier = Modifier.align(Alignment.End)) {
-                                ClickableIcon(painter = painterResource(R.drawable.website), enabled = false)
-                                ClickableIcon(painter = painterResource(R.drawable.share), enabled = false)
-                                ClickableIcon(painter = painterResource(R.drawable.link), enabled = false)
+                        if (news.url.isNotBlank()) {
+                            Row {
+                                ClickableIcon(painter = painterResource(R.drawable.website)) {
+                                    navigateToWebPage(news.url)
+                                }
+
+                                ClickableIcon(painter = painterResource(R.drawable.share)) {
+                                    val sendIntent: Intent = Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        putExtra(Intent.EXTRA_TEXT, news.url)
+                                        type = "text/plain"
+                                    }
+
+                                    val shareIntent = Intent.createChooser(sendIntent, null)
+                                    context.startActivity(shareIntent)
+                                }
+
+                                val clipboard = LocalClipboardManager.current
+                                ClickableIcon(painter = painterResource(R.drawable.link)) {
+                                    clipboard.setText(AnnotatedString(news.url))
+                                    AppToast.show(context, "URL has been copy to clipboard!")
+                                }
                             }
                         }
+
                     }
                 }
 //        Text("2022/10/10  Tech")

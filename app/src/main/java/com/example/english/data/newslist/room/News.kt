@@ -12,9 +12,6 @@ data class News(
     @ColumnInfo(name = "news_title")
     var title: String = "No Title",
 
-//    @ColumnInfo(name = "news_caption")
-//    var caption: String = "No caption",
-
     @ColumnInfo(name = "source")
     var source: String = "",
 
@@ -22,23 +19,16 @@ data class News(
     var tag: String = "",
 
 
-// progress state
     @ColumnInfo
     var progress: Int = 0,
 
 
-    // add url and image column
-//    @ColumnInfo(name = "tag")
-//    val imageFile: String = "",
-
-//    @ColumnInfo(name = "url")
-//    val url: String = "",
+    @ColumnInfo(name = "url")
+    val url: String = "",
 
 
     // date
     @ColumnInfo(name = "date")
     val date: String = "",
 
-//@ColumnInfo(name = "end")
-//var end = ""
 )
