@@ -11,6 +11,10 @@ class DefaultWordRepository(private val dao: WordDao) : WordRepository {
         return dao.getWord(id)
     }
 
+    override suspend fun getWordSus(id: Int): Word {
+        return dao.getWordSus(id)
+    }
+
     override fun getWordByName(english: String): Flow<Word?> {
         return dao.getWordByEnglish(english)
     }

@@ -325,12 +325,12 @@ fun MainPage(viewModel: MainViewModel, navController: NavController, navigateToW
                     it,
                     viewModel,
                     {
-                        Log.d("!!!", "NewsCard onClick navigatable = $navigatable")
+//                        Log.d("!!!", "NewsCard onClick navigatable = $navigatable")
                         navigatable = false
                         navController.navigate(MainRoute.News.route)
                     },
                     {
-                        Log.d("!!!", "navigatable = $navigatable")
+//                        Log.d("!!!", "navigatable = $navigatable")
                         navigatable
                     },
                     context
@@ -441,8 +441,6 @@ fun NewsCard(
             }
         }) {
 
-            Log.d("!!!", (news.progress == 100).toString())
-
             Column(
                 modifier = Modifier
 //                    .drawBehind { drawRect(brush) }
@@ -519,7 +517,7 @@ fun NewsCard(
                         NewsWebsite.BBC.sourceName -> R.drawable.bbc
                         else -> null
                     }
-                    Log.d("!!!", "NewsCard: $sourceIcon")
+//                    Log.d("!!!", "NewsCard: $sourceIcon")
                     if (sourceIcon != null) {
                         Icon(painter = painterResource(id = R.drawable.bbc),
                             contentDescription = "bbc news",

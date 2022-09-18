@@ -295,6 +295,10 @@ class MainViewModel @Inject constructor(
         return wordRepository.getWord(id)
     }
 
+    suspend fun getWordByIdSus(id: Int): Word {
+        return wordRepository.getWordSus(id)
+    }
+
     suspend fun getWordId(english: String): Int? {
         return wordRepository.getWordIdSuspend(english)
     }

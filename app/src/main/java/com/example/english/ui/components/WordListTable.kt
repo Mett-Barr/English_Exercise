@@ -12,11 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -255,6 +256,8 @@ fun WordComponent(
     remove: () -> Unit,
     updateWord: () -> Unit,
     viewModel: MainViewModel,
+    focusWord: (Word) -> Unit = {},
+    unFocus: () -> Unit = {},
 ) {
 
 //    val currentWord = remember {
@@ -264,6 +267,11 @@ fun WordComponent(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val swipeRange = with(LocalDensity.current) { (48.dp).toPx() }
+
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+
+    var focusState by remember { mutableStateOf(false) }
 
 
     val anchors = mapOf(0f to "normal", -swipeRange to "delete", swipeRange to "translate")
@@ -434,6 +442,10 @@ fun WordComponent(
         Card(
             elevation = 3.dp,
             modifier = Modifier
+
+//                .focusable()
+//                .focusRequester(focusRequester)
+
                 .padding(horizontal = 2.dp, vertical = 4.dp)
                 .heightIn(min = 48.dp)
 //                .offset(y = anim)
@@ -455,6 +467,21 @@ fun WordComponent(
                 )
                 Divider(
                     modifier = Modifier
+
+//                        .focusTarget()
+                        .focusRequester(focusRequester)
+//                        .onFocusChanged {
+////                            if (!it.isFocused) unFocus()
+//                            Log.d("!!!", "Divider: onFocusChanged $it")
+//                        }
+
+                        .onFocusEvent {
+                            Log.d("!!!", "Divider: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
+                        }
+
+                        .focusTarget()
+                        .focusable()
+
                         .fillMaxHeight()
                         .width(1.dp),
                     color = MaterialTheme.colors.onBackground
@@ -470,7 +497,27 @@ fun WordComponent(
                         .align(Alignment.CenterVertically)
                         .weight(1F)
                         .padding(horizontal = 8.dp)
-                        .onFocusChanged { updateWord.invoke() },
+//                        .focusRequester(focusRequester)
+                        .onFocusChanged {
+                            if (it.isFocused) {
+                                focusWord(word.value)
+                                focusState = true
+                            } else {
+//                                focusWord(Word())
+                                updateWord()
+//                                unFocus()
+
+//                                focusManager.
+                                if (focusState) {
+                                    focusRequester.requestFocus()
+                                    focusState = false
+                                    Log.d("!!!", "word: focusRequester.requestFocus()")
+                                }
+
+//                                focusRequester.requestFocus()
+                            }
+                            Log.d("!!!", "word: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
+                        },
                     textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
                     cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
                 )

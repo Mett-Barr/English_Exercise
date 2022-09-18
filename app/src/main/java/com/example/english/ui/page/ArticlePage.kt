@@ -50,14 +50,13 @@ import com.example.english.ui.components.WordComponent
 import com.example.english.ui.components.test.PopupInfo
 import com.example.english.ui.theme.ColorDone
 import com.example.english.ui.theme.TextBackgroundAlphaLight
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 
 enum class AnnotationState {
-    TRANSLATION, WORDS, CLOSE
+    TRANSLATION, WORDS, CLOSE, ON_WORD
 }
 
 //enum class ReadMode(val position: Float) {
@@ -169,10 +168,16 @@ fun ArticlePage(
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val hideKeyboardModifier = Modifier.clickable(
+    val hideKeyboardModifier = Modifier
+
+
+
+//        .focusable()
+        .clickable(
         interactionSource = MutableInteractionSource(),
         indication = null
     ) {
+        Log.d("!!!", "hideKeyboardModifier ")
         focusManager.clearFocus()
         keyboardController?.hide()
     }
@@ -543,7 +548,8 @@ fun ArticlePage(
 //                                    - 8.dp,
                     ),
                     state = lazyListState,
-                    modifier = Modifier.animateContentSize()
+                    modifier = hideKeyboardModifier.animateContentSize()
+//                    modifier = Modifier.animateContentSize()
                 ) {
 
                     item {
@@ -638,13 +644,70 @@ fun ArticlePage(
                             }
                         }
 
-                        LaunchedEffect(selectedText.isNotBlank()) {
-//                            scope.launch {
-                            val id = viewModel.getWordId(selectedText)
-                            if(viewModel.wordListTable[paragraphIndex].contains(id)) {
-                                Log.d("!!!", "$selectedText true")
-//
+//                        var id by remember {
+//                            mutableStateOf(-1)
+//                        }
+//                        val selectedWord by viewModel.getWordById(id).collectAsState(initial = Word())
+                        val selectedWord = remember { mutableStateOf(Word()) }
+
+                        var focusWord by remember {
+                            mutableStateOf(Word())
+                        }
+
+                        var wordState by remember { mutableStateOf(false) }
+
+                        suspend fun onWordChange() {
+                            if (selectedText.isNotBlank()) {
+                                val id = viewModel.getWordId(selectedText)
+                                if (viewModel.wordListTable[paragraphIndex].contains(id)) {
+//                                Log.d("!!!", "$selectedText true")
+//                                if (annotationState)
+
+                                    selectedWord.value = viewModel.getWordByIdSus(id!!)
+                                    annotationState = AnnotationState.ON_WORD
+                                } else selectedWord.value = Word()
+
+//                            } else if (annotationState == AnnotationState.ON_WORD) {
+                            } else if (annotationState == AnnotationState.ON_WORD && focusWord != selectedWord.value) {
+                                if (focusWord != Word()) {
+                                    focusWord = Word()
+                                } else {
+                                    annotationState = AnnotationState.CLOSE
+                                }
                             }
+
+
+                            Log.d("!!!",
+                                "ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
+                        }
+
+
+                        LaunchedEffect(selectedText) {
+                            onWordChange()
+
+//                            if (selectedText.isNotBlank()){
+//                                val id = viewModel.getWordId(selectedText)
+//                                if(viewModel.wordListTable[paragraphIndex].contains(id)) {
+////                                Log.d("!!!", "$selectedText true")
+////                                if (annotationState)
+//
+//                                    selectedWord.value = viewModel.getWordByIdSus(id!!)
+//                                    annotationState = AnnotationState.ON_WORD
+//                                }
+//                            } else if (annotationState == AnnotationState.ON_WORD && focusWord != selectedWord.value) annotationState = AnnotationState.CLOSE
+//
+//
+//                            Log.d("!!!", "ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
+                        }
+
+                        LaunchedEffect(focusWord) {
+//                        LaunchedEffect(selectedWord.value) {
+                            onWordChange()
+                        }
+
+                        LaunchedEffect(wordState) {
+                            Log.d("!!!", "wordState = $wordState")
+                            onWordChange()
                         }
 
 
@@ -659,6 +722,9 @@ fun ArticlePage(
 //                                    .background(MaterialTheme.colors.background)
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                                 .fillMaxWidth()
+
+                                .then(hideKeyboardModifier)
+
                                 .wrapContentHeight(),
 //                        .clip(RoundedCornerShape(16.dp)),
                             backgroundColor = MaterialTheme.colors.surface,
@@ -709,7 +775,7 @@ fun ArticlePage(
 
 
                                 // button row
-                                Row(modifier = Modifier.fillMaxWidth()) {
+                                Row(modifier = hideKeyboardModifier.fillMaxWidth()) {
 
                                     fun isDone(): Boolean {
                                         return if (paragraphContent.text.isNotEmpty()) {
@@ -764,9 +830,15 @@ fun ArticlePage(
 //                                    )
 
                                     Spacer(modifier = Modifier
+//                                    hideKeyboardModifier
+//                                        .background(Color.White)
+//                                        .fillMaxSize()
+//                                        .fillMaxHeight()
+//                                        .height(48.dp)
                                         .weight(1F)
-                                        .focusable()
-                                        .clickable { })
+//                                        .focusable()
+//                                        .clickable { }
+                                    )
 
                                     SelectableIcon(
                                         painter = painterResource(id = R.drawable.translation),
@@ -1018,6 +1090,30 @@ fun ArticlePage(
                                         AnnotationState.CLOSE -> {
                                             LaunchedEffect(key1 = 1) {
                                                 color.animateTo(Color.White)
+                                            }
+                                        }
+
+
+                                        AnnotationState.ON_WORD -> {
+                                            Box(modifier = Modifier.padding(bottom = 8.dp)) {
+                                                WordComponent(
+//                                                word = viewModel.getWordById(id).collectAsState(
+//                                                initial = Word()),
+                                                    word = selectedWord,
+                                                    onValueChange = {
+                                                        selectedWord.value =
+                                                            selectedWord.value.copy(chinese = it)
+                                                    },
+                                                    remove = {
+                                                        viewModel.wordListTable[paragraphIndex].remove(
+                                                            selectedWord.value.id)
+                                                    },
+                                                    updateWord = { viewModel.updateWord(selectedWord.value) },
+                                                    viewModel = viewModel,
+                                                    focusWord = { focusWord = it },
+                                                    unFocus = { selectedWord.value = Word() }
+//                                                unFocus = { wordState = true}
+                                                )
                                             }
                                         }
                                     }
