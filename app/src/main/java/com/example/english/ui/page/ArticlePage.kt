@@ -165,6 +165,13 @@ fun ArticlePage(
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
+//    var wordState by remember { mutableStateOf(false) }
+
+    var focusWord by remember {
+        mutableStateOf(Word())
+    }
+
+
     val hideKeyboardModifier = Modifier
 
 
@@ -176,6 +183,10 @@ fun ArticlePage(
             Log.d("!!!", "hideKeyboardModifier ")
             focusManager.clearFocus()
             keyboardController?.hide()
+
+
+            if (focusWord != Word()) focusWord = Word()
+//            else
         }
 
     fun getRid(boolean: Boolean): Int =
@@ -629,7 +640,7 @@ fun ArticlePage(
                         val selectedText by remember {
                             derivedStateOf {
 //                                val text =
-                                    viewModel.currentContent[paragraphIndex].getSelectedText().text
+                                viewModel.currentContent[paragraphIndex].getSelectedText().text
 
 //                                if (text.isNotBlank()) {
 //                                    viewModel.getWordId(text)
@@ -646,9 +657,9 @@ fun ArticlePage(
 //                        val selectedWord by viewModel.getWordById(id).collectAsState(initial = Word())
                         val selectedWord = remember { mutableStateOf(Word()) }
 
-                        var focusWord by remember {
-                            mutableStateOf(Word())
-                        }
+//                        var focusWord by remember {
+//                            mutableStateOf(Word())
+//                        }
 
 //                        var wordState by remember { mutableStateOf(false) }
 

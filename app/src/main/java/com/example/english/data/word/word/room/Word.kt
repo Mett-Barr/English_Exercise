@@ -17,5 +17,5 @@ data class Word(
 )
 
 object EmptyWord {
-    val obj = Word(-1, "", "")
+    val word = Word(-1, "", "")
 }
