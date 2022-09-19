@@ -43,10 +43,7 @@ import com.example.english.content
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.isDone
-import com.example.english.ui.components.ClickableIcon
-import com.example.english.ui.components.FlatTextField
-import com.example.english.ui.components.SelectableIcon
-import com.example.english.ui.components.WordComponent
+import com.example.english.ui.components.*
 import com.example.english.ui.components.test.PopupInfo
 import com.example.english.ui.theme.ColorDone
 import com.example.english.ui.theme.TextBackgroundAlphaLight
@@ -171,16 +168,15 @@ fun ArticlePage(
     val hideKeyboardModifier = Modifier
 
 
-
 //        .focusable()
         .clickable(
-        interactionSource = MutableInteractionSource(),
-        indication = null
-    ) {
-        Log.d("!!!", "hideKeyboardModifier ")
-        focusManager.clearFocus()
-        keyboardController?.hide()
-    }
+            interactionSource = MutableInteractionSource(),
+            indication = null
+        ) {
+            Log.d("!!!", "hideKeyboardModifier ")
+            focusManager.clearFocus()
+            keyboardController?.hide()
+        }
 
     fun getRid(boolean: Boolean): Int =
         if (boolean) R.drawable.arrow_less else R.drawable.arrow_more
@@ -238,14 +234,14 @@ fun ArticlePage(
         offset.toDp()
     }
 
-    LaunchedEffect(key1 = Unit) {
-        scope.launch {
-            while (true) {
-                delay(1000)
-                Log.d("!!", "NewsArticlePage: $naviBarPadding")
-            }
-        }
-    }
+//    LaunchedEffect(key1 = Unit) {
+//        scope.launch {
+//            while (true) {
+//                delay(1000)
+//                Log.d("!!", "NewsArticlePage: $naviBarPadding")
+//            }
+//        }
+//    }
 
     /** SegmentedControls */
 //    val width = 96.dp
@@ -632,7 +628,7 @@ fun ArticlePage(
                         //!!!!!
                         val selectedText by remember {
                             derivedStateOf {
-                                val text =
+//                                val text =
                                     viewModel.currentContent[paragraphIndex].getSelectedText().text
 
 //                                if (text.isNotBlank()) {
@@ -640,7 +636,7 @@ fun ArticlePage(
 ////                                    if (viewModel.wordListTable[paragraphIndex].)
 //                                    }
 
-                                text
+//                                text
                             }
                         }
 
@@ -654,9 +650,12 @@ fun ArticlePage(
                             mutableStateOf(Word())
                         }
 
-                        var wordState by remember { mutableStateOf(false) }
+//                        var wordState by remember { mutableStateOf(false) }
 
                         suspend fun onWordChange() {
+                            Log.d("!!!",
+                                "1 ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
+
                             if (selectedText.isNotBlank()) {
                                 val id = viewModel.getWordId(selectedText)
                                 if (viewModel.wordListTable[paragraphIndex].contains(id)) {
@@ -664,8 +663,12 @@ fun ArticlePage(
 //                                if (annotationState)
 
                                     selectedWord.value = viewModel.getWordByIdSus(id!!)
+                                    Log.d("!!!", "selectedText.isNotBlank  ${selectedWord.value}")
                                     annotationState = AnnotationState.ON_WORD
-                                } else selectedWord.value = Word()
+                                } else {
+                                    annotationState = AnnotationState.CLOSE
+//                                    selectedWord.value = Word()
+                                }
 
 //                            } else if (annotationState == AnnotationState.ON_WORD) {
                             } else if (annotationState == AnnotationState.ON_WORD && focusWord != selectedWord.value) {
@@ -678,7 +681,7 @@ fun ArticlePage(
 
 
                             Log.d("!!!",
-                                "ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
+                                "2 ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
                         }
 
 
@@ -705,10 +708,10 @@ fun ArticlePage(
                             onWordChange()
                         }
 
-                        LaunchedEffect(wordState) {
-                            Log.d("!!!", "wordState = $wordState")
-                            onWordChange()
-                        }
+//                        LaunchedEffect(wordState) {
+//                            Log.d("!!!", "wordState = $wordState")
+//                            onWordChange()
+//                        }
 
 
                         val getElevation = if (MaterialTheme.colors.isLight) 8.dp else 1.dp
@@ -742,7 +745,10 @@ fun ArticlePage(
                                 )
                             ) {
 
+//                                FlatText(text = paragraphContent.text.content())
+
                                 FlatTextField(
+//                                    value = paragraphContent.text.content(),
                                     value = if (paragraphContent.text.isDone()) {
                                         paragraphContent.copy(
                                             text = paragraphContent.text.removeRange(
@@ -752,7 +758,9 @@ fun ArticlePage(
                                         )
                                     } else paragraphContent,
                                     onValueChange = {
-                                        viewModel.currentContent[paragraphIndex] = it
+                                        viewModel.currentContent[paragraphIndex] =
+                                            paragraphContent.copy(selection = it.selection,
+                                                composition = it.composition)
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     readOnly = true
@@ -777,15 +785,17 @@ fun ArticlePage(
                                 // button row
                                 Row(modifier = hideKeyboardModifier.fillMaxWidth()) {
 
-                                    fun isDone(): Boolean {
-                                        return if (paragraphContent.text.isNotEmpty()) {
-                                            paragraphContent.text.isDone()
-                                        } else false
+                                    fun isParagraphDone(): Boolean {
+//                                        Log.d("!!!", "isDone: ${paragraphContent.text}")
+//                                        return if (paragraphContent.text.isNotEmpty()) {
+//                                            paragraphContent.text.isDone()
+//                                        } else false
+                                        return paragraphContent.text.isDone()
                                     }
 
                                     val transition =
                                         updateTransition(
-                                            targetState = isDone(),
+                                            targetState = isParagraphDone(),
                                             label = "transition"
                                         )
 
@@ -811,7 +821,7 @@ fun ArticlePage(
 //                                        modifier = Modifier.alpha(doneAlpha),
 //                                        selectedColor = ColorDone,
 //                                        selectedColor = doneColor,
-                                        isSelected = isDone()
+                                        isSelected = isParagraphDone()
                                     )
 //                                    ClickableIcon(
 //                                        painter = painterResource(id = R.drawable.done_broad),
@@ -829,16 +839,7 @@ fun ArticlePage(
 //                                        tint = doneColor
 //                                    )
 
-                                    Spacer(modifier = Modifier
-//                                    hideKeyboardModifier
-//                                        .background(Color.White)
-//                                        .fillMaxSize()
-//                                        .fillMaxHeight()
-//                                        .height(48.dp)
-                                        .weight(1F)
-//                                        .focusable()
-//                                        .clickable { }
-                                    )
+                                    Spacer(modifier = Modifier.weight(1F))
 
                                     SelectableIcon(
                                         painter = painterResource(id = R.drawable.translation),
@@ -866,42 +867,111 @@ fun ArticlePage(
                                     val wordIconState by remember {
                                         derivedStateOf { selectedText.isNotBlank() || viewModel.wordListTable[paragraphIndex].isNotEmpty() }
                                     }
-                                    SelectableIcon(
-                                        painter = painterResource(id = R.drawable.word),
-                                        enabled = wordIconState,
-                                        isSelected = annotationState == AnnotationState.WORDS,
+
+//                                    var isWordIconAdd by remember {
+//                                        mutableStateOf(false)
+//                                    }
+
+                                    val painterAdd = painterResource(id = R.drawable.add_board)
+                                    val painterWord = painterResource(id = R.drawable.word)
+
+                                    var wordIconPainter by remember {
+                                        mutableStateOf(painterWord)
+                                    }
+
+                                    LaunchedEffect(selectedText) {
+//                                        Log.d("!!!", "wordIconState")
+                                        wordIconPainter = if (wordIconState) {
+                                            val id = viewModel.getWordId(selectedText)
+                                            if (viewModel.wordListTable[paragraphIndex].contains(id)) painterWord
+                                            else if (annotationState == AnnotationState.WORDS) painterWord
+                                            else if (selectedText.isBlank()) painterWord
+                                            else painterAdd
+                                        } else painterWord
+
+                                        Log.d("!!!",
+                                            "wordIconPainter == painterAdd  ${wordIconPainter == painterAdd}")
+
+                                        Log.d("!!!", "selectedText = $selectedText ")
+                                    }
+
+                                    AnimatedContent(targetState = wordIconPainter) {
+                                        SelectableIcon(
+                                            painter = it,
+                                            enabled = wordIconState,
+                                            isSelected = annotationState == AnnotationState.WORDS,
 //                                        selectedColor = ColorDone,
-                                        modifier = Modifier.focusable()
-                                    ) {
+                                            modifier = Modifier.focusable()
+                                        ) {
+                                            // 更換Icon
+                                            wordIconPainter = painterWord
 
-                                        // 清除上一次選重的單字
-                                        viewModel.noCurrentWord()
+                                            // 清除上一次選重的單字
+                                            viewModel.noCurrentWord()
 
-                                        // 1.檢測是否選取單字
+                                            // 1.檢測是否選取單字
 //                                    val contentText = paragraphContent.getSelectedText().text
-                                        annotationState = if (selectedText.isNotBlank()) {
+                                            annotationState = if (selectedText.isNotBlank()) {
 
 
-                                            viewModel.addWordListTable(
-                                                selectedText,
-                                                paragraphIndex
-                                            )
-
-                                            viewModel.currentContent[paragraphIndex] =
-                                                viewModel.currentContent[paragraphIndex].copy(
-                                                    selection = TextRange.Zero
+                                                viewModel.addWordListTable(
+                                                    selectedText,
+                                                    paragraphIndex
                                                 )
 
+                                                viewModel.currentContent[paragraphIndex] =
+                                                    viewModel.currentContent[paragraphIndex].copy(
+                                                        selection = TextRange.Zero
+                                                    )
 
-                                            // 2.translate並且開啟annotation欄位
 
-                                            AnnotationState.WORDS
-                                        } else {
-                                            // 3.檢測開啟狀態，決定開關annotation欄位
-                                            if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
-                                            else AnnotationState.WORDS
+                                                // 2.translate並且開啟annotation欄位
+
+                                                AnnotationState.WORDS
+                                            } else {
+                                                // 3.檢測開啟狀態，決定開關annotation欄位
+                                                if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
+                                                else AnnotationState.WORDS
+                                            }
                                         }
                                     }
+
+//                                    SelectableIcon(
+//                                        painter = painterResource(id = R.drawable.word),
+//                                        enabled = wordIconState,
+//                                        isSelected = annotationState == AnnotationState.WORDS,
+////                                        selectedColor = ColorDone,
+//                                        modifier = Modifier.focusable()
+//                                    ) {
+//
+//                                        // 清除上一次選重的單字
+//                                        viewModel.noCurrentWord()
+//
+//                                        // 1.檢測是否選取單字
+////                                    val contentText = paragraphContent.getSelectedText().text
+//                                        annotationState = if (selectedText.isNotBlank()) {
+//
+//
+//                                            viewModel.addWordListTable(
+//                                                selectedText,
+//                                                paragraphIndex
+//                                            )
+//
+//                                            viewModel.currentContent[paragraphIndex] =
+//                                                viewModel.currentContent[paragraphIndex].copy(
+//                                                    selection = TextRange.Zero
+//                                                )
+//
+//
+//                                            // 2.translate並且開啟annotation欄位
+//
+//                                            AnnotationState.WORDS
+//                                        } else {
+//                                            // 3.檢測開啟狀態，決定開關annotation欄位
+//                                            if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
+//                                            else AnnotationState.WORDS
+//                                        }
+//                                    }
                                     AnimatedContent(targetState = openState) {
                                         ClickableIcon(
                                             painter = painterResource(id = getRid(it))
@@ -1111,7 +1181,7 @@ fun ArticlePage(
                                                     updateWord = { viewModel.updateWord(selectedWord.value) },
                                                     viewModel = viewModel,
                                                     focusWord = { focusWord = it },
-                                                    unFocus = { selectedWord.value = Word() }
+//                                                    unFocus = { selectedWord.value = Word() }
 //                                                unFocus = { wordState = true}
                                                 )
                                             }

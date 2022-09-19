@@ -60,6 +60,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // word test
+        viewModel.deleteWordTest()
+
 //        lifecycleScope.launch(Dispatchers.IO) {
 //            jsoupTagTest()
 //            val str = JsoupNews("https://www.bbc.com/news/technology-62833037").getTag()

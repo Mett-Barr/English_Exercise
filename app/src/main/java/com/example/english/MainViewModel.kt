@@ -14,6 +14,7 @@ import com.example.english.data.newslist.Repository
 import com.example.english.data.newslist.room.News
 import com.example.english.data.word.addInWordListTable
 import com.example.english.data.word.word.WordRepository
+import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.network.JsoupNews
 import com.example.english.network.imageStore
@@ -146,6 +147,9 @@ class MainViewModel @Inject constructor(
 
         // get content for page
         getFile(context)
+
+        // clean old state
+        allDoneList.clear()
     }
 
     fun removeCurrentParagraph(index: Int) {
@@ -346,6 +350,14 @@ class MainViewModel @Inject constructor(
             addInWordListTable(english, wordRepository, wordListTable[index])
         }
 
+    }
+
+    // Delete
+    fun deleteWordTest() {
+
+        viewModelScope.launch {
+            wordRepository.deleteWord(EmptyWord.word)
+        }
     }
 
 

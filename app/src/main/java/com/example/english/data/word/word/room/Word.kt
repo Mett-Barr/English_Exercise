@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "WordTable")
 data class Word(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = -1,
+    val id: Int = 0,
 
     @ColumnInfo(name = "english")
     var english: String = "",
@@ -17,5 +17,5 @@ data class Word(
 )
 
 object EmptyWord {
-    val word = Word(0, "", "")
+    val word = Word(-1, "", "")
 }

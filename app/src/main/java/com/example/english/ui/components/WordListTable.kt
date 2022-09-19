@@ -257,7 +257,7 @@ fun WordComponent(
     updateWord: () -> Unit,
     viewModel: MainViewModel,
     focusWord: (Word) -> Unit = {},
-    unFocus: () -> Unit = {},
+//    unFocus: () -> Unit = {},
 ) {
 
 //    val currentWord = remember {
@@ -469,18 +469,18 @@ fun WordComponent(
                     modifier = Modifier
 
 //                        .focusTarget()
-                        .focusRequester(focusRequester)
+//                        .focusRequester(focusRequester)
 //                        .onFocusChanged {
 ////                            if (!it.isFocused) unFocus()
 //                            Log.d("!!!", "Divider: onFocusChanged $it")
 //                        }
 
-                        .onFocusEvent {
-                            Log.d("!!!", "Divider: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
-                        }
+//                        .onFocusEvent {
+//                            Log.d("!!!", "Divider: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
+//                        }
 
-                        .focusTarget()
-                        .focusable()
+//                        .focusTarget()
+//                        .focusable()
 
                         .fillMaxHeight()
                         .width(1.dp),
