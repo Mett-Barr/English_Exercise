@@ -258,6 +258,8 @@ fun WordComponent(
     viewModel: MainViewModel,
     focusWord: (Word) -> Unit = {},
     unFocus: () -> Unit = {},
+    clickOutside: () -> Unit = {},
+    state: Boolean = true
 ) {
 
 //    val currentWord = remember {
@@ -289,7 +291,7 @@ fun WordComponent(
         }
     }
 
-    Log.d("!! ?", "word.value.english:${word.value.english}")
+//    Log.d("!! ?", "word.value.english:${word.value.english}")
 
     fun swipeToTr() {
         coroutineScope.launch {
@@ -476,7 +478,7 @@ fun WordComponent(
 //                        }
 
                         .onFocusEvent {
-                            Log.d("!!!", "Divider: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
+//                            Log.d("!!!", "Divider: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
                         }
 
                         .focusTarget()
@@ -511,12 +513,12 @@ fun WordComponent(
                                 if (focusState) {
                                     focusRequester.requestFocus()
                                     focusState = false
-                                    Log.d("!!!", "word: focusRequester.requestFocus()")
+//                                    Log.d("!!!", "word: focusRequester.requestFocus()")
                                 }
 
 //                                focusRequester.requestFocus()
                             }
-                            Log.d("!!!", "word: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
+//                            Log.d("!!!", "word: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
                         },
                     textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
                     cursorBrush = SolidColor(MaterialTheme.colors.onBackground),

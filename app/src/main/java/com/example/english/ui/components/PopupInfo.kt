@@ -1,6 +1,8 @@
 package com.example.english.ui.components.test
 
 import android.content.Intent
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +33,7 @@ const val blank3 = "   "
 const val blank4 = "    "
 
 //@Preview
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PopupInfo(news: News, progress: Int, delete: () -> Unit, navigateToWebPage: (String) -> Unit) {
     Card(
@@ -100,7 +103,16 @@ fun PopupInfo(news: News, progress: Int, delete: () -> Unit, navigateToWebPage: 
                                 Text(blank3 + news.tag + blank3, modifier = Modifier.align(Alignment.End))
                                 Divider(modifier = Modifier.padding(vertical = 4.dp))
                             }
-                            Text("$blank3$progress%$blank3", modifier = Modifier.align(Alignment.End))
+                            Row(modifier = Modifier.align(Alignment.End)) {
+                                AnimatedContent(targetState = progress) {
+                                    Text("$blank3$it")
+                                }
+                                Text(text = "%$blank3")
+                            }
+//                            AnimatedContent(targetState = progress, modifier = Modifier.align(Alignment.End)) {
+//                                Text("$blank3$it%$blank3", modifier = Modifier.align(Alignment.End))
+//                            }
+//                            Text("$blank3$progress%$blank3", modifier = Modifier.align(Alignment.End))
 
 //                            if (news.url.isNotBlank()) {
 //                                Row(modifier = Modifier.align(Alignment.End)) {

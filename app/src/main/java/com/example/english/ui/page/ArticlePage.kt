@@ -94,8 +94,11 @@ fun ArticlePage(
 
     // Popup Info
     var infoCardIsOpening by remember { mutableStateOf(false) }
-    val maskColor by animateColorAsState(targetValue = if (infoCardIsOpening) MaterialTheme.colors.background.copy(
-        alpha = 0.8f) else Color.Transparent, animationSpec = tween(300))
+    val maskColor by animateColorAsState(
+        targetValue = if (infoCardIsOpening) MaterialTheme.colors.background.copy(
+            alpha = 0.8f
+        ) else Color.Transparent, animationSpec = tween(300)
+    )
 
 
     // system bar
@@ -168,19 +171,28 @@ fun ArticlePage(
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val hideKeyboardModifier = Modifier
+    var oneWordOpenState by remember { mutableStateOf(false) }
 
+    var focusWord by remember {
+        mutableStateOf(EmptyWord.obj)
+    }
+
+
+    val hideKeyboardModifier = Modifier
 
 
 //        .focusable()
         .clickable(
-        interactionSource = MutableInteractionSource(),
-        indication = null
-    ) {
-        Log.d("!!!", "hideKeyboardModifier ")
-        focusManager.clearFocus()
-        keyboardController?.hide()
-    }
+            interactionSource = MutableInteractionSource(),
+            indication = null
+        ) {
+            Log.d("!!!", "hideKeyboardModifier ")
+            focusManager.clearFocus()
+            keyboardController?.hide()
+
+            if (focusWord != EmptyWord.obj) focusWord = EmptyWord.obj
+            else oneWordOpenState = false
+        }
 
     fun getRid(boolean: Boolean): Int =
         if (boolean) R.drawable.arrow_less else R.drawable.arrow_more
@@ -385,8 +397,10 @@ fun ArticlePage(
                             Spacer(
                                 modifier = Modifier
                                     .offset {
-                                        IntOffset(swipeableState.offset.value.roundToInt(),
-                                            0)
+                                        IntOffset(
+                                            swipeableState.offset.value.roundToInt(),
+                                            0
+                                        )
                                     }
                                     .padding(6.dp)
                                     .clip(CircleShape)
@@ -402,8 +416,10 @@ fun ArticlePage(
                                 color = Color(0xFF777777),
                                 modifier = Modifier
                                     .offset {
-                                        IntOffset(swipeableState.offset.value.roundToInt(),
-                                            0)
+                                        IntOffset(
+                                            swipeableState.offset.value.roundToInt(),
+                                            0
+                                        )
                                     }
                                     .padding(6.dp)
                                     .size(36.dp)
@@ -542,9 +558,10 @@ fun ArticlePage(
                 }
 
                 LazyColumn(
-                    contentPadding = PaddingValues(bottom =
+                    contentPadding = PaddingValues(
+                        bottom =
 //                    WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() +
-                    paddingValues.calculateBottomPadding() + 4.dp
+                        paddingValues.calculateBottomPadding() + 4.dp
 //                                    - 8.dp,
                     ),
                     state = lazyListState,
@@ -647,16 +664,16 @@ fun ArticlePage(
 //                        var id by remember {
 //                            mutableStateOf(-1)
 //                        }
-//                        val selectedWord by viewModel.getWordById(id).collectAsState(initial = Word())
-                        val selectedWord = remember { mutableStateOf(Word()) }
+//                        val selectedWord by viewModel.getWordById(id).collectAsState(initial = EmptyWord.obj)
+                        val selectedWord = remember { mutableStateOf(EmptyWord.obj) }
 
-                        var focusWord by remember {
-                            mutableStateOf(Word())
-                        }
+//                        var focusWord by remember {
+//                            mutableStateOf(EmptyWord.obj)
+//                        }
 
                         var wordState by remember { mutableStateOf(false) }
 
-                        suspend fun onWordChange() {
+                        suspend fun oneWordChange() {
                             if (selectedText.isNotBlank()) {
                                 val id = viewModel.getWordId(selectedText)
                                 if (viewModel.wordListTable[paragraphIndex].contains(id)) {
@@ -665,25 +682,27 @@ fun ArticlePage(
 
                                     selectedWord.value = viewModel.getWordByIdSus(id!!)
                                     annotationState = AnnotationState.ON_WORD
-                                } else selectedWord.value = Word()
+                                } else selectedWord.value = EmptyWord.obj
 
 //                            } else if (annotationState == AnnotationState.ON_WORD) {
                             } else if (annotationState == AnnotationState.ON_WORD && focusWord != selectedWord.value) {
-                                if (focusWord != Word()) {
-                                    focusWord = Word()
+                                if (focusWord != EmptyWord.obj) {
+//                                    focusWord = EmptyWord.obj
                                 } else {
                                     annotationState = AnnotationState.CLOSE
                                 }
                             }
 
 
-                            Log.d("!!!",
-                                "ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
+//                            Log.d(
+//                                "!!!",
+//                                "ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord"
+//                            )
                         }
 
 
                         LaunchedEffect(selectedText) {
-                            onWordChange()
+                            oneWordChange()
 
 //                            if (selectedText.isNotBlank()){
 //                                val id = viewModel.getWordId(selectedText)
@@ -700,14 +719,21 @@ fun ArticlePage(
 //                            Log.d("!!!", "ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
                         }
 
-                        LaunchedEffect(focusWord) {
-//                        LaunchedEffect(selectedWord.value) {
-                            onWordChange()
-                        }
+//                        LaunchedEffect(focusWord) {
+//                            Log.d("!!!", "focusWord $focusWord")
+//
+////                        LaunchedEffect(selectedWord.value) {
+//                            oneWordChange()
+//                        }
 
                         LaunchedEffect(wordState) {
                             Log.d("!!!", "wordState = $wordState")
-                            onWordChange()
+                            oneWordChange()
+                        }
+
+                        LaunchedEffect(!oneWordOpenState) {
+                            Log.d("!!!", "oneWordOpenState $oneWordOpenState")
+                            oneWordChange()
                         }
 
 
@@ -829,13 +855,14 @@ fun ArticlePage(
 //                                        tint = doneColor
 //                                    )
 
-                                    Spacer(modifier = Modifier
+                                    Spacer(
+                                        modifier = Modifier
 //                                    hideKeyboardModifier
 //                                        .background(Color.White)
 //                                        .fillMaxSize()
 //                                        .fillMaxHeight()
 //                                        .height(48.dp)
-                                        .weight(1F)
+                                            .weight(1F)
 //                                        .focusable()
 //                                        .clickable { }
                                     )
@@ -965,7 +992,7 @@ fun ArticlePage(
                                             val wordList: SnapshotStateList<MutableState<Word>> =
                                                 list.map {
                                                     viewModel.getWordById(it)
-                                                        .collectAsState(initial = EmptyWord.word) as MutableState<Word>
+                                                        .collectAsState(initial = EmptyWord.obj) as MutableState<Word>
                                                 }.toMutableStateList()
 //                                        emptyList<MutableState<Word>>().toMutableStateList()
 
@@ -1046,7 +1073,8 @@ fun ArticlePage(
 //                                                                word.value.id
 //                                                            )
                                                             viewModel.wordListTable[paragraphIndex].remove(
-                                                                word.value.id)
+                                                                word.value.id
+                                                            )
 //                                                            Log.d(
 //                                                                "!!",
 //                                                                viewModel.wordListTable[index].toList()
@@ -1098,7 +1126,7 @@ fun ArticlePage(
                                             Box(modifier = Modifier.padding(bottom = 8.dp)) {
                                                 WordComponent(
 //                                                word = viewModel.getWordById(id).collectAsState(
-//                                                initial = Word()),
+//                                                initial = EmptyWord.obj),
                                                     word = selectedWord,
                                                     onValueChange = {
                                                         selectedWord.value =
@@ -1106,13 +1134,21 @@ fun ArticlePage(
                                                     },
                                                     remove = {
                                                         viewModel.wordListTable[paragraphIndex].remove(
-                                                            selectedWord.value.id)
+                                                            selectedWord.value.id
+                                                        )
                                                     },
                                                     updateWord = { viewModel.updateWord(selectedWord.value) },
                                                     viewModel = viewModel,
-                                                    focusWord = { focusWord = it },
-                                                    unFocus = { selectedWord.value = Word() }
-//                                                unFocus = { wordState = true}
+                                                    focusWord = {
+                                                        focusWord = it
+                                                        oneWordOpenState = true
+                                                    },
+//                                                    unFocus = { selectedWord.value = EmptyWord.obj },
+//                                                unFocus = { wordState = true},
+
+//                                                    clickOutside = {
+//                                                        oneWordOpenState = true
+//                                                    }
                                                 )
                                             }
                                         }
@@ -1157,16 +1193,21 @@ fun ArticlePage(
             AnimatedVisibility(
                 visible = infoCardIsOpening,
                 enter = scaleIn() + fadeIn() + slideIn { fullSize ->
-                    IntOffset(0,
-                        fullSize.height / 5 * 2)
+                    IntOffset(
+                        0,
+                        fullSize.height / 5 * 2
+                    )
                 },
                 exit = scaleOut() + fadeOut() + slideOut { fullSize ->
-                    IntOffset(0,
-                        fullSize.height / 5 * 2)
+                    IntOffset(
+                        0,
+                        fullSize.height / 5 * 2
+                    )
                 },
                 modifier = Modifier
                     .padding(bottom = paddingValues.calculateBottomPadding())
-                    .align(Alignment.BottomCenter)) {
+                    .align(Alignment.BottomCenter)
+            ) {
                 PopupInfo(viewModel.currentNews,
                     progress,
                     { deleteArticleDialog = true }) { navigateToWebPage(it) }
