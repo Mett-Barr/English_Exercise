@@ -58,7 +58,7 @@ class MainViewModel @Inject constructor(
     /** current news */
     var currentNews by mutableStateOf(News())
     private var currentNewsId by mutableStateOf("0")
-    private var currentNewsSize by mutableStateOf(0)
+    var currentNewsSize by mutableStateOf(0)
 
     var currentImage by mutableStateOf<Bitmap?>(null)
     var currentTitle by mutableStateOf("Title")
@@ -73,12 +73,20 @@ class MainViewModel @Inject constructor(
     var currentWord by mutableStateOf<String?>(null)
 
     //    var currentProgress by mutableStateOf(0)
+
+
+    /** Done State */
     val allDoneList = mutableStateListOf<Int>()
 
     fun allDone() {
         viewModelScope.launch {
-            currentContent.forEachIndexed { index, textFieldValue ->
-                if (textFieldValue.text.first() != '^') {
+//            currentContent.forEachIndexed { index, textFieldValue ->
+//                if (textFieldValue.text.first() != '^') {
+//                    allDoneList.add(index)
+//                }
+//            }
+            currentContentTr.forEachIndexed { index, textFieldValue ->
+                if (!textFieldValue.text.isDone()) {
                     allDoneList.add(index)
                 }
             }
@@ -91,21 +99,32 @@ class MainViewModel @Inject constructor(
     fun allUndone() {
         viewModelScope.launch {
             val doneList = mutableListOf<Int>()
-            currentContent.forEachIndexed { index, textFieldValue ->
+//            currentContent.forEachIndexed { index, textFieldValue ->
+//                if (textFieldValue.text.isDone()) {
+//                    doneList.add(index)
+//                }
+//            }
+            currentContentTr.forEachIndexed { index, textFieldValue ->
                 if (textFieldValue.text.isDone()) {
                     doneList.add(index)
                 }
             }
             doneList.forEach {
-                currentContent[it] = currentContent[it].copy(text = currentContent[it].text.content())
+//                currentContent[it] = currentContent[it].copy(text = currentContent[it].text.content())
+                currentContentTr[it] = currentContentTr[it].copy(text = currentContentTr[it].text.content())
             }
         }
     }
 
     fun undoAllDone() {
         viewModelScope.launch {
+//            allDoneList.forEach {
+//                if (currentContent[it].text.isDone()) {
+//                    changeDoneState(it)
+//                }
+//            }
             allDoneList.forEach {
-                if (currentContent[it].text.isDone()) {
+                if (currentContentTr[it].text.isDone()) {
                     changeDoneState(it)
                 }
             }
@@ -113,6 +132,27 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun changeDoneState(index: Int) {
+//        currentContent.also {
+//            if (it[index].text.first() == '^') {
+//                it[index] = it[index].copy(text = it[index].text.removeRange(0, 1))
+//            } else {
+//                it[index] = it[index].copy(text = '^' + it[index].text)
+//            }
+//        }
+
+        Log.d("!!!", "1 changeDoneState: ${currentContentTr[index].text}")
+        currentContentTr.also {
+            if (it[index].text.isDone()) {
+                it[index] = it[index].copy(text = it[index].text.removeRange(0, 1))
+            } else {
+                it[index] = it[index].copy(text = '^' + it[index].text)
+            }
+        }
+        Log.d("!!!", "2 changeDoneState: ${currentContentTr[index].text}")
+
+    }
+    /** Done State */
 
 
 //    private fun wordExistCheck(word: String, index: Int) {
@@ -158,15 +198,6 @@ class MainViewModel @Inject constructor(
         currentContentTr.removeAt(index)
     }
 
-    fun changeDoneState(index: Int) {
-        currentContent.also {
-            if (it[index].text.first() == '^') {
-                it[index] = it[index].copy(text = it[index].text.removeRange(0, 1))
-            } else {
-                it[index] = it[index].copy(text = '^' + it[index].text)
-            }
-        }
-    }
 
 
     /** Repository operation */
@@ -212,11 +243,11 @@ class MainViewModel @Inject constructor(
     fun updateProgress() {
         viewModelScope.launch {
             var done = 0
-            currentContent.forEach { if (it.text.first() == '^') done++ }
-            Log.d("!!!", "updateProgress: $done")
+//            currentContent.forEach { if (it.text.first() == '^') done++ }
 
-            val progress = (done * 100 / currentContent.size)
-            Log.d("!!!", "updateProgress: $progress")
+            currentContentTr.forEach { if (it.text.isDone()) done++ }
+
+            val progress = (done * 100 / currentNewsSize)
             repository.updateProgress(currentNews.copy(progress = progress))
         }
     }

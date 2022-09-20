@@ -91,8 +91,11 @@ fun ArticlePage(
 
     // Popup Info
     var infoCardIsOpening by remember { mutableStateOf(false) }
-    val maskColor by animateColorAsState(targetValue = if (infoCardIsOpening) MaterialTheme.colors.background.copy(
-        alpha = 0.8f) else Color.Transparent, animationSpec = tween(300))
+    val maskColor by animateColorAsState(
+        targetValue = if (infoCardIsOpening) MaterialTheme.colors.background.copy(
+            alpha = 0.8f
+        ) else Color.Transparent, animationSpec = tween(300)
+    )
 
 
     // system bar
@@ -146,12 +149,13 @@ fun ArticlePage(
 
 
     // data
-    val progress by remember(viewModel.currentContent) {
+    val progress by remember(viewModel.currentContentTr) {
         derivedStateOf {
             var done = 0
-            viewModel.currentContent.forEach { if (it.text.isDone()) done++ }
+//            viewModel.currentContent.forEach { if (it.text.isDone()) done++ }
+            viewModel.currentContentTr.forEach { if (it.text.isDone()) done++ }
 
-            val progress = (done * 100 / viewModel.currentContent.size)
+            val progress = (done * 100 / viewModel.currentNewsSize)
 
             progress
         }
@@ -392,8 +396,10 @@ fun ArticlePage(
                             Spacer(
                                 modifier = Modifier
                                     .offset {
-                                        IntOffset(swipeableState.offset.value.roundToInt(),
-                                            0)
+                                        IntOffset(
+                                            swipeableState.offset.value.roundToInt(),
+                                            0
+                                        )
                                     }
                                     .padding(6.dp)
                                     .clip(CircleShape)
@@ -409,8 +415,10 @@ fun ArticlePage(
                                 color = Color(0xFF777777),
                                 modifier = Modifier
                                     .offset {
-                                        IntOffset(swipeableState.offset.value.roundToInt(),
-                                            0)
+                                        IntOffset(
+                                            swipeableState.offset.value.roundToInt(),
+                                            0
+                                        )
                                     }
                                     .padding(6.dp)
                                     .size(36.dp)
@@ -454,6 +462,7 @@ fun ArticlePage(
                                 if (progress == 100) allUndone()
                                 else allDone()
                             } else undoAllDone()
+                            Log.d("!!!", "allDoneList.isEmpty() = ${allDoneList.isEmpty()}   progress = $progress")
                         }
                     }
                 }
@@ -549,9 +558,10 @@ fun ArticlePage(
                 }
 
                 LazyColumn(
-                    contentPadding = PaddingValues(bottom =
+                    contentPadding = PaddingValues(
+                        bottom =
 //                    WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() +
-                    paddingValues.calculateBottomPadding() + 4.dp
+                        paddingValues.calculateBottomPadding() + 4.dp
 //                                    - 8.dp,
                     ),
                     state = lazyListState,
@@ -664,8 +674,10 @@ fun ArticlePage(
 //                        var wordState by remember { mutableStateOf(false) }
 
                         suspend fun onWordChange() {
-                            Log.d("!!!",
-                                "1 ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
+                            Log.d(
+                                "!!!",
+                                "1 ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord"
+                            )
 
                             if (selectedText.isNotBlank()) {
                                 val id = viewModel.getWordId(selectedText)
@@ -691,8 +703,10 @@ fun ArticlePage(
                             }
 
 
-                            Log.d("!!!",
-                                "2 ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord")
+                            Log.d(
+                                "!!!",
+                                "2 ArticlePage: selectedWord = ${selectedWord.value}  ,  focusWord = $focusWord"
+                            )
                         }
 
 
@@ -758,20 +772,40 @@ fun ArticlePage(
 
 //                                FlatText(text = paragraphContent.text.content())
 
+//                                fun TextRange.byState(): TextRange {
+//                                    return if (paragraphContent.text.isDone()) {
+//                                        TextRange(
+//                                            start = this.start + 1,
+//                                            end = this.end + 1
+//                                        )
+//                                    } else this
+//                                }
+
                                 FlatTextField(
 //                                    value = paragraphContent.text.content(),
-                                    value = if (paragraphContent.text.isDone()) {
-                                        paragraphContent.copy(
-                                            text = paragraphContent.text.removeRange(
-                                                0,
-                                                1
-                                            )
-                                        )
-                                    } else paragraphContent,
+                                    value = paragraphContent,
+//                                    if (paragraphContent.text.isDone()) {
+//                                        paragraphContent.copy(
+//                                            text = paragraphContent.text.content(),
+////                                            text = paragraphContent.text.removeRange(0, 1)
+//
+//                                            selection = TextRange(
+//                                                paragraphContent.selection.start - 1,
+//                                                paragraphContent.selection.end - 1
+//                                            )
+//                                        )
+//                                    } else paragraphContent,
                                     onValueChange = {
-                                        viewModel.currentContent[paragraphIndex] =
-                                            paragraphContent.copy(selection = it.selection,
-                                                composition = it.composition)
+                                        viewModel.currentContent[paragraphIndex] = it
+//                                            paragraphContent.copy(
+////                                                selection = if (!paragraphContent.text.isDone()) it.selection
+////                                                else TextRange(
+////                                                    it.selection.start + 1,
+////                                                    it.selection.end + 1
+////                                                ),
+//                                                selection = it.selection.byState(),
+//                                                composition = it.composition
+//                                            )
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     readOnly = true
@@ -801,7 +835,8 @@ fun ArticlePage(
 //                                        return if (paragraphContent.text.isNotEmpty()) {
 //                                            paragraphContent.text.isDone()
 //                                        } else false
-                                        return paragraphContent.text.isDone()
+//                                        return paragraphContent.text.isDone()
+                                        return viewModel.currentContentTr[paragraphIndex].text.isDone()
                                     }
 
                                     val transition =
@@ -900,8 +935,10 @@ fun ArticlePage(
                                             else painterAdd
                                         } else painterWord
 
-                                        Log.d("!!!",
-                                            "wordIconPainter == painterAdd  ${wordIconPainter == painterAdd}")
+                                        Log.d(
+                                            "!!!",
+                                            "wordIconPainter == painterAdd  ${wordIconPainter == painterAdd}"
+                                        )
 
                                         Log.d("!!!", "selectedText = $selectedText ")
                                     }
@@ -1012,7 +1049,7 @@ fun ArticlePage(
 
                                             ) {
                                                 Text(
-                                                    text = viewModel.currentContentTr[paragraphIndex].text,
+                                                    text = viewModel.currentContentTr[paragraphIndex].text.content(),
                                                     style = Typography().h6,
                                                     modifier = Modifier.padding(16.dp)
                                                 )
@@ -1127,7 +1164,8 @@ fun ArticlePage(
 //                                                                word.value.id
 //                                                            )
                                                             viewModel.wordListTable[paragraphIndex].remove(
-                                                                word.value.id)
+                                                                word.value.id
+                                                            )
 //                                                            Log.d(
 //                                                                "!!",
 //                                                                viewModel.wordListTable[index].toList()
@@ -1187,7 +1225,8 @@ fun ArticlePage(
                                                     },
                                                     remove = {
                                                         viewModel.wordListTable[paragraphIndex].remove(
-                                                            selectedWord.value.id)
+                                                            selectedWord.value.id
+                                                        )
                                                     },
                                                     updateWord = { viewModel.updateWord(selectedWord.value) },
                                                     viewModel = viewModel,
@@ -1238,16 +1277,21 @@ fun ArticlePage(
             AnimatedVisibility(
                 visible = infoCardIsOpening,
                 enter = scaleIn() + fadeIn() + slideIn { fullSize ->
-                    IntOffset(0,
-                        fullSize.height / 5 * 2)
+                    IntOffset(
+                        0,
+                        fullSize.height / 5 * 2
+                    )
                 },
                 exit = scaleOut() + fadeOut() + slideOut { fullSize ->
-                    IntOffset(0,
-                        fullSize.height / 5 * 2)
+                    IntOffset(
+                        0,
+                        fullSize.height / 5 * 2
+                    )
                 },
                 modifier = Modifier
                     .padding(bottom = paddingValues.calculateBottomPadding())
-                    .align(Alignment.BottomCenter)) {
+                    .align(Alignment.BottomCenter)
+            ) {
                 PopupInfo(viewModel.currentNews,
                     progress,
                     { deleteArticleDialog = true }) { navigateToWebPage(it) }
