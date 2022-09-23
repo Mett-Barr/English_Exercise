@@ -47,7 +47,6 @@ import com.example.english.ui.components.*
 import com.example.english.ui.components.test.PopupInfo
 import com.example.english.ui.theme.ColorDone
 import com.example.english.ui.theme.TextBackgroundAlphaLight
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -462,7 +461,8 @@ fun ArticlePage(
                                 if (progress == 100) allUndone()
                                 else allDone()
                             } else undoAllDone()
-                            Log.d("!!!", "allDoneList.isEmpty() = ${allDoneList.isEmpty()}   progress = $progress")
+                            Log.d("!!!",
+                                "allDoneList.isEmpty() = ${allDoneList.isEmpty()}   progress = $progress")
                         }
                     }
                 }
@@ -689,7 +689,10 @@ fun ArticlePage(
                                     Log.d("!!!", "selectedText.isNotBlank  ${selectedWord.value}")
                                     annotationState = AnnotationState.ON_WORD
                                 } else {
-                                    annotationState = AnnotationState.CLOSE
+                                    if (annotationState == AnnotationState.WORDS) {
+
+                                    }
+//                                    annotationState = AnnotationState.CLOSE
 //                                    selectedWord.value = Word()
                                 }
 
@@ -919,21 +922,29 @@ fun ArticlePage(
 //                                    }
 
                                     val painterAdd = painterResource(id = R.drawable.add_board)
-                                    val painterWord = painterResource(id = R.drawable.word)
+                                    val painterWords = painterResource(id = R.drawable.word)
 
                                     var wordIconPainter by remember {
-                                        mutableStateOf(painterWord)
+                                        mutableStateOf(painterWords)
                                     }
 
                                     LaunchedEffect(selectedText) {
 //                                        Log.d("!!!", "wordIconState")
-                                        wordIconPainter = if (wordIconState) {
+//                                        wordIconPainter = if (wordIconState) {
+//                                            val id = viewModel.getWordId(selectedText)
+//                                            if (viewModel.wordListTable[paragraphIndex].contains(id)) painterWords
+//                                            else if (annotationState == AnnotationState.WORDS) painterWords
+//                                            else if (selectedText.isBlank()) painterWords
+//                                            else painterAdd
+//                                        } else painterWords
+
+                                        if (wordIconState) {
                                             val id = viewModel.getWordId(selectedText)
-                                            if (viewModel.wordListTable[paragraphIndex].contains(id)) painterWord
-                                            else if (annotationState == AnnotationState.WORDS) painterWord
-                                            else if (selectedText.isBlank()) painterWord
-                                            else painterAdd
-                                        } else painterWord
+                                            wordIconPainter =
+                                                if (!viewModel.wordListTable[paragraphIndex].contains(id)) painterAdd
+                                                else painterWords
+
+                                        }
 
                                         Log.d(
                                             "!!!",
@@ -952,7 +963,7 @@ fun ArticlePage(
                                             modifier = Modifier.focusable()
                                         ) {
                                             // 更換Icon
-                                            wordIconPainter = painterWord
+                                            wordIconPainter = painterWords
 
                                             // 清除上一次選重的單字
                                             viewModel.noCurrentWord()
