@@ -461,8 +461,10 @@ fun ArticlePage(
                                 if (progress == 100) allUndone()
                                 else allDone()
                             } else undoAllDone()
-                            Log.d("!!!",
-                                "allDoneList.isEmpty() = ${allDoneList.isEmpty()}   progress = $progress")
+                            Log.d(
+                                "!!!",
+                                "allDoneList.isEmpty() = ${allDoneList.isEmpty()}   progress = $progress"
+                            )
                         }
                     }
                 }
@@ -938,13 +940,14 @@ fun ArticlePage(
 //                                            else painterAdd
 //                                        } else painterWords
 
-                                        if (wordIconState) {
-                                            val id = viewModel.getWordId(selectedText)
-                                            wordIconPainter =
-                                                if (!viewModel.wordListTable[paragraphIndex].contains(id)) painterAdd
-                                                else painterWords
+//                                        if (wordIconState) {
 
-                                        }
+                                        val id = viewModel.getWordId(selectedText)
+                                        wordIconPainter =
+                                            if (!viewModel.wordListTable[paragraphIndex].contains(id) && selectedText.isNotBlank()) painterAdd
+                                            else painterWords
+
+//                                        }
 
                                         Log.d(
                                             "!!!",

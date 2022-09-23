@@ -494,7 +494,9 @@ fun WordComponent(
                     onValueChange = {
                         onValueChange.invoke(it)
 //                        currentWord.value = Word(word.value.id, word.value.english, it)
-                    },
+
+                        updateWord()
+                 },
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .weight(1F)
