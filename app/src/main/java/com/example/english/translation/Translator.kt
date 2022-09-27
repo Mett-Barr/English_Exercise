@@ -128,6 +128,31 @@ fun test(
     if (content.isNotEmpty()) que()
 }
 
+suspend fun translateWord(english: String, context: Context): String {
+
+    var result = ""
+
+    val stringRequest = StringRequest(
+        Request.Method.POST, BASE_URL + BASIC_SETTING + TRANSLATE_REQUEST + english,
+        { response ->
+            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+            val adapter: JsonAdapter<Translations> = moshi.adapter(Translations::class.java)
+            val translations = adapter.fromJson(response)
+
+            if (translations != null) result = translations.data.translations.first().translatedText
+
+            Log.d("!!!", "translateWord: ")
+        }, {
+
+        }
+    )
+
+    val queue = Volley.newRequestQueue(context)
+    queue.add(stringRequest)
+
+    return result
+}
+
 
 //fun translateParagraph(context: Context, paragraph: String) {
 //    val queue = Volley.newRequestQueue(context)

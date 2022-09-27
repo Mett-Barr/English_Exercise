@@ -529,3 +529,285 @@ fun WordComponent(
         }
     }
 }
+
+@OptIn(ExperimentalMaterialApi::class, androidx.compose.animation.ExperimentalAnimationApi::class)
+@Composable
+fun WordComponent2(
+    word: Word,
+    onValueChange: (String) -> Unit,
+    remove: () -> Unit,
+    updateWord: () -> Unit,
+    viewModel: MainViewModel,
+    focusWord: (Word) -> Unit = {},
+    unFocus: () -> Unit = {},
+    clickOutside: () -> Unit = {},
+    state: Boolean = true
+) {
+
+//    val currentWord = remember {
+//        mutableStateOf(word)
+//    }
+
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val swipeRange = with(LocalDensity.current) { (48.dp).toPx() }
+
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+
+    var focusState by remember { mutableStateOf(false) }
+
+
+    val anchors = mapOf(0f to "normal", -swipeRange to "delete", swipeRange to "translate")
+//    val anchors = mapOf(0f to "normal", -swipeRange to "delete")
+//    val swipeableState =
+//        rememberSwipeableState(if (viewModel.currentWord == word.english) anchors[swipeRange]!! else anchors[0f]!!)
+    val swipeableState = rememberSwipeableState("normal")
+
+//    if ((viewModel.currentWord == word.english)) AppToast.show(context, "${word.english}!!")
+
+
+    val firstInit by remember {
+        derivedStateOf() {
+            word.english.isNotBlank()
+        }
+    }
+
+//    Log.d("!! ?", "word.english:${word.english}")
+
+    fun swipeToTr() {
+        coroutineScope.launch {
+//            Log.d(
+//                "!! 1",
+//                "\nviewModel.currentWord:${viewModel.currentWord}\nword.english:${word.english}\nword.chinese.isBlank():${word.chinese.isBlank()}"
+//            )
+            if (viewModel.currentWord == word.english && word.chinese.isBlank()) {
+//                Log.d(
+//                    "!! 2",
+//                    " \nviewModel.currentWord:${viewModel.currentWord}\nword.english:${word.english}\nword.chinese.isBlank():${word.chinese.isBlank()}"
+//                )
+                delay(150)
+                swipeableState.animateTo("translate")
+            }
+            viewModel.noCurrentWord()
+        }
+    }
+
+//    swipeToTr()
+
+    val openState by remember { derivedStateOf { word.english == viewModel.currentWord } }
+
+    if (openState) {
+        swipeToTr()
+    }
+
+//    if (firstInit) {
+//
+//        swipeToTr()
+//
+////        LaunchedEffect(key1 = Unit) {
+////            coroutineScope.launch {
+////                Log.d(
+////                    "!! 1",
+////                    "\nviewModel.currentWord:${viewModel.currentWord}\nword.english:${word.english}\nword.chinese.isBlank():${word.chinese.isBlank()}"
+////                )
+////                if (viewModel.currentWord == word.english && word.chinese.isBlank()) {
+////                    Log.d(
+////                        "!! 2",
+////                        " \nviewModel.currentWord:${viewModel.currentWord}\nword.english:${word.english}\nword.chinese.isBlank():${word.chinese.isBlank()}"
+////                    )
+////                    delay(300)
+////                    swipeableState.animateTo("translate")
+////                }
+////                viewModel.noCurrentWord()
+////            }
+////        }
+//    }
+
+//    val sizeDp by remember {
+//        derivedStateOf { with(LocalDensity.current) { sizePx.toDp() } }
+//    }
+
+    var visible by remember {
+        mutableStateOf(true)
+    }
+
+
+    var sizePx by remember {
+        mutableStateOf(0)
+    }
+
+    val anim: Dp by animateDpAsState(
+        targetValue = if (visible) LocalDensity.current.run { sizePx.toDp() } else 0.dp,
+        finishedListener = {
+            if (it == 0.dp) {
+                remove.invoke()
+                visible = true
+            }
+        }
+    )
+
+
+    val heightModifier by remember {
+        derivedStateOf { if (visible) Modifier else Modifier.height(anim) }
+    }
+
+//    AnimatedVisibility(visible = visible) {
+//
+//
+//    }
+
+    Box(modifier = Modifier
+//        .offset(y = anim)
+//        .height(anim)
+        .then(heightModifier)
+        .swipeable(
+            state = swipeableState,
+            anchors = anchors,
+            thresholds = { _, _ -> FractionalThreshold(1f) },
+            orientation = Orientation.Horizontal
+        )
+        .focusable()
+        .onFocusChanged {
+            coroutineScope.launch {
+                swipeableState.animateTo("normal")
+            }
+        }
+        .onGloballyPositioned {
+            sizePx = it.size.height
+        }
+    ) {
+
+        val deleteIconScale by remember {
+            derivedStateOf {
+                (-swipeableState.offset.value + swipeRange) / swipeRange / 2
+            }
+        }
+
+        val translateIconScale by remember {
+            derivedStateOf {
+                1f - deleteIconScale
+//                (swipeableState.offset.value + swipeRange) / swipeRange / 2
+            }
+        }
+
+        ClickableIcon(
+            painter = painterResource(id = R.drawable.delete),
+            modifier = Modifier
+                .scale(deleteIconScale)
+                .align(Alignment.CenterEnd),
+            tint = MaterialTheme.colors.error
+        ) {
+
+//                visible = false
+
+            remove()
+
+            coroutineScope.launch {
+                swipeableState.snapTo("normal")
+            }
+        }
+
+
+        ClickableIcon(
+            painter = painterResource(id = R.drawable.translation),
+            modifier = Modifier
+                .scale(translateIconScale)
+                .align(Alignment.CenterStart)
+        ) {
+            coroutineScope.launch {
+                swipeableState.animateTo("normal")
+            }
+
+            wordTranslate(context, word.english)
+        }
+
+
+        Card(
+            elevation = 3.dp,
+            modifier = Modifier
+
+//                .focusable()
+//                .focusRequester(focusRequester)
+
+                .padding(horizontal = 2.dp, vertical = 4.dp)
+                .heightIn(min = 48.dp)
+//                .offset(y = anim)
+                .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .height(IntrinsicSize.Max)
+                    .padding(4.dp)
+            ) {
+                Text(
+                    text = word.english,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .weight(1F)
+                        .padding(horizontal = 8.dp),
+                    style = Typography().h6
+                )
+                Divider(
+                    modifier = Modifier
+
+//                        .focusTarget()
+                        .focusRequester(focusRequester)
+//                        .onFocusChanged {
+////                            if (!it.isFocused) unFocus()
+//                            Log.d("!!!", "Divider: onFocusChanged $it")
+//                        }
+
+                        .onFocusEvent {
+//                            Log.d("!!!", "Divider: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
+                        }
+
+                        .focusTarget()
+                        .focusable()
+
+                        .fillMaxHeight()
+                        .width(1.dp),
+                    color = MaterialTheme.colors.onBackground
+                )
+
+                BasicTextField(
+                    value = word.chinese,
+                    onValueChange = {
+                        onValueChange.invoke(it)
+//                        currentword = Word(word.id, word.english, it)
+
+                        updateWord()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .weight(1F)
+                        .padding(horizontal = 8.dp)
+//                        .focusRequester(focusRequester)
+                        .onFocusChanged {
+                            if (it.isFocused) {
+                                focusWord(word)
+                                focusState = true
+                            } else {
+//                                focusWord(Word())
+                                updateWord()
+//                                unFocus()
+
+//                                focusManager.
+                                if (focusState) {
+                                    focusRequester.requestFocus()
+                                    focusState = false
+//                                    Log.d("!!!", "word: focusRequester.requestFocus()")
+                                }
+
+//                                focusRequester.requestFocus()
+                            }
+//                            Log.d("!!!", "word: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
+                        },
+                    textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
+                    cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
+                )
+            }
+        }
+    }
+}
