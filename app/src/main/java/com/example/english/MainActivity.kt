@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.english.network.JsoupNews
 import com.example.english.network.jsoupTagTest
 import com.example.english.translation.BUG_URL
+import com.example.english.translation.translate
 import com.example.english.ui.components.Loader
 import com.example.english.ui.components.Movement
 import com.example.english.ui.components.SegmentedControls
@@ -57,6 +58,12 @@ class MainActivity : ComponentActivity() {
 
 //                    WebViewTest()
                 }
+            }
+        }
+
+        lifecycleScope.launch(Dispatchers.Default) {
+            translate("this is a test", this@MainActivity) {
+                Log.d("!!!", "translate: $it")
             }
         }
 

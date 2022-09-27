@@ -10,6 +10,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+
+        // android-opencc
+        maven { url 'https://jitpack.io' }
     }
 }
 rootProject.name = "English"

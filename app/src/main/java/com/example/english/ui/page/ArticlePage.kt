@@ -1062,7 +1062,8 @@ fun ArticlePage(
 
                                 LaunchedEffect(isNewWord) {
                                     if (isNewWord) annotationState = AnnotationState.ONE_WORD
-                                    else if (annotationState == AnnotationState.ONE_WORD) annotationState = AnnotationState.CLOSE
+                                    else if (annotationState == AnnotationState.ONE_WORD && focusWord != Word()) annotationState =
+                                        AnnotationState.CLOSE
                                 }
 
                                 AnimatedContent(targetState = annotationState) { it ->
@@ -1247,42 +1248,81 @@ fun ArticlePage(
 
                                         AnnotationState.ONE_WORD -> {
 
+                                            var hasBeenAdded by remember {
+                                                mutableStateOf(false)
+                                            }
+
+
+//                                            val oneWord by remember {
+//                                                derivedStateOf {
+//                                                    Word(english = if (selectedText.isNotBlank()))
+//                                                }
+//                                            }
                                             var oneWord by remember {
                                                 mutableStateOf(Word(english = selectedText))
                                             }
-
-                                            LaunchedEffect(selectedText) {
-                                                oneWord = oneWord.copy(
-                                                    english = selectedText
-                                                )
-                                                Log.d("!!!", "AnnotationState.ONE_WORD")
-                                                val chinese = translateWord(selectedText, context)
-                                                oneWord = oneWord.copy(
-                                                    chinese = chinese
-                                                )
-                                                Log.d("!!!", chinese)
+                                            var translatedText by remember {
+                                                mutableStateOf("")
                                             }
 
-                                            Box(modifier = Modifier.padding(bottom = 8.dp)) {
-                                                WordComponent2(
+                                            LaunchedEffect(selectedText) {
+
+                                                if (selectedText.isNotBlank()) {
+                                                    oneWord = oneWord.copy(
+                                                        english = selectedText
+                                                    )
+
+                                                    val id = viewModel.getWordId(selectedText)
+                                                    if (viewModel.wordListTable[paragraphIndex].contains(id)) {
+                                                        oneWord = viewModel.getWordByIdSus(id!!)
+                                                    }
+                                                }
+
+                                                Log.d("!!!", "AnnotationState.ONE_WORD")
+//                                                val chinese = translateWord(selectedText, context)
+                                                translateWord(oneWord.english, context) {
+//                                                    oneWord = oneWord.copy(
+//                                                        chinese = it
+//                                                    )
+                                                    translatedText = it
+                                                }
+//                                                Log.d("!!!", chinese)
+                                            }
+
+                                            LaunchedEffect(viewModel.wordListTable[paragraphIndex].size) {
+                                                val id = viewModel.getWordId(oneWord.english)
+                                                hasBeenAdded = viewModel.wordListTable[paragraphIndex].contains(id)
+                                            }
+
+
+                                            Column(modifier = Modifier.padding(bottom = 8.dp)) {
+
+
+                                                if (hasBeenAdded) {
+
+                                                    WordComponent2(
 //                                                word = viewModel.getWordById(id).collectAsState(
 //                                                initial = Word()),
-                                                    word = oneWord,
-                                                    onValueChange = {
-                                                        oneWord =
-                                                            oneWord.copy(chinese = it)
-                                                    },
-                                                    remove = {
-                                                        viewModel.wordListTable[paragraphIndex].remove(
-                                                            oneWord.id
-                                                        )
-                                                    },
-                                                    updateWord = { viewModel.updateWord(oneWord) },
-                                                    viewModel = viewModel,
-                                                    focusWord = { focusWord = it },
+                                                        word = oneWord,
+                                                        onValueChange = {
+                                                            oneWord =
+                                                                oneWord.copy(chinese = it)
+                                                        },
+                                                        remove = {
+                                                            viewModel.wordListTable[paragraphIndex].remove(
+                                                                oneWord.id
+                                                            )
+                                                        },
+                                                        updateWord = { viewModel.updateWord(oneWord) },
+                                                        viewModel = viewModel,
+                                                        focusWord = { focusWord = it },
 //                                                    unFocus = { oneWord = Word() }
 //                                                unFocus = { wordState = true}
-                                                )
+                                                    )
+
+                                                }
+
+                                                if (translatedText.isNotBlank()) TranslatedWordComponent(translation = translatedText)
                                             }
                                         }
                                     }

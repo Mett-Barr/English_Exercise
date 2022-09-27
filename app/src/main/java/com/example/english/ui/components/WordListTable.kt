@@ -1,6 +1,9 @@
 package com.example.english.ui.components
 
 import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
@@ -496,7 +499,7 @@ fun WordComponent(
 //                        currentWord.value = Word(word.value.id, word.value.english, it)
 
                         updateWord()
-                 },
+                    },
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .weight(1F)
@@ -544,10 +547,6 @@ fun WordComponent2(
     state: Boolean = true
 ) {
 
-//    val currentWord = remember {
-//        mutableStateOf(word)
-//    }
-
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val swipeRange = with(LocalDensity.current) { (48.dp).toPx() }
@@ -559,33 +558,18 @@ fun WordComponent2(
 
 
     val anchors = mapOf(0f to "normal", -swipeRange to "delete", swipeRange to "translate")
-//    val anchors = mapOf(0f to "normal", -swipeRange to "delete")
-//    val swipeableState =
-//        rememberSwipeableState(if (viewModel.currentWord == word.english) anchors[swipeRange]!! else anchors[0f]!!)
     val swipeableState = rememberSwipeableState("normal")
 
-//    if ((viewModel.currentWord == word.english)) AppToast.show(context, "${word.english}!!")
 
-
-    val firstInit by remember {
-        derivedStateOf() {
-            word.english.isNotBlank()
-        }
-    }
-
-//    Log.d("!! ?", "word.english:${word.english}")
+//    val firstInit by remember {
+//        derivedStateOf() {
+//            word.english.isNotBlank()
+//        }
+//    }
 
     fun swipeToTr() {
         coroutineScope.launch {
-//            Log.d(
-//                "!! 1",
-//                "\nviewModel.currentWord:${viewModel.currentWord}\nword.english:${word.english}\nword.chinese.isBlank():${word.chinese.isBlank()}"
-//            )
             if (viewModel.currentWord == word.english && word.chinese.isBlank()) {
-//                Log.d(
-//                    "!! 2",
-//                    " \nviewModel.currentWord:${viewModel.currentWord}\nword.english:${word.english}\nword.chinese.isBlank():${word.chinese.isBlank()}"
-//                )
                 delay(150)
                 swipeableState.animateTo("translate")
             }
@@ -593,40 +577,11 @@ fun WordComponent2(
         }
     }
 
-//    swipeToTr()
-
     val openState by remember { derivedStateOf { word.english == viewModel.currentWord } }
 
     if (openState) {
         swipeToTr()
     }
-
-//    if (firstInit) {
-//
-//        swipeToTr()
-//
-////        LaunchedEffect(key1 = Unit) {
-////            coroutineScope.launch {
-////                Log.d(
-////                    "!! 1",
-////                    "\nviewModel.currentWord:${viewModel.currentWord}\nword.english:${word.english}\nword.chinese.isBlank():${word.chinese.isBlank()}"
-////                )
-////                if (viewModel.currentWord == word.english && word.chinese.isBlank()) {
-////                    Log.d(
-////                        "!! 2",
-////                        " \nviewModel.currentWord:${viewModel.currentWord}\nword.english:${word.english}\nword.chinese.isBlank():${word.chinese.isBlank()}"
-////                    )
-////                    delay(300)
-////                    swipeableState.animateTo("translate")
-////                }
-////                viewModel.noCurrentWord()
-////            }
-////        }
-//    }
-
-//    val sizeDp by remember {
-//        derivedStateOf { with(LocalDensity.current) { sizePx.toDp() } }
-//    }
 
     var visible by remember {
         mutableStateOf(true)
@@ -652,14 +607,8 @@ fun WordComponent2(
         derivedStateOf { if (visible) Modifier else Modifier.height(anim) }
     }
 
-//    AnimatedVisibility(visible = visible) {
-//
-//
-//    }
 
     Box(modifier = Modifier
-//        .offset(y = anim)
-//        .height(anim)
         .then(heightModifier)
         .swipeable(
             state = swipeableState,
@@ -687,7 +636,6 @@ fun WordComponent2(
         val translateIconScale by remember {
             derivedStateOf {
                 1f - deleteIconScale
-//                (swipeableState.offset.value + swipeRange) / swipeRange / 2
             }
         }
 
@@ -698,9 +646,6 @@ fun WordComponent2(
                 .align(Alignment.CenterEnd),
             tint = MaterialTheme.colors.error
         ) {
-
-//                visible = false
-
             remove()
 
             coroutineScope.launch {
@@ -726,13 +671,8 @@ fun WordComponent2(
         Card(
             elevation = 3.dp,
             modifier = Modifier
-
-//                .focusable()
-//                .focusRequester(focusRequester)
-
                 .padding(horizontal = 2.dp, vertical = 4.dp)
                 .heightIn(min = 48.dp)
-//                .offset(y = anim)
                 .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
             shape = RoundedCornerShape(8.dp)
         ) {
@@ -751,16 +691,9 @@ fun WordComponent2(
                 )
                 Divider(
                     modifier = Modifier
-
-//                        .focusTarget()
                         .focusRequester(focusRequester)
-//                        .onFocusChanged {
-////                            if (!it.isFocused) unFocus()
-//                            Log.d("!!!", "Divider: onFocusChanged $it")
-//                        }
 
                         .onFocusEvent {
-//                            Log.d("!!!", "Divider: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
                         }
 
                         .focusTarget()
@@ -775,8 +708,6 @@ fun WordComponent2(
                     value = word.chinese,
                     onValueChange = {
                         onValueChange.invoke(it)
-//                        currentword = Word(word.id, word.english, it)
-
                         updateWord()
                     },
                     modifier = Modifier
@@ -802,11 +733,54 @@ fun WordComponent2(
 
 //                                focusRequester.requestFocus()
                             }
-//                            Log.d("!!!", "word: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
                         },
                     textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
                     cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
                 )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun TranslatedWordComponent(translation: String) {
+
+    Row(
+        modifier = Modifier.animateContentSize().height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        ClickableIcon(painter = painterResource(id = R.drawable.translation))
+
+        Card(
+            elevation = 3.dp,
+            modifier = Modifier
+                .padding(horizontal = 2.dp, vertical = 4.dp)
+                .heightIn(min = 48.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Box(
+                contentAlignment = Alignment.CenterStart,
+                modifier = Modifier.height(IntrinsicSize.Max).padding(4.dp)
+            ) {
+//                AnimatedContent(targetState = translation) {
+                    Text(
+                        text = translation,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp),
+                        style = Typography().h6
+                    )
+
+//                }
+//            Text(
+//                text = "翻譯：" + translation,
+//                modifier = Modifier
+//                    .padding(horizontal = 8.dp),
+//                style = Typography().h6
+//            )
             }
         }
     }

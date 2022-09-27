@@ -8,12 +8,19 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.english.data.article.FileOperator
 import com.example.english.tool.AppToast
+import com.example.english.translation.Translator.mlTranslator
 import com.example.english.translation.json.Translation
 import com.example.english.translation.json.Translations
 import com.google.gson.JsonObject
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation.getClient
+import com.google.mlkit.nl.translate.TranslatorOptions
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.zqc.opencc.android.lib.ChineseConverter
+import com.zqc.opencc.android.lib.ConversionType
 
 const val BASE_URL = "https://translation.googleapis.com/language/translate/v2/"
 const val BASIC_SETTING = "?key=AIzaSyBjmgx_l-kWKBO1L2Bci7bCxvKM83BQLgY&source=en&target=zh-TW"
@@ -128,7 +135,7 @@ fun test(
     if (content.isNotEmpty()) que()
 }
 
-suspend fun translateWord(english: String, context: Context): String {
+suspend fun translateWord(english: String, context: Context, getChinese: (String) -> Unit) {
 
     var result = ""
 
@@ -139,7 +146,7 @@ suspend fun translateWord(english: String, context: Context): String {
             val adapter: JsonAdapter<Translations> = moshi.adapter(Translations::class.java)
             val translations = adapter.fromJson(response)
 
-            if (translations != null) result = translations.data.translations.first().translatedText
+            if (translations != null) getChinese(translations.data.translations.first().translatedText)
 
             Log.d("!!!", "translateWord: ")
         }, {
@@ -149,8 +156,52 @@ suspend fun translateWord(english: String, context: Context): String {
 
     val queue = Volley.newRequestQueue(context)
     queue.add(stringRequest)
+}
 
-    return result
+//fun mlTranslate(english: String): String {
+//
+//    return chinese
+//}
+
+suspend fun downloadModelAndTranslate(
+    english: String,
+    context: Context,
+    success: (String) -> Unit,
+    failure: () -> Unit = {}
+)
+{
+//    val conditions = DownloadConditions.Builder().build()
+    mlTranslator.downloadModelIfNeeded()
+        .addOnSuccessListener {
+            mlTranslator.translate(english).addOnSuccessListener {
+                val S2TWP = ChineseConverter.convert(it, ConversionType.S2TWP, context)
+                success(S2TWP)
+            }
+        }
+        .addOnFailureListener {
+            failure()
+        }
+}
+
+suspend fun translate(english: String, context: Context, getChinese: (String) -> Unit) {
+    downloadModelAndTranslate(
+        english = english,
+        context = context,
+        success = {
+            getChinese(it)
+        },
+        failure = {
+            getChinese("")
+        }
+    )
+}
+
+object Translator {
+    private val options = TranslatorOptions.Builder()
+        .setSourceLanguage(TranslateLanguage.ENGLISH)
+        .setTargetLanguage(TranslateLanguage.CHINESE)
+        .build()
+    val mlTranslator = getClient(options)
 }
 
 

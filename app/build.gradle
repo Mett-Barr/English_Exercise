@@ -131,4 +131,8 @@ dependencies {
 
     // Okhttp
     implementation 'com.squareup.okhttp:okhttp:2.4.0'
+    
+    
+    // android-opencc
+    implementation 'com.github.qichuan:android-opencc:1.2.0'
 }
