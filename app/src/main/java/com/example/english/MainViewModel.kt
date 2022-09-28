@@ -348,6 +348,11 @@ class MainViewModel @Inject constructor(
         return wordList
     }
 
+    suspend fun String.isNewWord(index: Int): Boolean {
+        val id = getWordId(this)
+        return !wordListTable[index].contains(id)
+    }
+
     // Insert
     fun addNewWord(word: Word) {
         viewModelScope.launch {
