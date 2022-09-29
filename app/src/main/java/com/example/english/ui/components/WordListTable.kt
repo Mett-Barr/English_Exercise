@@ -1,5 +1,6 @@
 package com.example.english.ui.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -582,12 +583,12 @@ fun WordComponent2(
 //        swipeToTr()
 //    }
 
-    LaunchedEffect(Unit) {
-        if (openState) {
-            swipeToTr()
-        }
-
-    }
+//    LaunchedEffect(Unit) {
+//        if (openState) {
+//            swipeToTr()
+//        }
+//
+//    }
 
 //    if (needSwipe) swipeToTr()
 
