@@ -1,7 +1,5 @@
 package com.example.english.ui.components
 
-import android.util.Log
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -544,7 +542,8 @@ fun WordComponent2(
     focusWord: (Word) -> Unit = {},
     unFocus: () -> Unit = {},
     clickOutside: () -> Unit = {},
-    state: Boolean = true
+    state: Boolean = true,
+    needSwipe: Boolean = false
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -577,11 +576,20 @@ fun WordComponent2(
         }
     }
 
-    val openState by remember { derivedStateOf { word.english == viewModel.currentWord } }
+    val openState by remember { derivedStateOf { word.english == viewModel.currentWord && needSwipe} }
 
-    if (openState) {
-        swipeToTr()
+//    if (openState) {
+//        swipeToTr()
+//    }
+
+    LaunchedEffect(Unit) {
+        if (openState) {
+            swipeToTr()
+        }
+
     }
+
+//    if (needSwipe) swipeToTr()
 
     var visible by remember {
         mutableStateOf(true)
@@ -748,7 +756,9 @@ fun WordComponent2(
 fun TranslatedWordComponent(translation: String) {
 
     Row(
-        modifier = Modifier.animateContentSize().height(IntrinsicSize.Min),
+        modifier = Modifier
+            .animateContentSize()
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -764,7 +774,9 @@ fun TranslatedWordComponent(translation: String) {
         ) {
             Box(
                 contentAlignment = Alignment.CenterStart,
-                modifier = Modifier.height(IntrinsicSize.Max).padding(4.dp)
+                modifier = Modifier
+                    .height(IntrinsicSize.Max)
+                    .padding(4.dp)
             ) {
 //                AnimatedContent(targetState = translation) {
                     Text(
