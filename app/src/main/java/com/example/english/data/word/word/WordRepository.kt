@@ -9,7 +9,9 @@ interface WordRepository {
 
     suspend fun getWordSus(id: Int): Word
 
-    fun getWordByName(english: String): Flow<Word?>
+    fun getWordByEnglish(english: String): Flow<Word?>
+
+    fun getWordByEnglishSus(english: String): Word?
 
     fun getWordId(english: String): Flow<Int>
 

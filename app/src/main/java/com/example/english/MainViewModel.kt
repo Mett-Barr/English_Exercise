@@ -141,7 +141,6 @@ class MainViewModel @Inject constructor(
 //            }
 //        }
 
-        Log.d("!!!", "1 changeDoneState: ${currentContentTr[index].text}")
         currentContentTr.also {
             if (it[index].text.isDone()) {
                 it[index] = it[index].copy(text = it[index].text.removeRange(0, 1))
@@ -149,8 +148,6 @@ class MainViewModel @Inject constructor(
                 it[index] = it[index].copy(text = '^' + it[index].text)
             }
         }
-        Log.d("!!!", "2 changeDoneState: ${currentContentTr[index].text}")
-
     }
     /** Done State */
 
@@ -336,6 +333,10 @@ class MainViewModel @Inject constructor(
 
     suspend fun getWordId(english: String): Int? {
         return wordRepository.getWordIdSuspend(english)
+    }
+
+    suspend fun getWordByEnglish(english: String): Word? {
+        return wordRepository.getWordByEnglishSus(english)
     }
 
     fun getWordList(list: List<Int>): List<Flow<Word>> {

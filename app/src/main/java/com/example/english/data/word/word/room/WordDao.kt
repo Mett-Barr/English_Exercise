@@ -15,6 +15,9 @@ interface WordDao {
     @Query("SELECT * FROM WordTable WHERE english=:english")
     fun getWordByEnglish(english: String): Flow<Word?>
 
+    @Query("SELECT * FROM WordTable WHERE english=:english")
+    fun getWordByEnglishSus(english: String): Word?
+
     @Query("SELECT id FROM WordTable WHERE english=:english")
     fun getWordId(english: String): Flow<Int>
 

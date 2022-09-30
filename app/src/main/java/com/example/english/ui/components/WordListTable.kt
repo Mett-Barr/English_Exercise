@@ -1,5 +1,6 @@
 package com.example.english.ui.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -494,6 +495,7 @@ fun WordComponent(
                 BasicTextField(
                     value = word.value.chinese,
                     onValueChange = {
+                        Log.d("!!!", "WordComponent: focus")
                         onValueChange.invoke(it)
 //                        currentWord.value = Word(word.value.id, word.value.english, it)
 
@@ -502,28 +504,28 @@ fun WordComponent(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .weight(1F)
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = 8.dp),
 //                        .focusRequester(focusRequester)
-                        .onFocusChanged {
-                            if (it.isFocused) {
-                                focusWord(word.value)
-                                focusState = true
-                            } else {
-//                                focusWord(Word())
-                                updateWord()
-//                                unFocus()
-
-//                                focusManager.
-                                if (focusState) {
-                                    focusRequester.requestFocus()
-                                    focusState = false
-//                                    Log.d("!!!", "word: focusRequester.requestFocus()")
-                                }
-
-//                                focusRequester.requestFocus()
-                            }
-//                            Log.d("!!!", "word: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
-                        },
+//                        .onFocusChanged {
+//                            if (it.isFocused) {
+//                                focusWord(word.value)
+//                                focusState = true
+//                            } else {
+////                                focusWord(Word())
+//                                updateWord()
+////                                unFocus()
+//
+////                                focusManager.
+//                                if (focusState) {
+//                                    focusRequester.requestFocus()
+//                                    focusState = false
+////                                    Log.d("!!!", "word: focusRequester.requestFocus()")
+//                                }
+//
+////                                focusRequester.requestFocus()
+//                            }
+////                            Log.d("!!!", "word: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
+//                        },
                     textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),
                     cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
                 )
@@ -551,10 +553,10 @@ fun WordComponent2(
     val context = LocalContext.current
     val swipeRange = with(LocalDensity.current) { (48.dp).toPx() }
 
-    val focusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
+//    val focusManager = LocalFocusManager.current
+//    val focusRequester = remember { FocusRequester() }
 
-    var focusState by remember { mutableStateOf(false) }
+//    var focusState by remember { mutableStateOf(false) }
 
 
     val anchors = mapOf(0f to "normal", -swipeRange to "delete", swipeRange to "translate")
@@ -577,7 +579,7 @@ fun WordComponent2(
         }
     }
 
-    val openState by remember { derivedStateOf { word.english == viewModel.currentWord && needSwipe} }
+    val openState by remember { derivedStateOf { word.english == viewModel.currentWord && needSwipe } }
 
 //    if (openState) {
 //        swipeToTr()
@@ -700,14 +702,14 @@ fun WordComponent2(
                 )
                 Divider(
                     modifier = Modifier
-                        .focusRequester(focusRequester)
-
-                        .onFocusEvent {
-                        }
-
-                        .focusTarget()
-                        .focusable()
-
+//                        .focusRequester(focusRequester)
+//
+//                        .onFocusEvent {
+//                        }
+//
+//                        .focusTarget()
+//                        .focusable()
+//
                         .fillMaxHeight()
                         .width(1.dp),
                     color = MaterialTheme.colors.onBackground
@@ -727,18 +729,22 @@ fun WordComponent2(
                         .onFocusChanged {
                             if (it.isFocused) {
                                 focusWord(word)
-                                focusState = true
+//                                focusState = true
                             } else {
 //                                focusWord(Word())
-                                updateWord()
+
+//                                updateWord()
+
+
+
 //                                unFocus()
 
-//                                focusManager.
-                                if (focusState) {
-                                    focusRequester.requestFocus()
-                                    focusState = false
-//                                    Log.d("!!!", "word: focusRequester.requestFocus()")
-                                }
+
+////                                focusManager.
+//                                if (focusState) {
+//                                    focusRequester.requestFocus()
+//                                    focusState = false
+//                                }
 
 //                                focusRequester.requestFocus()
                             }
@@ -779,21 +785,12 @@ fun TranslatedWordComponent(translation: String) {
                     .height(IntrinsicSize.Max)
                     .padding(4.dp)
             ) {
-//                AnimatedContent(targetState = translation) {
-                    Text(
-                        text = translation,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp),
-                        style = Typography().h6
-                    )
-
-//                }
-//            Text(
-//                text = "翻譯：" + translation,
-//                modifier = Modifier
-//                    .padding(horizontal = 8.dp),
-//                style = Typography().h6
-//            )
+                Text(
+                    text = translation,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp),
+                    style = Typography().h6
+                )
             }
         }
     }
