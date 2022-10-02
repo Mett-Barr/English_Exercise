@@ -378,13 +378,13 @@ class MainViewModel @Inject constructor(
 
     /** WordList Operation */
     //Insert
-    fun addWordListTable(english: String, index: Int) {
+    fun addWordListTable(english: String, index: Int, finish: () -> Unit = {}) {
 //        wordExistCheck(english, index)
 
         currentWord = english
 
         viewModelScope.launch {
-            addInWordListTable(english, wordRepository, wordListTable[index])
+            addInWordListTable(english, wordRepository, wordListTable[index], finish)
         }
 
     }

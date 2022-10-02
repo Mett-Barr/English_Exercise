@@ -620,6 +620,7 @@ fun WordComponent2(
 
 
     Box(modifier = Modifier
+        .animateContentSize()
         .then(heightModifier)
         .swipeable(
             state = swipeableState,

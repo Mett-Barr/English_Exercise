@@ -202,6 +202,15 @@ fun ArticlePage(
             else focusWord = Word()
         }
 
+    fun hideKeyboardFun() {
+        focusManager.clearFocus()
+        keyboardController?.hide()
+
+
+        if (focused) focused = false
+        else focusWord = Word()
+    }
+
     fun getRid(boolean: Boolean): Int =
         if (boolean) R.drawable.arrow_less else R.drawable.arrow_more
 
@@ -666,10 +675,10 @@ fun ArticlePage(
                         suspend fun String.hasTranslation(): Boolean {
                             val id = viewModel.getWordId(this)
                             return id?.let {
-                                Log.d(
-                                    "!!!",
-                                    "hasBeenTranslated: ^${viewModel.getWordByIdSus(it).chinese}^"
-                                )
+//                                Log.d(
+//                                    "!!!",
+//                                    "hasBeenTranslated: ^${viewModel.getWordByIdSus(it).chinese}^"
+//                                )
                                 viewModel.getWordByIdSus(it).chinese.isNotBlank()
                             } ?: false
                         }
@@ -691,6 +700,13 @@ fun ArticlePage(
                             mutableStateOf(false)
                         }
 
+                        fun isWordAdded(boo: Boolean) {
+                            hasBeenAdded = boo
+                        }
+                        LaunchedEffect(key1 = hasBeenAdded) {
+                            Log.d("!!!", "hasBeenAdded = $hasBeenAdded")
+                        }
+
                         var justBeenAdded by remember {
                             mutableStateOf(false)
                         }
@@ -706,22 +722,25 @@ fun ArticlePage(
                         var oneWord by remember {
                             mutableStateOf(Word())
                         }
+
                         LaunchedEffect(viewModel.wordListTable[paragraphIndex].size) {
-//                            coroutineScope.launch(Dispatchers.IO) {
-                                if (viewModel.wordListTable[paragraphIndex].contains(oneWord.id)) {
-                                    oneWord
+                            coroutineScope.launch(Dispatchers.IO) {
+//                                if (viewModel.wordListTable[paragraphIndex].contains(oneWord.id)) {
+//                                    oneWord
+//                                }
+                                val word = viewModel.getWordByEnglish(oneWord.english)
+                                if (word != null && oneWord != word) {
+                                    oneWord = word
                                 }
-//                            }
+                            }
                         }
-//                        fun addWord(english: String) {
-//
-//                        }
 
                         var translatedText by remember {
                             mutableStateOf("")
                         }
 
                         fun annoInit() {
+                            Log.d("!!!", "annoInit: ")
                             textNeedTranslate = false
                             hasBeenAdded = false
                             justBeenAdded = false
@@ -734,97 +753,67 @@ fun ArticlePage(
 
                         LaunchedEffect(annotationState) {
                             if (annotationState != AnnotationState.ONE_WORD) {
+                                Log.d("!!!", "LaunchedEffect annoInit()")
                                 annoInit()
                             }
                         }
 
 
                         suspend fun oneWordChange() {
-//                            Log.d(
-//                                "!!!",
-//                                "1 ArticlePage:  focusWord = $focusWord"
-//                            )
 
-//                            if (selectedText.isNotBlank()) {
-//                                val id = viewModel.getWordId(selectedText)
-//                                if (viewModel.wordListTable[paragraphIndex].contains(id)) {
-////                                Log.d("!!!", "$selectedText true")
-////                                if (annotationState)
-//
-//                                    selectedWord.value = viewModel.getWordByIdSus(id!!)
-//                                    Log.d("!!!", "selectedText.isNotBlank  ${selectedWord.value}")
-//                                    annotationState = AnnotationState.ONE_WORD
-//                                } else {
-//                                    if (annotationState == AnnotationState.WORDS) {
-//
-//                                    }
-////                                    annotationState = AnnotationState.CLOSE
-////                                    selectedWord.value = Word()
-//                                }
-//
-////                            } else if (annotationState == AnnotationState.ON_WORD) {
-//                            } else if (annotationState == AnnotationState.ONE_WORD && focusWord != selectedWord.value) {
-//                                if (focusWord != Word()) {
-//                                    focusWord = Word()
-//                                } else {
-//                                    annotationState = AnnotationState.CLOSE
-//                                }
-//                            }
+                            oneWordState = OneWordState.NULL
 
                             if (selectedText.isNotBlank()) {
-
-//                                val selectedTextIsNewWord = selectedText.isNewWord(paragraphIndex)
-
-//                                if (selectedTextIsNewWord || hasBeenAdded && !selectedText.hasBeenTranslated()) textNeedTranslate = true
-//                                textNeedTranslate =
-//                                    selectedTextIsNewWord || !selectedText.hasTranslation()
-//                                    selectedTextIsNewWord || hasBeenAdded && !selectedText.hasTranslation()
-                                Log.d(
-                                    "!!!", "oneWordChange: $selectedText" +
-//                                            "\nselectedTextIsNewWord = $selectedTextIsNewWord" +
-                                            "\nhasBeenAdded = $hasBeenAdded" +
-                                            "\n!selectedText.hasBeenTranslated() = ${selectedText.hasTranslation()}" +
-                                            "\ntextNeedTranslate = $textNeedTranslate"
-                                )
-
-//                                if (!selectedTextIsNewWord) hasBeenAdded = true
-//                                hasBeenAdded = !selectedTextIsNewWord
+//                                Log.d(
+//                                    "!!!", "oneWordChange: $selectedText" +
+////                                            "\nselectedTextIsNewWord = $selectedTextIsNewWord" +
+//                                            "\nhasBeenAdded = $hasBeenAdded" +
+//                                            "\n!selectedText.hasBeenTranslated() = ${selectedText.hasTranslation()}" +
+//                                            "\ntextNeedTranslate = $textNeedTranslate"
+//                                )
 
                                 val word = viewModel.getWordByEnglish(selectedText)
+
+                                Log.d("!!!", "oneWordChange: $word")
                                 if (word != null) {
                                     if (word.chinese.isBlank()) {
-                                        translate(oneWord.english, context) {
+                                        translate(word.english, context) {
                                             translatedText = it
                                         }
 
+                                        textNeedTranslate = true
                                         oneWordState = OneWordState.NO_TRANSLATION
                                     } else {
                                         translatedText = ""
 
+                                        textNeedTranslate = false
                                         oneWordState = OneWordState.HAS_TRANSLATION
                                     }
 
                                     hasBeenAdded = true
+                                    isWordAdded(true)
                                     oneWord = word
 
                                 } else {
-
-                                    hasBeenAdded = false
-//                                    oneWord = Word()
 
                                     translate(selectedText, context) {
                                         translatedText = it
                                         Log.d("!!!", "translate: $it")
                                     }
+                                    textNeedTranslate = true
+
+                                    hasBeenAdded = false
+                                    isWordAdded(false)
+//                                    oneWord = Word()
 
                                     oneWordState = OneWordState.NEW_WORD
 
                                 }
-                                Log.d(
-                                    "!!!", "oneWordChange: \n" +
-                                            "oneWord = $oneWord\n" +
-                                            "translatedText = ^$translatedText^"
-                                )
+//                                Log.d(
+//                                    "!!!", "oneWordChange: \n" +
+//                                            "oneWord = $oneWord\n" +
+//                                            "translatedText = ^$translatedText^"
+//                                )
 
 
                                 annotationState = AnnotationState.ONE_WORD
@@ -841,25 +830,17 @@ fun ArticlePage(
                                 annoInit()
 
                                 annotationState = AnnotationState.CLOSE
+
+                                Log.d("!!!", "annotationState = AnnotationState.CLOSE ")
                             }
 
-//                            Log.d(
-//                                "!!!", "oneWordChange: \n" +
-//                                        "!selectedText.isNewWord(paragraphIndex) = ${
-//                                            !selectedText.isNewWord(
-//                                                paragraphIndex
-//                                            )
-//                                        }\n" +
-//                                        "focusWord == Word() = ${focusWord == Word()}\n" +
-//                                        "annotationState == AnnotationState.ONE_WORD = ${annotationState == AnnotationState.ONE_WORD}\n" +
-//                                        "translatedText = ^$translatedText^"
-//                            )
+                            Log.d("!!!", "oneWordChange: \n" +
+                                    "$oneWord\n" +
+                                    "hasBeenAdded = $hasBeenAdded\n" +
+                                    "translatedText = $translatedText\n" +
+                                    "textNeedTranslate = $textNeedTranslate\n" +
+                                    "annotationState = $annotationState")
 
-
-//                            Log.d(
-//                                "!!!",
-//                                "2 ArticlePage: focusWord = $focusWord"
-//                            )
                         }
 
 //                        LaunchedEffect(selectedText) {
@@ -867,10 +848,10 @@ fun ArticlePage(
                             if (selectedText.isBlank() && focusWord == Word())
                                 annoInit()
 
-                            Log.d(
-                                "!!!",
-                                "oneWordChange() selectedText = $selectedText, focusWord = $focusWord"
-                            )
+//                            Log.d(
+//                                "!!!",
+//                                "oneWordChange() selectedText = $selectedText, focusWord = $focusWord"
+//                            )
 
                             coroutineScope.launch(Dispatchers.IO) {
 
@@ -1029,9 +1010,15 @@ fun ArticlePage(
                                             viewModel.addWordListTable(
                                                 selectedText,
                                                 paragraphIndex
-                                            )
+                                            ) {
+                                                coroutineScope.launch(Dispatchers.IO) {
+                                                    oneWord = viewModel.getWordByEnglish(selectedText)!!
+                                                    hasBeenAdded = true
+                                                }
+                                            }
 
                                             justBeenAdded = true
+
                                         }
                                     }
 
@@ -1054,9 +1041,15 @@ fun ArticlePage(
                                         normalColor = Color.White,
                                         modifier = Modifier.focusable()
                                     ) {
+
+                                        hideKeyboardFun()
+
                                         annotationState =
                                             if (annotationState == AnnotationState.TRANSLATION) AnnotationState.CLOSE
                                             else AnnotationState.TRANSLATION
+
+                                        annoInit()
+
 
 //                                        viewModel.currentContent[paragraphIndex] =
 //                                            viewModel.currentContent[paragraphIndex].copy(
@@ -1169,9 +1162,14 @@ fun ArticlePage(
                                         modifier = Modifier.focusable()
                                     ) {
 
+                                        hideKeyboardFun()
+
+
                                         annotationState =
                                             if (annotationState == AnnotationState.WORDS) AnnotationState.CLOSE
                                             else AnnotationState.WORDS
+
+                                        annoInit()
 
 //                                        viewModel.currentContent[paragraphIndex] =
 //                                            viewModel.currentContent[paragraphIndex].copy(
@@ -1235,10 +1233,23 @@ fun ArticlePage(
 //                                        AnnotationState.CLOSE
 //                                }
 
+
+                                // wordlist init
+
+//                                var wordList by remember {
+//                                    mutableStateListOf<Word>()
+//                                }
+
+//                                    viewModel.wordListTable[paragraphIndex].map {
+//                                        viewModel.getWordById(it)
+//                                            .collectAsState(initial = EmptyWord.word) as MutableState<Word>
+//                                    }.toMutableStateList()
+
+
                                 AnimatedContent(targetState = annotationState) { it ->
                                     when (it) {
                                         AnnotationState.TRANSLATION -> {
-                                            annoInit()
+//                                            annoInit()
 
                                             Card(
                                                 elevation = 0.dp,
@@ -1276,7 +1287,7 @@ fun ArticlePage(
 
 
                                         AnnotationState.WORDS -> {
-                                            annoInit()
+//                                            annoInit()
 
                                             val list = remember {
                                                 viewModel.wordListTable[paragraphIndex]
@@ -1290,6 +1301,8 @@ fun ArticlePage(
                                                     viewModel.getWordById(it)
                                                         .collectAsState(initial = EmptyWord.word) as MutableState<Word>
                                                 }.toMutableStateList()
+
+
 //                                        emptyList<MutableState<Word>>().toMutableStateList()
 
 //                                    wordList = list
@@ -1420,79 +1433,94 @@ fun ArticlePage(
 
                                         AnnotationState.ONE_WORD -> {
 
-//                                            var hasBeenAdded by remember {
-//                                                mutableStateOf(false)
-//                                            }
-
-//                                            val oneWord by remember {
-//                                                derivedStateOf {
-//                                                    Word(english = if (selectedText.isNotBlank()))
-//                                                }
-//                                            }
-//                                            var oneWord by remember {
-//                                                mutableStateOf(Word(english = selectedText))
-//                                            }
-//                                            var translatedText by remember {
-//                                                mutableStateOf("")
-//                                            }
-
-//                                            LaunchedEffect(selectedText) {
+//                                            Log.d("!!!", "AnnotationState.ONE_WORD hasBeenAdded = $hasBeenAdded")
 //
-//                                                if (selectedText.isNotBlank()) {
-//                                                    oneWord = oneWord.copy(
-//                                                        english = selectedText
-//                                                    )
-//
-//                                                    val id = viewModel.getWordId(selectedText)
-//                                                    if (viewModel.wordListTable[paragraphIndex].contains(
-//                                                            id
+                                            LaunchedEffect(key1 = hasBeenAdded) {
+                                                Log.d("!!!", "hasBeenAdded = $hasBeenAdded")
+                                            }
+
+//                                            Log.d("!!!", "oneWordChange: \n" +
+//                                                    "$oneWord\n" +
+//                                                    "hasBeenAdded = $hasBeenAdded\n" +
+//                                                    "translatedText = $translatedText\n" +
+//                                                    "textNeedTranslate = $textNeedTranslate\n" +
+//                                                    "annotationState = $annotationState")
+
+//                                            Column(Modifier.animateContentSize()) {
+                                            Column {
+
+
+                                                AnimatedVisibility(visible = hasBeenAdded) {
+                                                    Log.d("!!!", "WordComponent2: ")
+                                                    WordComponent2(
+                                                        word = oneWord,
+                                                        onValueChange = {
+                                                            oneWord = oneWord.copy(chinese = it)
+                                                        },
+                                                        remove = {
+                                                            viewModel.wordListTable[paragraphIndex].remove(
+                                                                oneWord.id
+                                                            )
+                                                        },
+                                                        updateWord = {
+                                                            viewModel.updateWord(oneWord)
+                                                        },
+                                                        viewModel = viewModel,
+                                                        focusWord = {
+                                                            focused = true
+                                                            focusWord = it
+                                                        },
+                                                    )
+                                                }
+//                                                AnimatedContent(targetState = hasBeenAdded) { state ->
+//                                                    if (state) {
+//                                                        WordComponent2(
+//                                                            word = oneWord,
+//                                                            onValueChange = {
+//                                                                oneWord = oneWord.copy(chinese = it)
+//                                                            },
+//                                                            remove = {
+//                                                                viewModel.wordListTable[paragraphIndex].remove(
+//                                                                    oneWord.id
+//                                                                )
+//                                                            },
+//                                                            updateWord = {
+//                                                                viewModel.updateWord(oneWord)
+//                                                            },
+//                                                            viewModel = viewModel,
+//                                                            focusWord = {
+//                                                                focused = true
+//                                                                focusWord = it
+//                                                            },
+////                                                            needSwipe = !textNeedTranslate
 //                                                        )
-//                                                    ) {
-//                                                        oneWord = viewModel.getWordByIdSus(id!!)
 //                                                    }
 //                                                }
-////                                                else if (!viewModel.currentWord.isNullOrBlank()) {
-////                                                    oneWord = oneWord.copy(
-////                                                        english = viewModel.currentWord!!
-////                                                    )
-////
-////                                                    val id = viewModel.getWordId(viewModel.currentWord!!)
-////                                                    if (viewModel.wordListTable[paragraphIndex].contains(
-////                                                            id
-////                                                        )
-////                                                    ) {
-////                                                        oneWord = viewModel.getWordByIdSus(id!!)
-////                                                    }
-////                                                }
-//
-//                                                Log.d("!!!", "AnnotationState.ONE_WORD")
-////                                                val chinese = translateWord(selectedText, context)
-//                                                translateWord(oneWord.english, context) {
-////                                                    oneWord = oneWord.copy(
-////                                                        chinese = it
-////                                                    )
-//                                                    translatedText = it
+
+
+                                                AnimatedVisibility(textNeedTranslate) {
+                                                    Log.d("!!!", "TranslatedWordComponent: ")
+                                                    TranslatedWordComponent(translation = translatedText)
+                                                }
+
+
+//                                                AnimatedContent(targetState = translatedText.isNotBlank()) {
+////                                                AnimatedContent(targetState = textNeedTranslate) {
+//                                                    if (it) TranslatedWordComponent(translation = translatedText)
 //                                                }
-////                                                Log.d("!!!", chinese)
-//                                            }
+
+//                                                if (translatedText.isNotBlank()) {
 //
-//                                            LaunchedEffect(viewModel.wordListTable[paragraphIndex].size) {
-//                                                val id = viewModel.getWordId(oneWord.english)
-//                                                hasBeenAdded =
-//                                                    viewModel.wordListTable[paragraphIndex].contains(
-//                                                        id
-//                                                    )
-//
-//                                                viewModel.currentWord = oneWord.english
-//
-//                                                Log.d(
-//                                                    "!!!",
-//                                                    "AnnotationState.ONE_WORD: hasBeenAdded = $hasBeenAdded"
-//                                                )
-//                                            }
+//                                                    TranslatedWordComponent(translation = translatedText)
+//                                                }
+
+//                                                AnimatedVisibility(visible = hasBeenAdded || textNeedTranslate) {
+//                                                }
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                            }
 
 
-//                                            AnimatedContent(targetState = oneWordState) {
+                                            //                                            AnimatedContent(targetState = oneWordState) {
 //                                                Column {
 //
 //                                                    when(it) {
@@ -1607,82 +1635,11 @@ fun ArticlePage(
 //                                                }
 //                                            }
 
-
-                                            Column {
-
-//                                                AnimatedVisibility(visible = hasBeenAdded) {
-//                                                    WordComponent2(
-//                                                        word = oneWord,
-//                                                        onValueChange = {
-//                                                            oneWord = oneWord.copy(chinese = it)
-//                                                        },
-//                                                        remove = {
-//                                                            viewModel.wordListTable[paragraphIndex].remove(
-//                                                                oneWord.id
-//                                                            )
-//                                                        },
-//                                                        updateWord = {
-//                                                            viewModel.updateWord(oneWord)
-//                                                        },
-//                                                        viewModel = viewModel,
-//                                                        focusWord = {
-//                                                            focused = true
-//                                                            focusWord = it
-//                                                        },
-//                                                    )
-//                                                }
-                                                AnimatedContent(targetState = hasBeenAdded) { state ->
-                                                    if (state) {
-                                                        WordComponent2(
-                                                            word = oneWord,
-                                                            onValueChange = {
-                                                                oneWord = oneWord.copy(chinese = it)
-                                                            },
-                                                            remove = {
-                                                                viewModel.wordListTable[paragraphIndex].remove(
-                                                                    oneWord.id
-                                                                )
-                                                            },
-                                                            updateWord = {
-                                                                viewModel.updateWord(oneWord)
-                                                            },
-                                                            viewModel = viewModel,
-                                                            focusWord = {
-                                                                focused = true
-                                                                focusWord = it
-                                                            },
-//                                                            needSwipe = !textNeedTranslate
-                                                        )
-                                                    }
-                                                }
-
-//                                                AnimatedVisibility(translatedText.isNotBlank()) {
-//                                                    TranslatedWordComponent(translation = translatedText)
-//                                                }
-
-//                                                AnimatedContent(targetState = translatedText.isNotBlank()) {
-////                                                AnimatedContent(targetState = textNeedTranslate) {
-//                                                    if (it) TranslatedWordComponent(translation = translatedText)
-//                                                }
-
-                                                if (translatedText.isNotBlank()) {
-
-                                                    TranslatedWordComponent(translation = translatedText)
-                                                }
-
-                                                AnimatedVisibility(visible = hasBeenAdded || translatedText.isNotBlank()) {
-                                                    Spacer(modifier = Modifier.height(8.dp))
-                                                }
-                                            }
                                         }
                                     }
                                 }
-//                        Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
-//                        }
-//                    }
-
                     }
                 }
 

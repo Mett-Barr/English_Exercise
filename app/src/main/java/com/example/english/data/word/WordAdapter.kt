@@ -15,6 +15,7 @@ suspend fun addInWordListTable(
     english: String,
     wordRepository: WordRepository,
     list: SnapshotStateList<Int>,
+    finish: () -> Unit = {}
 ): SnapshotStateList<Int>  {
 
     Log.d("!!!", "addInWordListTable: $english")
@@ -29,6 +30,8 @@ suspend fun addInWordListTable(
         val wordId = wordRepository.addNewWord(Word(english = english)).toInt()
         list.add(wordId)
     }
+
+    finish()
 
     return list
 }
