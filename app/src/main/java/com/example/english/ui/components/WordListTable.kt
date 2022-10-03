@@ -504,12 +504,13 @@ fun WordComponent(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .weight(1F)
-                        .padding(horizontal = 8.dp),
+                        .padding(horizontal = 8.dp)
 //                        .focusRequester(focusRequester)
-//                        .onFocusChanged {
-//                            if (it.isFocused) {
-//                                focusWord(word.value)
+                        .onFocusChanged {
+                            if (it.isFocused) {
+                                focusWord(word.value)
 //                                focusState = true
+                            }
 //                            } else {
 ////                                focusWord(Word())
 //                                updateWord()
@@ -523,7 +524,7 @@ fun WordComponent(
 //                                }
 //
 ////                                focusRequester.requestFocus()
-//                            }
+                            },
 ////                            Log.d("!!!", "word: onFocusChanged $it ${it.isFocused} ${it.isCaptured} ${it.hasFocus}")
 //                        },
                     textStyle = Typography().h6.copy(color = MaterialTheme.colors.onBackground),

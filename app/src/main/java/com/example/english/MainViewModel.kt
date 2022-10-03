@@ -43,8 +43,8 @@ class MainViewModel @Inject constructor(
     var currentWebsite by mutableStateOf(NewsWebsite.BBC)
 
     /** draft news */
-    var draftTitle by mutableStateOf(TextFieldValue("test"))
-    var draftContent by mutableStateOf(TextFieldValue("test"))
+    var draftTitle by mutableStateOf(TextFieldValue("Title"))
+    var draftContent by mutableStateOf(TextFieldValue("content"))
 
     //
     fun navToInsertPage() {

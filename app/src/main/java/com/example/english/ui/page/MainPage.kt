@@ -133,40 +133,40 @@ fun MainPage(viewModel: MainViewModel, navController: NavController, navigateToW
             ) {
 
 
-                // Insert
-                Row(
-                    modifier = Modifier
-                        .alpha(fabAlphaAnimation)
-                        .fillMaxWidth()
-                        .align(Alignment.BottomEnd)
-                        .padding(bottom = fabPaddingAdd + 56.dp + 16.dp)
-                ) {
-//                    .padding(bottom = 144.dp)) {
-                    Text(
-                        text = "測試", modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp)
-                            .align(Alignment.CenterVertically), textAlign = TextAlign.Left
-                    )
-//                    Spacer(modifier = Modifier.weight(1f))
-                    FloatingActionButton(
-                        modifier = Modifier.scale(fabScaleAnimation),
-//                            .align(Alignment.BottomEnd),
-                        onClick = {
-//                            navController.navigate(MainRoute.Insert.route)
-//                    viewModel.addBBCNews(BUG_URL, context)
-
-                            viewModel.draftTitle = TextFieldValue("Title")
-                            viewModel.draftContent =
-                                TextFieldValue("This is a test content. zqwe asd zxc\nqwe asd zxc\n wer sdf xcv")
-                            viewModel.addNews(context)
-
-                            fabIsOpening = !fabIsOpening
-                        }) {
-                        Icon(imageVector = Icons.Rounded.Add, contentDescription = "add",
-                            tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background))
-                    }
-                }
+                // Test
+//                Row(
+//                    modifier = Modifier
+//                        .alpha(fabAlphaAnimation)
+//                        .fillMaxWidth()
+//                        .align(Alignment.BottomEnd)
+//                        .padding(bottom = fabPaddingAdd + 56.dp + 16.dp)
+//                ) {
+////                    .padding(bottom = 144.dp)) {
+//                    Text(
+//                        text = "測試", modifier = Modifier
+//                            .weight(1f)
+//                            .padding(end = 8.dp)
+//                            .align(Alignment.CenterVertically), textAlign = TextAlign.Left
+//                    )
+////                    Spacer(modifier = Modifier.weight(1f))
+//                    FloatingActionButton(
+//                        modifier = Modifier.scale(fabScaleAnimation),
+////                            .align(Alignment.BottomEnd),
+//                        onClick = {
+////                            navController.navigate(MainRoute.Insert.route)
+////                    viewModel.addBBCNews(BUG_URL, context)
+//
+//                            viewModel.draftTitle = TextFieldValue("Title")
+//                            viewModel.draftContent =
+//                                TextFieldValue("This is a test content. zqwe asd zxc\nqwe asd zxc\n wer sdf xcv")
+//                            viewModel.addNews(context)
+//
+//                            fabIsOpening = !fabIsOpening
+//                        }) {
+//                        Icon(imageVector = Icons.Rounded.Add, contentDescription = "add",
+//                            tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background))
+//                    }
+//                }
 
 
                 // Insert

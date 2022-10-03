@@ -185,22 +185,24 @@ fun ArticlePage(
     }
 
 
-    val hideKeyboardModifier = Modifier
+    fun hideKeyboardModifier(click: () -> Unit = {} ) =
+        Modifier
+            .clickable(
+                interactionSource = MutableInteractionSource(),
+                indication = null
+            ) {
+                Log.d("!!!", "hideKeyboardModifier ")
+                focusManager.clearFocus()
+                keyboardController?.hide()
 
 
-//        .focusable()
-        .clickable(
-            interactionSource = MutableInteractionSource(),
-            indication = null
-        ) {
-            Log.d("!!!", "hideKeyboardModifier ")
-            focusManager.clearFocus()
-            keyboardController?.hide()
+                if (focused) focused = false
+                else focusWord = Word()
 
 
-            if (focused) focused = false
-            else focusWord = Word()
-        }
+                click()
+            }
+
 
     fun hideKeyboardFun() {
         focusManager.clearFocus()
@@ -490,7 +492,7 @@ fun ArticlePage(
             }
         },
 
-        modifier = hideKeyboardModifier
+        modifier = hideKeyboardModifier()
 
     ) { paddingValues ->
 
@@ -586,7 +588,7 @@ fun ArticlePage(
 //                                    - 8.dp,
                     ),
                     state = lazyListState,
-                    modifier = hideKeyboardModifier.animateContentSize()
+                    modifier = hideKeyboardModifier().animateContentSize()
 //                    modifier = Modifier.animateContentSize()
                 ) {
 
@@ -700,6 +702,16 @@ fun ArticlePage(
                             mutableStateOf(false)
                         }
 
+
+                        var isNewWord by remember { mutableStateOf(false) }
+                        suspend fun checkIsNewWord() {
+                            val word = viewModel.getWordByEnglish(selectedText)
+
+                            isNewWord =
+                                !(viewModel.wordListTable[paragraphIndex].contains(word?.id) || (viewModel.wordListTable[paragraphIndex].contains(
+                                    focusWord.id) && focusWord != Word()))
+                        }
+
                         fun isWordAdded(boo: Boolean) {
                             hasBeenAdded = boo
                         }
@@ -732,6 +744,9 @@ fun ArticlePage(
                                 if (word != null && oneWord != word) {
                                     oneWord = word
                                 }
+
+
+                                checkIsNewWord()
                             }
                         }
 
@@ -763,6 +778,8 @@ fun ArticlePage(
 
                             oneWordState = OneWordState.NULL
 
+                            val word = viewModel.getWordByEnglish(selectedText)
+
                             if (selectedText.isNotBlank()) {
 //                                Log.d(
 //                                    "!!!", "oneWordChange: $selectedText" +
@@ -772,7 +789,6 @@ fun ArticlePage(
 //                                            "\ntextNeedTranslate = $textNeedTranslate"
 //                                )
 
-                                val word = viewModel.getWordByEnglish(selectedText)
 
                                 Log.d("!!!", "oneWordChange: $word")
                                 if (word != null) {
@@ -834,6 +850,15 @@ fun ArticlePage(
                                 Log.d("!!!", "annotationState = AnnotationState.CLOSE ")
                             }
 
+
+                            // check if word is in list
+                            checkIsNewWord()
+                            isNewWord =
+                                !(viewModel.wordListTable[paragraphIndex].contains(word?.id) || (viewModel.wordListTable[paragraphIndex].contains(
+                                    focusWord.id) && focusWord != Word()))
+
+
+
                             Log.d("!!!", "oneWordChange: \n" +
                                     "$oneWord\n" +
                                     "hasBeenAdded = $hasBeenAdded\n" +
@@ -877,7 +902,10 @@ fun ArticlePage(
                                 .alpha(cardViewAlpha)
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                                 .fillMaxWidth()
-                                .then(hideKeyboardModifier)
+                                .then(hideKeyboardModifier {
+                                    if (focusWord == Word()) annotationState =
+                                        AnnotationState.CLOSE
+                                })
                                 .wrapContentHeight(),
                             backgroundColor = MaterialTheme.colors.surface,
                             shape = RoundedCornerShape(16.dp)
@@ -947,10 +975,9 @@ fun ArticlePage(
                                     )
                                 }
 
-                                var isNewWord by remember { mutableStateOf(false) }
-
                                 // button row
-                                Row(modifier = hideKeyboardModifier.fillMaxWidth()) {
+                                Row(modifier = Modifier.fillMaxWidth()) {
+//                                Row(modifier = hideKeyboardModifier().fillMaxWidth()) {
 
                                     fun isParagraphDone(): Boolean {
 //                                        Log.d("!!!", "isDone: ${paragraphContent.text}")
@@ -992,32 +1019,51 @@ fun ArticlePage(
                                         isSelected = isParagraphDone()
                                     )
 
-                                    LaunchedEffect(selectedText) {
-                                        val id = viewModel.getWordId(selectedText)
-                                        isNewWord =
-                                            !viewModel.wordListTable[paragraphIndex].contains(id) && selectedText.isNotBlank()
-                                    }
+//                                    LaunchedEffect(selectedText) {
+//                                        val id = viewModel.getWordId(selectedText)
+//                                        isNewWord =
+//                                            !viewModel.wordListTable[paragraphIndex].contains(id) && selectedText.isNotBlank()
+//                                    }
+
                                     AnimatedVisibility(
-                                        visible = isNewWord && !justBeenAdded,
+                                        visible = annotationState == AnnotationState.ONE_WORD,
+//                                        visible = isNewWord && !justBeenAdded,
                                         enter = scaleIn(),
                                         exit = scaleOut()
                                     ) {
-                                        ClickableIcon(painter = painterResource(id = R.drawable.add_board)) {
+//                                        ClickableIcon(painter = painterResource(id = R.drawable.add_board)) {
+                                        SelectableIcon(
+                                            painter = painterResource(id = R.drawable.add_board),
+                                            isSelected = !isNewWord
+                                        ) {
 
-                                            // 清除上一次選重的單字
-                                            viewModel.noCurrentWord()
+                                            if (isNewWord) {
+                                                // 清除上一次選重的單字
+                                                viewModel.noCurrentWord()
 
-                                            viewModel.addWordListTable(
-                                                selectedText,
-                                                paragraphIndex
-                                            ) {
+                                                viewModel.addWordListTable(
+                                                    selectedText,
+                                                    paragraphIndex
+                                                ) {
+                                                    coroutineScope.launch(Dispatchers.IO) {
+                                                        oneWord =
+                                                            viewModel.getWordByEnglish(selectedText)!!
+                                                        hasBeenAdded = true
+                                                    }
+                                                }
+
+//                                            justBeenAdded = true
+
+                                            } else {
                                                 coroutineScope.launch(Dispatchers.IO) {
-                                                    oneWord = viewModel.getWordByEnglish(selectedText)!!
-                                                    hasBeenAdded = true
+                                                    val id =
+                                                        if (selectedText.isNotBlank()) viewModel.getWordByEnglish(
+                                                            selectedText)?.id else if (focusWord != Word()) focusWord.id
+                                                        else null
+                                                    if (id != null)
+                                                        viewModel.wordListTable[paragraphIndex].remove(id)
                                                 }
                                             }
-
-                                            justBeenAdded = true
 
                                         }
                                     }
@@ -1400,7 +1446,12 @@ fun ArticlePage(
 //                                                        )
 //                                                    )
 //                                                }
-                                                        viewModel = viewModel
+                                                        viewModel = viewModel,
+
+                                                        focusWord = {
+                                                            focused = true
+                                                            focusWord = it
+                                                        }
                                                     )
                                                 }
                                             }
