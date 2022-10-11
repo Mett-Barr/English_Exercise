@@ -1,7 +1,6 @@
 package com.example.english.ui.components
 
 import android.util.Log
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -760,9 +759,9 @@ fun WordComponent2(
 }
 
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun TranslatedWordComponent(translation: String) {
+fun TranslatedWordComponent(translation: String, onClickIcon: () -> Unit = {}, onClick: () -> Unit = {}) {
 
     Row(
         modifier = Modifier
@@ -771,7 +770,9 @@ fun TranslatedWordComponent(translation: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        ClickableIcon(painter = painterResource(id = R.drawable.translation))
+        ClickableIcon(painter = painterResource(id = R.drawable.translation)) {
+            onClickIcon()
+        }
 
         Card(
             elevation = 3.dp,
@@ -779,7 +780,8 @@ fun TranslatedWordComponent(translation: String) {
                 .padding(horizontal = 2.dp, vertical = 4.dp)
                 .heightIn(min = 48.dp)
                 .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            onClick = onClick
         ) {
             Box(
                 contentAlignment = Alignment.CenterStart,

@@ -9,8 +9,8 @@ import com.example.english.data.word.wordlist.WordListTable
 import com.example.english.data.word.wordlist.stringToWordListTable
 import com.example.english.data.word.wordlist.wordListTableToString
 import com.example.english.stringconverter.StringConverter
-import com.example.english.tool.translation.json.Translation
-import com.example.english.tool.translation.translateArticle
+import com.example.english.translation.json.Translation
+import com.example.english.translation.translateArticle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader

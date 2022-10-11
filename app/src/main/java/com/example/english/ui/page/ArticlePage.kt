@@ -185,7 +185,7 @@ fun ArticlePage(
     }
 
 
-    fun hideKeyboardModifier(click: () -> Unit = {} ) =
+    fun hideKeyboardModifier(click: () -> Unit = {}) =
         Modifier
             .clickable(
                 interactionSource = MutableInteractionSource(),
@@ -709,7 +709,8 @@ fun ArticlePage(
 
                             isNewWord =
                                 !(viewModel.wordListTable[paragraphIndex].contains(word?.id) || (viewModel.wordListTable[paragraphIndex].contains(
-                                    focusWord.id) && focusWord != Word()))
+                                    focusWord.id
+                                ) && focusWord != Word()))
                         }
 
                         fun isWordAdded(boo: Boolean) {
@@ -855,16 +856,19 @@ fun ArticlePage(
                             checkIsNewWord()
                             isNewWord =
                                 !(viewModel.wordListTable[paragraphIndex].contains(word?.id) || (viewModel.wordListTable[paragraphIndex].contains(
-                                    focusWord.id) && focusWord != Word()))
+                                    focusWord.id
+                                ) && focusWord != Word()))
 
 
 
-                            Log.d("!!!", "oneWordChange: \n" +
-                                    "$oneWord\n" +
-                                    "hasBeenAdded = $hasBeenAdded\n" +
-                                    "translatedText = $translatedText\n" +
-                                    "textNeedTranslate = $textNeedTranslate\n" +
-                                    "annotationState = $annotationState")
+                            Log.d(
+                                "!!!", "oneWordChange: \n" +
+                                        "$oneWord\n" +
+                                        "hasBeenAdded = $hasBeenAdded\n" +
+                                        "translatedText = $translatedText\n" +
+                                        "textNeedTranslate = $textNeedTranslate\n" +
+                                        "annotationState = $annotationState"
+                            )
 
                         }
 
@@ -1058,10 +1062,13 @@ fun ArticlePage(
                                                 coroutineScope.launch(Dispatchers.IO) {
                                                     val id =
                                                         if (selectedText.isNotBlank()) viewModel.getWordByEnglish(
-                                                            selectedText)?.id else if (focusWord != Word()) focusWord.id
+                                                            selectedText
+                                                        )?.id else if (focusWord != Word()) focusWord.id
                                                         else null
                                                     if (id != null)
-                                                        viewModel.wordListTable[paragraphIndex].remove(id)
+                                                        viewModel.wordListTable[paragraphIndex].remove(
+                                                            id
+                                                        )
                                                 }
                                             }
 
@@ -1551,7 +1558,26 @@ fun ArticlePage(
 
                                                 AnimatedVisibility(textNeedTranslate) {
                                                     Log.d("!!!", "TranslatedWordComponent: ")
-                                                    TranslatedWordComponent(translation = translatedText)
+                                                    TranslatedWordComponent(translation = translatedText,
+                                                        onClickIcon = {
+                                                            if (selectedText.isNotBlank()) {
+
+                                                            }
+                                                        },
+                                                        onClick = {
+                                                            if (oneWord.chinese.isBlank()) {
+                                                                oneWord = oneWord.copy(
+                                                                    chinese = translatedText
+                                                                )
+                                                            } else if (oneWord.chinese == translatedText) {
+                                                                oneWord = oneWord.copy(
+                                                                    chinese = ""
+                                                                )
+                                                            }
+
+                                                            viewModel.updateWord(oneWord)
+                                                        }
+                                                    )
                                                 }
 
 
