@@ -1,4 +1,4 @@
-package com.example.english.translation
+package com.example.english.tool.translation
 
 import android.content.ActivityNotFoundException
 import android.content.ComponentName

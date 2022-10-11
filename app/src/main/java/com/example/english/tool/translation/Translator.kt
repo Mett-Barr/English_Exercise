@@ -1,4 +1,4 @@
-package com.example.english.translation
+package com.example.english.tool.translation
 
 import android.content.Context
 import android.util.Log
@@ -8,9 +8,9 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.english.data.article.FileOperator
 import com.example.english.tool.AppToast
-import com.example.english.translation.Translator.mlTranslator
-import com.example.english.translation.json.Translation
-import com.example.english.translation.json.Translations
+import com.example.english.tool.translation.Translator.mlTranslator
+import com.example.english.tool.translation.json.Translation
+import com.example.english.tool.translation.json.Translations
 import com.google.gson.JsonObject
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage

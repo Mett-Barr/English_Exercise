@@ -15,8 +15,8 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.english.network.JsoupNews
 import com.example.english.network.jsoupTagTest
-import com.example.english.translation.BUG_URL
-import com.example.english.translation.translate
+import com.example.english.tool.translation.BUG_URL
+import com.example.english.tool.translation.translate
 import com.example.english.ui.components.Loader
 import com.example.english.ui.components.Movement
 import com.example.english.ui.components.SegmentedControls

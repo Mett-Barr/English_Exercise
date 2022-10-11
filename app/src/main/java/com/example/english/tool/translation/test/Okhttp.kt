@@ -1,6 +1,6 @@
-package com.example.english.translation.test
+package com.example.english.tool.translation.test
 
-import com.example.english.translation.BASE_URL
+import com.example.english.tool.translation.BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
