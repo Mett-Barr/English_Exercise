@@ -44,6 +44,8 @@ import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.isDone
 import com.example.english.translation.translate
+import com.example.english.translation.translateApp
+import com.example.english.translation.wordTranslate
 import com.example.english.ui.components.*
 import com.example.english.ui.components.test.PopupInfo
 import com.example.english.ui.theme.ColorDone
@@ -99,7 +101,9 @@ fun ArticlePage(
     val maskColor by animateColorAsState(
         targetValue = if (infoCardIsOpening) MaterialTheme.colors.background.copy(
             alpha = 0.8f
-        ) else Color.Transparent, animationSpec = tween(300)
+        ) else MaterialTheme.colors.background.copy(
+            alpha = 0f
+        ), animationSpec = tween(300)
     )
 
 
@@ -143,14 +147,14 @@ fun ArticlePage(
         return backgroundColor.copy(alpha = statusBarAlpha)
     }
 
-    val color = remember { Animatable(getColor()) }
+//    val color = remember { Animatable(getColor()) }
 
-    fun changeColor() {
-        coroutineScope.launch {
-            if (infoCardIsOpening) color.animateTo(Color.Transparent)
-            else color.animateTo(Color.Transparent.copy(alpha = statusBarAlpha))
-        }
-    }
+//    fun changeColor() {
+//        coroutineScope.launch {
+//            if (infoCardIsOpening) color.animateTo(Color.Transparent)
+//            else color.animateTo(Color.Transparent.copy(alpha = statusBarAlpha))
+//        }
+//    }
 
 
     // data
@@ -519,30 +523,30 @@ fun ArticlePage(
                         .fillMaxWidth()
                         .aspectRatio(16f / ratio)
                 ) {
-                    Crossfade(
-                        targetState = viewModel.currentImage,
-                        modifier = Modifier.align(Alignment.TopCenter)
-                    ) {
-                        if (it != null) {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .aspectRatio(imageRatio)
-//                            .aspectRatio(14f / 9f)
-                                    .fillMaxWidth(),
-//                                    .blur(8.dp)
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Spacer(
-                                modifier = Modifier
-                                    .aspectRatio(16f / 9f)
-                                    .fillMaxWidth()
-                                    .background(Color.DarkGray)
-                            )
-                        }
-                    }
+//                    Crossfade(
+//                        targetState = viewModel.currentImage,
+//                        modifier = Modifier.align(Alignment.TopCenter)
+//                    ) {
+//                        if (it != null) {
+//                            Image(
+//                                bitmap = it.asImageBitmap(),
+//                                contentDescription = null,
+//                                modifier = Modifier
+//                                    .aspectRatio(imageRatio)
+////                            .aspectRatio(14f / 9f)
+//                                    .fillMaxWidth(),
+////                                    .blur(8.dp)
+//                                contentScale = ContentScale.Crop
+//                            )
+//                        } else {
+//                            Spacer(
+//                                modifier = Modifier
+//                                    .aspectRatio(16f / 9f)
+//                                    .fillMaxWidth()
+//                                    .background(Color.DarkGray)
+//                            )
+//                        }
+//                    }
 
 
                     val spacerHeight by remember {
@@ -595,31 +599,33 @@ fun ArticlePage(
                     item {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .aspectRatio(16f / ratio)
+                                .fillMaxWidth()
                         ) {
-//                    Crossfade(targetState = viewModel.currentImage) {
-//                        if (it != null) {
-//                            Image(
-//                                bitmap = it.asImageBitmap(),
-//                                contentDescription = null,
-//                                modifier = Modifier
-//                                    .aspectRatio(14f / 9f)
-//                                    .fillMaxWidth(),
-////                                    .blur(8.dp)
-//                            contentScale = ContentScale.Crop
-//                            )
-//                        } else {
-//                            Spacer(
-//                                modifier = Modifier
-//                                    .aspectRatio(16f / 9f)
-//                                    .fillMaxWidth()
-//                                    .background(Color.DarkGray)
-//                            )
-//                        }
-//                    }
+                    Crossfade(targetState = viewModel.currentImage, modifier = Modifier.align(Alignment.BottomCenter)) {
+                        if (it != null) {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier
+//                                    .align(Alignment.BottomCenter)
+                                    .aspectRatio(imageRatio)
+                                    .fillMaxWidth(),
+//                                    .blur(8.dp)
+                            contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Spacer(
+                                modifier = Modifier
+                                    .aspectRatio(16f / 9f)
+                                    .fillMaxWidth()
+                                    .background(Color.DarkGray)
+                            )
+                        }
+                    }
                             Text(
                                 text = viewModel.currentTitle,
+                                color = MaterialTheme.colors.onBackground,
                                 style = Typography().h5,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
@@ -1032,8 +1038,8 @@ fun ArticlePage(
                                     AnimatedVisibility(
                                         visible = annotationState == AnnotationState.ONE_WORD,
 //                                        visible = isNewWord && !justBeenAdded,
-                                        enter = scaleIn(),
-                                        exit = scaleOut()
+                                        enter = scaleIn() + fadeIn(),
+                                        exit = scaleOut() + fadeOut()
                                     ) {
 //                                        ClickableIcon(painter = painterResource(id = R.drawable.add_board)) {
                                         SelectableIcon(
@@ -1045,14 +1051,27 @@ fun ArticlePage(
                                                 // 清除上一次選重的單字
                                                 viewModel.noCurrentWord()
 
-                                                viewModel.addWordListTable(
-                                                    selectedText,
-                                                    paragraphIndex
-                                                ) {
-                                                    coroutineScope.launch(Dispatchers.IO) {
-                                                        oneWord =
-                                                            viewModel.getWordByEnglish(selectedText)!!
-                                                        hasBeenAdded = true
+                                                if (oneWord != Word()) {
+                                                    viewModel.addWordListTable(
+                                                        oneWord.english,
+                                                        paragraphIndex
+                                                    ) {
+//                                                        coroutineScope.launch(Dispatchers.IO) {
+//                                                            oneWord =
+//                                                                viewModel.getWordByEnglish(selectedText)!!
+//                                                            hasBeenAdded = true
+//                                                        }
+                                                    }
+                                                } else {
+                                                    viewModel.addWordListTable(
+                                                        selectedText,
+                                                        paragraphIndex
+                                                    ) {
+                                                        coroutineScope.launch(Dispatchers.IO) {
+                                                            oneWord =
+                                                                viewModel.getWordByEnglish(selectedText)!!
+                                                            hasBeenAdded = true
+                                                        }
                                                     }
                                                 }
 
@@ -1560,8 +1579,10 @@ fun ArticlePage(
                                                     Log.d("!!!", "TranslatedWordComponent: ")
                                                     TranslatedWordComponent(translation = translatedText,
                                                         onClickIcon = {
-                                                            if (selectedText.isNotBlank()) {
-
+                                                            if (oneWord != Word()) {
+                                                                wordTranslate(context, oneWord.english)
+                                                            } else if (selectedText.isNotBlank()) {
+                                                                wordTranslate(context, selectedText)
                                                             }
                                                         },
                                                         onClick = {

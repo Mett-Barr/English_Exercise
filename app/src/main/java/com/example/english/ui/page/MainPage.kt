@@ -451,33 +451,33 @@ fun NewsCard(
             ) {
 
                 Box {
-                    bitmap?.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .aspectRatio(16f / 9f)
-                                .fillMaxWidth()
-                        )
-                    }
-//                    Crossfade(targetState = bitmap) {
-//                        if (it != null) {
-//                            Image(
-//                                bitmap = it.asImageBitmap(),
-//                                contentDescription = null,
-//                                modifier = Modifier
-//                                    .aspectRatio(16f / 9f)
-//                                    .fillMaxWidth()
-//                            )
-//                        } else {
-//                            Spacer(
-//                                modifier = Modifier
-//                                    .aspectRatio(16f / 9f)
-//                                    .fillMaxWidth()
-//                                    .background(MaterialTheme.colors.surface)
-//                            )
-//                        }
+//                    bitmap?.let {
+//                        Image(
+//                            bitmap = it.asImageBitmap(),
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .aspectRatio(16f / 9f)
+//                                .fillMaxWidth()
+//                        )
 //                    }
+                    Crossfade(targetState = bitmap) {
+                        if (it != null) {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .aspectRatio(16f / 9f)
+                                    .fillMaxWidth()
+                            )
+                        } else {
+                            Spacer(
+                                modifier = Modifier
+                                    .aspectRatio(16f / 9f)
+                                    .fillMaxWidth()
+//                                    .background(MaterialTheme.colors.surface)
+                            )
+                        }
+                    }
 
 //                    Spacer(modifier = Modifier
 //                        .align(Alignment.BottomCenter)
