@@ -8,6 +8,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.english.data.article.*
 import com.example.english.data.image.ImageOperatorObject
 import com.example.english.data.newslist.Repository
@@ -378,13 +380,13 @@ class MainViewModel @Inject constructor(
 
     /** WordList Operation */
     //Insert
-    fun addWordListTable(english: String, index: Int, finish: () -> Unit = {}) {
+    fun addWordListTable(english: String, chinese: String = "", index: Int, finish: () -> Unit = {}) {
 //        wordExistCheck(english, index)
 
         currentWord = english
 
         viewModelScope.launch {
-            addInWordListTable(english, wordRepository, wordListTable[index], finish)
+            addInWordListTable(english, chinese, wordRepository, wordListTable[index], finish)
         }
 
     }

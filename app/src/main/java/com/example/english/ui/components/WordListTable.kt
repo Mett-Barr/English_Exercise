@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.english.MainViewModel
 import com.example.english.R
 import com.example.english.data.word.word.room.Word
+import com.example.english.translation.translateApp
 import com.example.english.translation.wordTranslate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -439,7 +440,8 @@ fun WordComponent(
                 swipeableState.animateTo("normal")
             }
 
-            wordTranslate(context, word.value.english)
+//            wordTranslate(context, word.value.english)
+            translateApp(context, word.value.english)
         }
 
 
@@ -676,7 +678,8 @@ fun WordComponent2(
                 swipeableState.animateTo("normal")
             }
 
-            wordTranslate(context, word.english)
+//            wordTranslate(context, word.english)
+            translateApp(context, word.english)
         }
 
 
@@ -759,7 +762,7 @@ fun WordComponent2(
 }
 
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TranslatedWordComponent(translation: String, onClickIcon: () -> Unit = {}, onClick: () -> Unit = {}) {
 

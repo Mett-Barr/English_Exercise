@@ -1,9 +1,18 @@
 package com.example.english.ui.navigation
 
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -68,13 +77,29 @@ fun MainNavigation(viewModel: MainViewModel) {
 //            WebPage(viewModel)
         }
         composable(MainRoute.News.route) {
-            ArticlePage(
-                viewModel = viewModel,
-                viewModel.currentTitle,
-                navController = navController
-            ) {
-                navigateToWebPage(it)
+            if (viewModel.currentContent.isEmpty()) {
+                (LocalContext.current as Activity).apply {
+                    LaunchedEffect(Unit) {
+                        val intent = intent.apply {
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        }
+//            this.finish()
+                        Log.d("!!!", "startActivity ")
+                        startActivity(intent)
+                    }
+                }
             }
+            else {
+
+                ArticlePage(
+                    viewModel = viewModel,
+                    viewModel.currentTitle,
+                    navController = navController
+                ) {
+                    navigateToWebPage(it)
+                }
+            }
+
         }
         composable(MainRoute.Dictionary.route) {
 
@@ -84,4 +109,9 @@ fun MainNavigation(viewModel: MainViewModel) {
         }
     }
 
+
+    val lifecycle  = LocalLifecycleOwner.current
+    ViewCompositionStrategy.DisposeOnLifecycleDestroyed(lifecycle)
+
+    Log.d("!!!", "MainNavigation: ${viewModel.currentNewsSize}")
 }

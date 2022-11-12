@@ -1,11 +1,11 @@
 package com.example.english
 
-import android.net.Uri
+import android.content.Intent
+import android.content.pm.ResolveInfo
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -13,19 +13,13 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.english.network.JsoupNews
-import com.example.english.network.jsoupTagTest
-import com.example.english.translation.BUG_URL
 import com.example.english.translation.translate
-import com.example.english.ui.components.Loader
-import com.example.english.ui.components.Movement
-import com.example.english.ui.components.SegmentedControls
-import com.example.english.ui.components.test.BookMark
 import com.example.english.ui.navigation.MainNavigation
 import com.example.english.ui.theme.EnglishTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -36,6 +30,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val mainIntent = Intent(Intent.ACTION_MAIN, null)
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+        val pkgAppsList: List<ResolveInfo> =
+            this.packageManager.queryIntentActivities(mainIntent, 0)
+        pkgAppsList.forEach {
+            if (it.resolvePackageName != null) {
+                Log.d("!!!", it.resolvePackageName)
+            }
+        }
+
 
         setContent {
             EnglishTheme {

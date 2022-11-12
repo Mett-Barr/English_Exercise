@@ -1,8 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.english">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <queries>
+        <package android:name="${applicationId}" />
+
+        <!--WhatsApp-->
+        <package android:name="com.whatsapp" />
+        <!--Facebook-->
+        <package android:name="com.facebook.katana" />
+        <!--Line客户端-->
+        <package android:name="jp.naver.line.android" />
+        <!--Twitter-->
+        <package android:name="com.twitter.android" />
+        <!--WeChat-->
+        <package android:name="com.tencent.mm" />
+        <!--QQ-->
+        <package android:name="com.tencent.mobileqq" />
+        <!--instagram-->
+        <package android:name="com.instagram.android" />
+        <!--Messenger-->
+        <package android:name="com.facebook.orca" />
+
+        <!--拍照应用-->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+
+        <!--Alipay-->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data
+                android:host="*"
+                android:scheme="alipays" />
+        </intent>
+
+        <!--应用商店-->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data
+                android:host="*"
+                android:scheme="market" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data
+                android:host="play.google.com"
+                android:scheme="https" />
+        </intent>
+
+        <!--webview 中的 intent-->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data
+                android:host="*"
+                android:scheme="intent" />
+        </intent>
+        <!--Line群-->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data
+                android:host="ti"
+                android:scheme="line" />
+        </intent>
+
+    </queries>
+
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+
 
     <application
         android:name=".MainApplication"
@@ -15,7 +85,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="Learnzy"
             android:theme="@style/Theme.English">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

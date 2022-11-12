@@ -1,5 +1,9 @@
 package com.example.english.ui.page
 
+import android.app.Activity
+import android.app.ActivityManager
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -36,6 +40,8 @@ import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.content.getSystemService
+import androidx.core.view.ContentInfoCompat.Flags
 import androidx.navigation.NavController
 import com.example.english.MainViewModel
 import com.example.english.R
@@ -43,6 +49,7 @@ import com.example.english.content
 import com.example.english.data.word.word.room.EmptyWord
 import com.example.english.data.word.word.room.Word
 import com.example.english.isDone
+import com.example.english.tool.AppToast
 import com.example.english.translation.translate
 import com.example.english.translation.translateApp
 import com.example.english.translation.wordTranslate
@@ -304,6 +311,21 @@ fun ArticlePage(
         }
     }
 
+    // navigate
+//    if (viewModel.currentContent.isEmpty()) {
+//        (LocalContext.current as Activity).apply {
+//            LaunchedEffect(Unit) {
+//                val intent = intent.apply {
+//                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                }
+////            this.finish()
+//                Log.d("!!!", "startActivity ")
+//                startActivity(intent)
+//            }
+//        }
+//
+//    } else {
+//    }
     Scaffold(
         bottomBar = {
             BottomAppBar(
@@ -428,7 +450,8 @@ fun ArticlePage(
                                     .padding(6.dp)
                                     .clip(CircleShape)
                                     .size(36.dp)
-                                    .background(if (MaterialTheme.colors.isLight) Color(0xFF888888) else Color.White)
+                                    .background(if (MaterialTheme.colors.isLight) Color(
+                                        0xFF888888) else Color.White)
 //                                .background(Color.White)
 //                                .align(alignment)
                             )
@@ -602,27 +625,28 @@ fun ArticlePage(
                                 .aspectRatio(16f / ratio)
                                 .fillMaxWidth()
                         ) {
-                    Crossfade(targetState = viewModel.currentImage, modifier = Modifier.align(Alignment.BottomCenter)) {
-                        if (it != null) {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier
+                            Crossfade(targetState = viewModel.currentImage,
+                                modifier = Modifier.align(Alignment.BottomCenter)) {
+                                if (it != null) {
+                                    Image(
+                                        bitmap = it.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier
 //                                    .align(Alignment.BottomCenter)
-                                    .aspectRatio(imageRatio)
-                                    .fillMaxWidth(),
+                                            .aspectRatio(imageRatio)
+                                            .fillMaxWidth(),
 //                                    .blur(8.dp)
-                            contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Spacer(
-                                modifier = Modifier
-                                    .aspectRatio(16f / 9f)
-                                    .fillMaxWidth()
-                                    .background(Color.DarkGray)
-                            )
-                        }
-                    }
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Spacer(
+                                        modifier = Modifier
+                                            .aspectRatio(16f / 9f)
+                                            .fillMaxWidth()
+                                            .background(Color.DarkGray)
+                                    )
+                                }
+                            }
                             Text(
                                 text = viewModel.currentTitle,
                                 color = MaterialTheme.colors.onBackground,
@@ -1054,7 +1078,7 @@ fun ArticlePage(
                                                 if (oneWord != Word()) {
                                                     viewModel.addWordListTable(
                                                         oneWord.english,
-                                                        paragraphIndex
+                                                        index = paragraphIndex
                                                     ) {
 //                                                        coroutineScope.launch(Dispatchers.IO) {
 //                                                            oneWord =
@@ -1065,11 +1089,12 @@ fun ArticlePage(
                                                 } else {
                                                     viewModel.addWordListTable(
                                                         selectedText,
-                                                        paragraphIndex
+                                                        index = paragraphIndex
                                                     ) {
                                                         coroutineScope.launch(Dispatchers.IO) {
                                                             oneWord =
-                                                                viewModel.getWordByEnglish(selectedText)!!
+                                                                viewModel.getWordByEnglish(
+                                                                    selectedText)!!
                                                             hasBeenAdded = true
                                                         }
                                                     }
@@ -1538,6 +1563,9 @@ fun ArticlePage(
                                                             viewModel.wordListTable[paragraphIndex].remove(
                                                                 oneWord.id
                                                             )
+                                                            viewModel.currentContent[paragraphIndex] =
+                                                                paragraphContent.copy(selection = TextRange.Zero)
+                                                            annoInit()
                                                         },
                                                         updateWord = {
                                                             viewModel.updateWord(oneWord)
@@ -1576,17 +1604,34 @@ fun ArticlePage(
 
 
                                                 AnimatedVisibility(textNeedTranslate) {
-                                                    Log.d("!!!", "TranslatedWordComponent: ")
+//                                                    Log.d("!!!", "TranslatedWordComponent: ")
                                                     TranslatedWordComponent(translation = translatedText,
                                                         onClickIcon = {
                                                             if (oneWord != Word()) {
-                                                                wordTranslate(context, oneWord.english)
+//                                                                wordTranslate(context,
+//                                                                    oneWord.english)
+                                                                translateApp(context, oneWord.english)
                                                             } else if (selectedText.isNotBlank()) {
-                                                                wordTranslate(context, selectedText)
+//                                                                wordTranslate(context, selectedText)
+                                                                translateApp(context, selectedText)
                                                             }
                                                         },
                                                         onClick = {
-                                                            if (oneWord.chinese.isBlank()) {
+                                                            if (oneWord == Word()) {
+                                                                viewModel.addWordListTable(
+                                                                    selectedText,
+                                                                    translatedText,
+                                                                    paragraphIndex
+                                                                ) {
+                                                                    coroutineScope.launch(
+                                                                        Dispatchers.IO) {
+                                                                        oneWord =
+                                                                            viewModel.getWordByEnglish(
+                                                                                selectedText)!!
+                                                                        hasBeenAdded = true
+                                                                    }
+                                                                }
+                                                            } else if (oneWord.chinese.isBlank()) {
                                                                 oneWord = oneWord.copy(
                                                                     chinese = translatedText
                                                                 )
@@ -1595,7 +1640,6 @@ fun ArticlePage(
                                                                     chinese = ""
                                                                 )
                                                             }
-
                                                             viewModel.updateWord(oneWord)
                                                         }
                                                     )
@@ -1801,7 +1845,6 @@ fun ArticlePage(
 
 
     }
-
     if (deleteParagraphDialog) {
         AlertDialog(
             onDismissRequest = { deleteParagraphDialog = false },

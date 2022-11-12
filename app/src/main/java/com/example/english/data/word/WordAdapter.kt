@@ -13,6 +13,7 @@ suspend fun wordIsExistByEnglish(english: String, wordRepository: WordRepository
 
 suspend fun addInWordListTable(
     english: String,
+    chinese: String = "",
     wordRepository: WordRepository,
     list: SnapshotStateList<Int>,
     finish: () -> Unit = {}
@@ -27,7 +28,7 @@ suspend fun addInWordListTable(
             }
         }
     } else {
-        val wordId = wordRepository.addNewWord(Word(english = english)).toInt()
+        val wordId = wordRepository.addNewWord(Word(english = english, chinese = chinese)).toInt()
         list.add(wordId)
     }
 
