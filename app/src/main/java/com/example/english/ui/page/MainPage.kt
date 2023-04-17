@@ -48,7 +48,11 @@ import com.example.english.ui.theme.Typography
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun MainPage(viewModel: MainViewModel, navController: NavController, navigateToWebPage: (String) -> Unit) {
+fun MainPage(
+    viewModel: MainViewModel,
+    navController: NavController,
+    navigateToWebPage: (String) -> Unit
+) {
 
     val context = LocalContext.current
 
@@ -113,7 +117,7 @@ fun MainPage(viewModel: MainViewModel, navController: NavController, navigateToW
 
     /** FAB mask */
     val fabMaskAlpha by transition.animateColor(label = "spacerAlphaAnimation") {
-        if (it) MaterialTheme.colors.background.copy(alpha = 0.8f) else Color.Transparent
+        if (it) MaterialTheme.colors.background.copy(alpha = 0.8f) else MaterialTheme.colors.background.copy(alpha = 0f)
     }
 
 
@@ -193,8 +197,10 @@ fun MainPage(viewModel: MainViewModel, navController: NavController, navigateToW
 //                    viewModel.addBBCNews(BUG_URL, context)
                             fabIsOpening = !fabIsOpening
                         }) {
-                        Icon(imageVector = Icons.Rounded.Edit, contentDescription = "add",
-                            tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background))
+                        Icon(
+                            imageVector = Icons.Rounded.Edit, contentDescription = "add",
+                            tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.background)
+                        )
                     }
                 }
 
@@ -508,10 +514,12 @@ fun NewsCard(
                         .fillMaxWidth()
                 )
 
-                Row(modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .padding(bottom = 12.dp)
-                    .height(IntrinsicSize.Min)) {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .padding(bottom = 12.dp)
+                        .height(IntrinsicSize.Min)
+                ) {
 
                     val sourceIcon = when (news.source) {
                         NewsWebsite.BBC.sourceName -> R.drawable.bbc
@@ -537,15 +545,17 @@ fun NewsCard(
                                         }
                                     }
                                 }
-                                .padding(end = 6.dp).clip(RoundedCornerShape(2.dp))
+                                .padding(end = 6.dp)
+                                .clip(RoundedCornerShape(2.dp))
                         )
                     }
 
                     val dot = if (news.date.isNotBlank() && news.tag.isNotBlank()) " • " else ""
                     val caption = news.date + dot + news.tag
 //                    if (caption.isNotBlank()) {
-                        Text(text = if (caption.isNotBlank()) caption else "",
-                            style = Typography.body2,
+                    Text(
+                        text = if (caption.isNotBlank()) caption else "",
+                        style = Typography.body2,
 //                            modifier = Modifier
 //                                .padding(horizontal = 12.dp)
 //                                .padding(bottom = 12.dp)
@@ -553,7 +563,7 @@ fun NewsCard(
 //                                .weight(1f)
 //                                .wrapContentSize()
 //                                .wrapContentHeight()
-                        )
+                    )
 //                    }
                 }
 
@@ -573,9 +583,11 @@ fun NewsCard(
 //                        .padding(6.dp)
 //                        .size(24.dp))
 
-                BookMark(modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 24.dp))
+                BookMark(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 24.dp)
+                )
             }
 
 
